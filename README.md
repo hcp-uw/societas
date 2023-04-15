@@ -34,7 +34,4 @@ git push --set-upstream origin xxxx (git push will tell you the correct push com
 git checkout -b xxxx (next time when you work, create a new branch)
 git pull origin main (make sure you have the latest version of the main branch before you work)
 ```
-
-##Contact
-If you have any questions or concerns, please contact Vincent Liu at rliu8@uw.edu
-<br>
+## Contact
