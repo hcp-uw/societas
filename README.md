@@ -1,6 +1,8 @@
 # Societas
 Empower creative UW individuals to find like-minded people to make their dream and goals come true.
 <br>
+[Figma Prototype](https://www.figma.com/file/6yX5dizljeuc0oP9LdDIOM/WINFO-Hackathon-Societas?node-id=0%3A1&t=Tcgv1oujrbZSiSCV-1)
+<br>
 ## Installation
 ## Usage
 ## Contributing
@@ -34,4 +36,22 @@ git push --set-upstream origin xxxx (git push will tell you the correct push com
 git checkout -b xxxx (next time when you work, create a new branch)
 git pull origin main (make sure you have the latest version of the main branch before you work)
 ```
+
+## Credits
+
+Vincent: PM Github:VincentLiu777
+
+Santiago: Frontend Github:SantiagoG14
+
+Angela: Frontend Github:Ajyang5
+
+Ben: Frontend Github:bene34
+
+Ronit : Backend Github:ronitdasgupta
+
+Arjun: Backend Github:Aleph-Null-123
+
+Sid: Backend GitHub :Szzzz234
+
 ## Contact
+If you have any questions or concerns feel free to contact us at rliu8@uw.edu
