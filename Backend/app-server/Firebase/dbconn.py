@@ -3,20 +3,20 @@ import json
 from firebase_admin import credentials, firestore, initialize_app
 from datetime import datetime as dt
 
-cred = credentials.Certificate('../../res/key.json')
+cred = credentials.Certificate('Backend/res/key.json')
 
 default_app = initialize_app(cred)
 
 db = firestore.client()
 
-societasdb = db.collection('Societas')
+userdb = db.collection('Users')
 
-def create(id: str, doc):
+def create(id: str):
 	try:
-		societasdb.document(id).set((doc))
-		return ("Success", True, 200)
+		userdb.add(
+			{"created":dt.now(), "email": "e123@uw.edu", "username":"D3"}
+		)
 	except Exception as e:
 		return (f"Failed: {e}", False, 000)
 
-n = create('Users', {"Created":dt.now(), "Email": "e@uw.edu", "ID": 1, "Username":"D2"})
-print(n)
+create('Users')
