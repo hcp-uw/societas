@@ -3,15 +3,22 @@
 ![Societas Logo](/img/SCR-20230408-ldac.png)
 
 <br>
+
 * Societas is a website that creates a judgement-free zone to empower creative UW individuals to find like-minded people to make their dream and goals come true.
+
 <br>
 Keyfeatures
 <br>
+
 * Mitigates biased preconceptions of users by reducing identity information such as gender and age.
+
 * Promotes cross-pollination of ideas and diverse interactions among users from varying backgrounds. 
+
 * Creates opportunities for users to build meaningful connections outside of their immediate circle.
 <br>
+
 Check out our [Figma Prototype](https://www.figma.com/file/6yX5dizljeuc0oP9LdDIOM/WINFO-Hackathon-Societas?node-id=0%3A1&t=Tcgv1oujrbZSiSCV-1)!
+
 <br>
 
 ## Installation
