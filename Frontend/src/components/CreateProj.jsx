@@ -30,7 +30,7 @@ export default function CreateProj() {
   //  index -> index of picture to be deleted
 
   function handleDelPictre(index) {
-    const newArr = formState.files.filter((_, i) => i !== index)
+    const newArr = formState.images.filter((_, i) => i !== index)
     setFormState({ ...formState, images: newArr })
   }
 
@@ -48,49 +48,6 @@ export default function CreateProj() {
 
   return (
     <StyledForm action="">
-      {/* Image wrapper */}
-      <FilesWrapper>
-        <div>
-          <p>
-            Add pictures
-            <label htmlFor="files">
-              <span className="material-symbols-outlined">add</span>
-            </label>
-          </p>
-          <FileInput
-            type="file"
-            accept="image/*"
-            multiple
-            ref={fileInputRef}
-            onChange={(e) =>
-              setFormState({
-                ...formState,
-                images: [...formState.images, e.target.files[0]],
-              })
-            }
-            id="files"
-          />
-        </div>
-
-        {/* images for project */}
-        <Images>
-          {formState.images.map((file, i) => (
-            <Image key={file.name}>
-              <button onClick={() => handleDelPictre(i)} type="button">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-              <img
-                src={URL.createObjectURL(file)}
-                alt=""
-                key={file.name}
-                width={300}
-                height={300}
-              />
-            </Image>
-          ))}
-        </Images>
-      </FilesWrapper>
-
       {/* Wrapper for inputs */}
       <InputsWrapper>
         {/* Title Input */}
@@ -116,7 +73,7 @@ export default function CreateProj() {
           value={formState.description}
           required
         ></TextArea>
-        {/* Loaction input */}
+        {/* Location input */}
         <StyledInput
           type="text"
           placeholder="Enter Project Location Here"
@@ -154,18 +111,59 @@ export default function CreateProj() {
             required
           />
         </InputLabel>
-
-        {/* Submit button wrapper and button */}
-        <SubmitWrapper>
-          <SubmitBtn
-            type="submit"
-            onClick={handleSubmit}
-            disabled={!isFormValid()}
-          >
-            Post Project
-          </SubmitBtn>
-        </SubmitWrapper>
       </InputsWrapper>
+      {/* Image wrapper */}
+      <FilesWrapper>
+        <>
+          <p>
+            Add pictures
+            <label htmlFor="files">
+              <span className="material-symbols-outlined">add</span>
+            </label>
+          </p>
+          <FileInput
+            type="file"
+            accept="image/*"
+            multiple
+            ref={fileInputRef}
+            onChange={(e) =>
+              setFormState({
+                ...formState,
+                images: [...formState.images, e.target.files[0]],
+              })
+            }
+            id="files"
+          />
+        </>
+
+        {/* images for project */}
+        <Images>
+          {formState.images.map((file, i) => (
+            <Image key={file.name}>
+              <button onClick={() => handleDelPictre(i)} type="button">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+              <img
+                src={URL.createObjectURL(file)}
+                alt=""
+                key={file.name}
+                width={300}
+                height={300}
+              />
+            </Image>
+          ))}
+        </Images>
+      </FilesWrapper>
+      {/* Submit button wrapper and button */}
+      <SubmitWrapper>
+        <SubmitBtn
+          type="submit"
+          onClick={handleSubmit}
+          disabled={!isFormValid()}
+        >
+          Post Project
+        </SubmitBtn>
+      </SubmitWrapper>
     </StyledForm>
   )
 }
@@ -173,8 +171,11 @@ export default function CreateProj() {
 const StyledForm = styled.form`
   font-family: ${({ theme }) => theme.fonts.default};
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   color: ${({ theme }) => theme.colors.mainText};
+  max-width: 36rem;
+  padding: 0.5rem;
+  gap: 1rem;
 `
 
 const SubmitWrapper = styled.div`
@@ -186,7 +187,9 @@ const SubmitWrapper = styled.div`
 
 const Images = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-y: scroll;
 `
 
 const Image = styled.div`
@@ -251,9 +254,7 @@ const SubmitBtn = styled.button`
 const InputsWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 36rem;
   gap: 2rem;
-  padding: 0.5rem;
 `
 
 const FilesWrapper = styled.div`
@@ -262,6 +263,7 @@ const FilesWrapper = styled.div`
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    padding: 0.5rem;
   }
 
   label {
