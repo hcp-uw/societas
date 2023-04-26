@@ -8,9 +8,8 @@ export default function CreateProj() {
     location: "",
     projEnds: "",
     maxMems: "",
+    images: [],
   }) // state form the inputs
-
-  const [files, setFiles] = useState([]) // state for the images
 
   const fileInputRef = useRef()
 
@@ -31,9 +30,8 @@ export default function CreateProj() {
   //  index -> index of picture to be deleted
 
   function handleDelPictre(index) {
-    const newArr = files.filter((_, i) => i !== index)
-    console.log(newArr)
-    setFiles(newArr)
+    const newArr = formState.files.filter((_, i) => i !== index)
+    setFormState({ ...formState, images: newArr })
   }
 
   // return true if form fields are not empty
@@ -64,13 +62,19 @@ export default function CreateProj() {
             accept="image/*"
             multiple
             ref={fileInputRef}
-            onChange={(e) => setFiles([...files, e.target.files[0]])}
+            onChange={(e) =>
+              setFormState({
+                ...formState,
+                images: [...formState.images, e.target.files[0]],
+              })
+            }
             id="files"
           />
         </div>
 
+        {/* images for project */}
         <Images>
-          {files.map((file, i) => (
+          {formState.images.map((file, i) => (
             <Image key={file.name}>
               <button onClick={() => handleDelPictre(i)} type="button">
                 <span className="material-symbols-outlined">close</span>
