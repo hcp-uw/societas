@@ -34,6 +34,16 @@ export default function CreateProj() {
     setFormState({ ...formState, images: newArr })
   }
 
+  function handleAddPicture(file) {
+    if (formState.images.includes(file)) {
+      return
+    }
+    setFormState({
+      ...formState,
+      images: [...formState.images, file],
+    })
+  }
+
   // return true if form fields are not empty
   // false otherwiise
 
@@ -111,6 +121,16 @@ export default function CreateProj() {
             required
           />
         </InputLabel>
+
+        <SubmitWrapper desktop>
+          <SubmitBtn
+            type="submit"
+            onClick={handleSubmit}
+            disabled={!isFormValid()}
+          >
+            Post Project
+          </SubmitBtn>
+        </SubmitWrapper>
       </InputsWrapper>
       {/* Image wrapper */}
       <FilesWrapper>
@@ -126,12 +146,7 @@ export default function CreateProj() {
             accept="image/*"
             multiple
             ref={fileInputRef}
-            onChange={(e) =>
-              setFormState({
-                ...formState,
-                images: [...formState.images, e.target.files[0]],
-              })
-            }
+            onChange={(e) => handleAddPicture(e.target.files[0])}
             id="files"
           />
         </>
@@ -176,6 +191,11 @@ const StyledForm = styled.form`
   max-width: 36rem;
   padding: 0.5rem;
   gap: 1rem;
+  margin: auto;
+
+  @media (min-width: 62rem) {
+    flex-direction: row-reverse;
+  }
 `
 
 const SubmitWrapper = styled.div`
@@ -183,6 +203,13 @@ const SubmitWrapper = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
+  display: ${({ desktop }) => (desktop ? "none" : "default")};
+  @media (min-width: 62rem) {
+    display: inline-block;
+    display: ${({ desktop }) => (desktop ? "flex" : "none")};
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
 `
 
 const Images = styled.div`
@@ -190,10 +217,17 @@ const Images = styled.div`
   flex-direction: row;
   gap: 1rem;
   overflow-y: scroll;
+  @media (min-width: 62rem) {
+    flex-direction: column;
+    overflow-y: visible;
+  }
+
+  /* width: 100vw; */
 `
 
 const Image = styled.div`
   position: relative;
+  width: min-content;
   img {
     object-fit: cover;
   }
@@ -255,6 +289,11 @@ const InputsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  height: min-content;
+  @media (min-width: 62rem) {
+    position: sticky;
+    top: 0;
+  }
 `
 
 const FilesWrapper = styled.div`
@@ -264,6 +303,15 @@ const FilesWrapper = styled.div`
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem;
+    position: sticky;
+    top: 0;
+    height: fit-content;
+    position: sticky;
+    top: 0px;
+    width: 100%;
+    /* height: min-content; */
+    z-index: 1;
+    background: #ffffff9c;
   }
 
   label {
@@ -276,11 +324,17 @@ const FilesWrapper = styled.div`
     border-radius: 100%;
     cursor: pointer;
     transition: all 150ms ease;
+    margin-right: 1rem;
 
     &:hover {
       background-color: ${({ theme }) => theme.colors.mainText};
       color: ${({ theme }) => theme.colors.whiteText};
     }
+  }
+
+  @media (min-width: 62rem) {
+    min-width: 19rem;
+    margin-right: 4rem;
   }
 `
 
