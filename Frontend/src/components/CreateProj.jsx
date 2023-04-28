@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import { useState, useRef } from "react"
+import { FileUploader } from "react-drag-drop-files"
 
 export default function CreateProj() {
   const [formState, setFormState] = useState({
@@ -35,8 +36,9 @@ export default function CreateProj() {
   }
 
   function handleAddPicture(file) {
+    console.log(file)
     if (formState.images.includes(file)) {
-      return
+      throw Error("this already exists")
     }
     setFormState({
       ...formState,
@@ -179,6 +181,11 @@ export default function CreateProj() {
           Post Project
         </SubmitBtn>
       </SubmitWrapper>
+
+      <FileUploader
+        handleChange={handleAddPicture}
+        label={"add your pictures"}
+      />
     </StyledForm>
   )
 }
