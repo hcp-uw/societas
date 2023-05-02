@@ -1,35 +1,31 @@
 import styled from "styled-components"
+import PropTypes from "prop-types"
+import { FileUploader } from "react-drag-drop-files"
 
-export default function FilesWrapper({
+Files.propTypes = {
+  formState: PropTypes.object.isRequired,
+  fileInputRef: PropTypes.object.isRequired,
+  handleAddPicture: PropTypes.func.isRequired,
+  handleDelPicture: PropTypes.func.isRequired,
+}
+
+export default function Files({
   formState,
-  fileInputRef,
   handleAddPicture,
-  handleDelPictre,
+  handleDelPicture,
 }) {
   return (
-    <StyledWrapper>
-      <div>
-        <p>
-          Add pictures
-          <label htmlFor="files">
-            <span className="material-symbols-outlined">add</span>
-          </label>
-        </p>
-        <FileInput
-          type="file"
-          accept="image/*"
-          multiple
-          ref={fileInputRef}
-          onChange={(e) => handleAddPicture(e.target.files[0])}
-          id="files"
-        />
-      </div>
+    <FilesWrapper>
+      <FileUploader
+        handleChange={handleAddPicture}
+        label={"Upload pictures for your project!"}
+      />
 
       {/* images for project */}
       <Images>
         {formState.images.map((file, i) => (
           <Image key={file.name}>
-            <button onClick={() => handleDelPictre(i)} type="button">
+            <button onClick={() => handleDelPicture(i)} type="button">
               <span className="material-symbols-outlined">close</span>
             </button>
             <img
@@ -42,52 +38,31 @@ export default function FilesWrapper({
           </Image>
         ))}
       </Images>
-    </StyledWrapper>
+    </FilesWrapper>
   )
 }
 
-const FileInput = styled.input`
-  display: none;
-`
-
-const StyledWrapper = styled.div`
-  p {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem;
-    position: sticky;
-    top: 0;
-    height: fit-content;
-    position: sticky;
-    top: 0px;
-    width: 100%;
-    z-index: 1;
-    background: #ffffff9c;
-  }
+const FilesWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 
   label {
-    width: 2rem;
-    height: 2rem;
+    all: unset;
+    font-family: inherit;
+    white-space: nowrap;
+    border: 2px dashed #27a0f2;
+    border-radius: 0.5rem;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: grey;
-    border-radius: 100%;
-    cursor: pointer;
-    transition: all 150ms ease;
-    margin-right: 1rem;
+    gap: 1rem;
 
-    &:hover {
-      background-color: ${({ theme }) => theme.colors.mainText};
-      color: ${({ theme }) => theme.colors.whiteText};
+    span {
+      font-size: 0.9rem;
+      color: ${({ theme }) => theme.colors.subText};
     }
-  }
-
-  @media (min-width: 62rem) {
-    min-width: 19rem;
-    margin-right: 4rem;
   }
 `
 
