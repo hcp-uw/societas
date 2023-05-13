@@ -31,9 +31,6 @@ def hashpwd(password):
     return stored_password
 
 class Auth:
-    def __init__(self):
-        pass
-    @app.route("login")
     def login():
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
@@ -48,7 +45,6 @@ class Auth:
         return str(Status(False, f'User with email {email} does not exist.'))
 
         
-    @app.route("register")
     def register():
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
@@ -74,7 +70,6 @@ class Auth:
         return str(Status(True, f'Successfully registered {email}.'))
         
         
-    @app.route("logout")
     def logout():
         setcurr(None)
         return str(Status(True, "Successfully logged out."))
