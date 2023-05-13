@@ -1,6 +1,6 @@
 import os
 import json
-from firebase_admin import credentials, firestore, initialize_app
+from firebase_admin import credentials, firestore, initialize_app, auth
 from datetime import datetime as dt
 
 cred = credentials.Certificate('Backend/res/key.json')
