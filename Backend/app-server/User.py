@@ -3,7 +3,6 @@ from cryptography.hazmat.backends import default_backend
 import base64
 import os
 from Firebase import dbconn
-from main import *
 
 ROUTE = '/user/'
 
