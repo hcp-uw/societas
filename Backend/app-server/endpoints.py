@@ -1,6 +1,6 @@
 #from Firebase import *
-#from main import *
-'''import User
+from main import *
+import User
 
 @app.route(User.ROUTE + 'login')
 def login():
@@ -12,7 +12,7 @@ def login():
 
 @app.route(User.ROUTE + 'register')
 def login():
-    return User.Auth.register()'''
+    return User.Auth.register()
 
 
 #if __name__ == "__main__":

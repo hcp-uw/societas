@@ -4,7 +4,6 @@ import os
 
 from flask import Flask, request
 from flask_cors import CORS
-import User
 
 
 app = Flask(__name__)
@@ -28,18 +27,6 @@ class Status:
 @app.route("/")
 def hello_world():
     return "hello world"
-
-@app.route(User.ROUTE + 'login')
-def login():
-    return User.Auth.login()
-
-@app.route(User.ROUTE + 'logout')
-def login():
-    return User.Auth.logout()
-
-@app.route(User.ROUTE + 'register')
-def login():
-    return User.Auth.register()
 
 
 if __name__ == "__main__":
