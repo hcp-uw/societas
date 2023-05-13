@@ -37,8 +37,8 @@ class Auth:
     def login():
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
-        email = requests.args.get('email')
-        pwd = requests.args.get('password')
+        email = request.args.get('email')
+        pwd = request.args.get('password')
         for user in auth.list_users().iterate_all():
             if user.email == email:
                 if user.passwordHash == hashpwd(pwd):
@@ -53,12 +53,12 @@ class Auth:
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
         
-        email = requests.args.get('email')
+        email = request.args.get('email')
 
         if not email.endswith('@uw.edu'):
             return str(Status(False, f"{email} is not a valid UW email"))
 
-        pwd = requests.args.get('password')
+        pwd = request.args.get('password')
 
         if len(pwd) < 6:
             return str(Status(False, 'Password must be at least 6 characters long.'))
