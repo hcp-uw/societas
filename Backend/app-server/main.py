@@ -1,7 +1,5 @@
-#from endpoints import *
-
 import os
-
+import User
 from flask import Flask, request
 from flask_cors import CORS
 
@@ -16,17 +14,24 @@ getcurr = lambda: curr_user
 def setcurr(new):
     curr_user = new
 
-class Status:
-    def __init__(self, success, message):
-        self.success = success
-        self.message = message
-    
-    def __str__(self):
-        return str({'success':self.success,'message':self.message})
+
 
 @app.route("/")
 def hello_world():
     return "hello world"
+
+
+@app.route(User.ROUTE + 'login')
+def login():
+    return User.Auth.login()
+
+@app.route(User.ROUTE + 'logout')
+def login():
+    return User.Auth.logout()
+
+@app.route(User.ROUTE + 'register')
+def login():
+    return User.Auth.register()
 
 
 if __name__ == "__main__":

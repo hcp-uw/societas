@@ -3,7 +3,7 @@ from cryptography.hazmat.backends import default_backend
 import base64
 import os
 from Firebase import dbconn
-
+from Status import Status
 ROUTE = '/user/'
 
 def hashpwd(password):
