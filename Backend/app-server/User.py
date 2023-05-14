@@ -41,7 +41,7 @@ def comparePWD(password, user):
     salt = user.password_salt
     password_bytes = password.encode('utf-8')
     generated_hash = scrypt.hash(password_bytes, salt=salt, N=2**14, r=8, p=1)
-    return stored_hash == generated_hash
+    return stored_hash, generated_hash
 
 class Auth:
     def login(request):
@@ -55,10 +55,11 @@ class Auth:
                 salt = base64.b64decode(user.password_salt)
                 stored_hash = base64.b64decode(user.password_hash)
                 encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))'''
-                if comparePWD(pwd, user):
+                e = comparePWD(pwd, user)
+                if e[0]==e[1]:
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect.'))
+                return str(Status(False, f'Password is incorrect. {e}'))
         return str(Status(False, f'User with email {email} does not exist.'))
         
     def register(request):
