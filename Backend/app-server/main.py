@@ -8,12 +8,6 @@ app = Flask(__name__)
 
 CORS(app)
 
-curr_user = None
-
-getcurr = lambda: curr_user
-def setcurr(new):
-    curr_user = new
-
 
 
 @app.route("/")
@@ -23,7 +17,7 @@ def hello_world():
 
 @app.route(User.ROUTE + 'login')
 def login():
-    return User.Auth.login()
+    return User.Auth.login(request)
 
 @app.route(User.ROUTE + 'logout')
 def login():
@@ -31,7 +25,7 @@ def login():
 
 @app.route(User.ROUTE + 'register')
 def login():
-    return User.Auth.register()
+    return User.Auth.register(request)
 
 
 if __name__ == "__main__":

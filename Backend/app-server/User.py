@@ -3,7 +3,7 @@ from cryptography.hazmat.backends import default_backend
 import base64
 import os
 from Firebase import dbconn
-from Status import Status
+from core import *
 ROUTE = '/user/'
 
 def hashpwd(password):
@@ -30,7 +30,7 @@ def hashpwd(password):
     return stored_password
 
 class Auth:
-    def login():
+    def login(request):
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
         email = request.args.get('email')
@@ -44,7 +44,7 @@ class Auth:
         return str(Status(False, f'User with email {email} does not exist.'))
 
         
-    def register():
+    def register(request):
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
         
