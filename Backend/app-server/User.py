@@ -2,6 +2,7 @@ from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.backends import default_backend
 import base64
 import os
+import scrypt
 from Firebase.dbconn import *
 from core import *
 ROUTE = '/user/'
@@ -29,6 +30,12 @@ def hashpwd(password, salt):
     stored_password = base64.b64encode(salt.encode('utf-8') + key).decode()
     return stored_password
 
+def hash2(password, salt):
+    salt_separator = base64.b64decode('Bw==')
+    salt = salt.encode('utf-8') + salt_separator
+    hash_params = {"N": 2**14, "r": 8, "p": 1}
+    return base64.b64encode(scrypt.hash(password.encode('utf-8'), salt=salt, **hash_params))
+
 class Auth:
     def login(request):
         if getcurr() is not None:
@@ -38,10 +45,11 @@ class Auth:
         for user in auth.list_users().iterate_all():
             if user.email == email:
                 e = base64.b64encode(user.password_salt.encode('utf-8') + user.password_hash.encode('utf-8')).decode()
-                if  e == hashpwd(pwd, user.password_salt):
+                e2 = hash2(pwd, user.password_salt)
+                if  e2 == user.pasword_hash:
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect. actual: {e}. passed: {hashpwd(pwd, user.password_salt)}'))
+                return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {e2}'))
         return str(Status(False, f'User with email {email} does not exist.'))
 
         
