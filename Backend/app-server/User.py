@@ -36,6 +36,13 @@ def hash2(password, salt):
     hash_params = {"N": 2**14, "r": 8, "p": 1}
     return base64.b64encode(scrypt.hash(password.encode('utf-8'), salt=salt, **hash_params)).decode()
 
+def comparePWD(password, user):
+    stored_hash = base64.b64decode(user.password_hash)
+    salt = base64.b64decode(user.password_salt)
+    password_bytes = password.encode('utf-8')
+    generated_hash = scrypt.hash(password_bytes, salt=salt, N=2**14, r=8, p=1, dklen=64)
+    return stored_hash == generated_hash
+
 class Auth:
     def login(request):
         if getcurr() is not None:
@@ -44,13 +51,14 @@ class Auth:
         pwd = request.args.get('password')
         for user in auth.list_users().iterate_all():
             if user.email == email:
+                '''
                 salt = base64.b64decode(user.password_salt)
                 stored_hash = base64.b64decode(user.password_hash)
-                encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))
-                if encoded_hash == stored_hash:
+                encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))'''
+                if comparePWD(pwd, user):
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {base64.b64encode(encoded_hash).decode()}'))
+                return str(Status(False, f'Password is incorrect.'))
         return str(Status(False, f'User with email {email} does not exist.'))
         
     def register(request):
