@@ -40,7 +40,7 @@ def comparePWD(password, user):
     stored_hash = (user.password_hash)
     salt = user.password_salt
     password_bytes = password.encode('utf-8')
-    generated_hash = base64.b64encode(scrypt.hash(password_bytes, salt=salt, N=2**14, r=8, p=1)).decode()
+    generated_hash = base64.b64encode(scrypt.hash(password_bytes, salt=salt, N=2**8, r=8, p=14)).decode()
     return stored_hash, generated_hash
 
 class Auth:
