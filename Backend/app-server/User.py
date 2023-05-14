@@ -34,7 +34,7 @@ def hash2(password, salt):
     salt_separator = base64.b64decode('Bw==')
     salt = salt.encode('utf-8') + salt_separator
     hash_params = {"N": 2**14, "r": 8, "p": 1}
-    return base64.b64encode(scrypt.hash(password.encode('utf-8'), salt=salt, **hash_params))
+    return base64.b64encode(scrypt.hash(password.encode('utf-8'), salt=salt, **hash_params)).decode()
 
 class Auth:
     def login(request):
