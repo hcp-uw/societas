@@ -10,21 +10,21 @@ CORS(app)
 
 
 
-@app.route("/")
+@app.route("/", methods = ['GET'])
 def hello_world():
     return "hello world"
 
 
-@app.route(User.ROUTE + 'login')
+@app.route(User.ROUTE + 'login', methods = ['POST'])
 def login():
     return User.Auth.login(request)
 
-@app.route(User.ROUTE + 'logout')
-def login():
+@app.route(User.ROUTE + 'logout', methods = ['POST'])
+def logout():
     return User.Auth.logout()
 
-@app.route(User.ROUTE + 'register')
-def login():
+@app.route(User.ROUTE + 'register', methods = ['POST'])
+def register():
     return User.Auth.register(request)
 
 
