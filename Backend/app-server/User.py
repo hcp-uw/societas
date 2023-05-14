@@ -10,9 +10,10 @@ def hashpwd(password, salt):
     # Convert base64-encoded parameters to byte arrays
     signer_key = base64.b64decode("wawILo40NkG69NfUuESYubil5/dQB4vccZFhqAz+SGHg6utWCOQyGR7qHxB6k8VgIRlKoIVFXcgtlrBztqLlWA==")
     salt_separator = base64.b64decode("Bw==")
-    # Generate random salt value
+    
     # Concatenate salt separator and salt value
-    salted = salt_separator + salt
+    salted = salt_separator + salt.encode('utf-8')
+    
     # Hash password with SCRYPT algorithm
     kdf = Scrypt(
         salt=salted,
@@ -25,7 +26,7 @@ def hashpwd(password, salt):
     key = kdf.derive(password.encode())
     
     # Store salt and hashed password in database
-    stored_password = base64.b64encode(salt + key).decode()
+    stored_password = base64.b64encode(salt.encode('utf-8') + key).decode()
     return stored_password
 
 class Auth:
