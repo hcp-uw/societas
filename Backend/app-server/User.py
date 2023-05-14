@@ -37,7 +37,7 @@ class Auth:
         pwd = request.args.get('password')
         for user in auth.list_users().iterate_all():
             if user.email == email:
-                if user.password_hash == hashpwd(pwd, user.password_salt):
+                if  base64.b64encode(user.password_salt.encode('utf-8') + user.password_hash.encode('utf-8')).decode() == hashpwd(pwd, user.password_salt):
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
                 return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {hashpwd(pwd, user.password_salt)}'))
