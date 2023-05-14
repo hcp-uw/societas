@@ -40,7 +40,7 @@ class Auth:
                 if user.password_hash == hashpwd(pwd):
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, 'Password is incorrect.'))
+                return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {hashpwd(pwd)}'))
         return str(Status(False, f'User with email {email} does not exist.'))
 
         
