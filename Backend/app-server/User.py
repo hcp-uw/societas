@@ -46,7 +46,7 @@ class Auth:
             if user.email == email:
                 e = base64.b64encode(user.password_salt.encode('utf-8') + user.password_hash.encode('utf-8')).decode()
                 e2 = hash2(pwd, user.password_salt)
-                if  e2 == user.pasword_hash:
+                if  e2 == user.password_hash:
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
                 return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {e2}'))
