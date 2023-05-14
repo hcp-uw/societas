@@ -1,8 +1,7 @@
-from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-from cryptography.hazmat.backends import default_backend
 import base64
-import os
-import scrypt
+import hashlib
+import hmac
+from Crypto.Cipher import AES
 from Firebase.dbconn import *
 from core import *
 ROUTE = '/user/'
@@ -40,8 +39,38 @@ def comparePWD(password, user):
     stored_hash = (user.password_hash)
     salt = user.password_salt
     password_bytes = password.encode('utf-8')
-    generated_hash = base64.b64encode(scrypt.hash(password_bytes, salt=salt, N=2**8, r=8, p=14)).decode()
+    generated_hash = base64.b64encode(scrypt.hash(password_bytes, salt=salt, N=2**14, r=8, p=1)).decode()
     return stored_hash, generated_hash
+
+def hash3(password, user):
+    n = 2 ** 14
+    p = 1
+    salt = user.password_salt
+    user_salt: bytes = base64.b64decode(salt)
+    salt_separator= base64.b64decode('Bw==')
+    password = bytes(password, 'utf-8')
+
+    derived_key = hashlib.scrypt(
+        password=password,
+        salt=user_salt + salt_separator,
+        n=n,
+        r=8,
+        p=p,
+    )
+
+    key = derived_key[:32]
+    iv = b'\x00' * 16
+    nonce=b''
+    crypter = AES.new(key, AES.MODE_CTR, initial_value=iv, nonce=nonce)
+    sk = "wawILo40NkG69NfUuESYubil5/dQB4vccZFhqAz+SGHg6utWCOQyGR7qHxB6k8VgIRlKoIVFXcgtlrBztqLlWA=="
+
+    result = crypter.encrypt(sk)
+
+    signer_key = base64.b64decode(sk)
+
+    password_hash = base64.b64encode(result).decode('utf-8')
+
+    return hmac.compare_digest(password_hash, user.password_hash)
 
 class Auth:
     def login(request):
@@ -55,11 +84,10 @@ class Auth:
                 salt = base64.b64decode(user.password_salt)
                 stored_hash = base64.b64decode(user.password_hash)
                 encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))'''
-                e = comparePWD(pwd, user)
-                if e[0]==e[1]:
+                if hash3(pwd, user):
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect. {e}'))
+                return str(Status(False, f'Password is incorrect.'))
         return str(Status(False, f'User with email {email} does not exist.'))
         
     def register(request):
