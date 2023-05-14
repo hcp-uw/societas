@@ -37,9 +37,9 @@ def hash2(password, salt):
     return base64.b64encode(scrypt.hash(password.encode('utf-8'), salt=salt, **hash_params)).decode()
 
 def comparePWD(password, user):
-    stored_hash = base64.b64decode(user.password_hash)
-    salt = base64.b64decode(user.password_salt)
-    password_bytes = password.encode('utf-8')
+    stored_hash = (user.password_hash)
+    salt = user.password_salt
+    password_bytes = base64.b64encode(password)#password.encode('utf-8')
     generated_hash = scrypt.hash(password_bytes, salt=salt, N=2**14, r=8, p=1, dklen=64)
     return stored_hash == generated_hash
 
