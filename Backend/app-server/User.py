@@ -44,14 +44,14 @@ class Auth:
         pwd = request.args.get('password')
         for user in auth.list_users().iterate_all():
             if user.email == email:
-                e = base64.b64encode(user.password_salt.encode('utf-8') + user.password_hash.encode('utf-8')).decode()
-                e2 = hash2(pwd, user.password_salt)
-                if  e2 == user.password_hash:
+                salt = base64.b64decode(user.password_salt)
+                stored_hash = base64.b64decode(user.password_hash)
+                encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))
+                if encoded_hash == stored_hash:
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {e2}'))
+                return str(Status(False, f'Password is incorrect. actual: {user.password_hash}. passed: {base64.b64encode(encoded_hash).decode()}'))
         return str(Status(False, f'User with email {email} does not exist.'))
-
         
     def register(request):
         if getcurr() is not None:
