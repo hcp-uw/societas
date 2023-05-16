@@ -63,10 +63,10 @@ def hash3(password, user):
     nonce=b''
     crypter = AES.new(key, AES.MODE_CTR, initial_value=iv, nonce=nonce)
     sk = "wawILo40NkG69NfUuESYubil5/dQB4vccZFhqAz+SGHg6utWCOQyGR7qHxB6k8VgIRlKoIVFXcgtlrBztqLlWA=="
-
-    result = crypter.encrypt(sk)
-
     signer_key = base64.b64decode(sk)
+
+    result = crypter.encrypt(signer_key)
+
 
     password_hash = base64.b64encode(result).decode('utf-8')
 
