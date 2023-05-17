@@ -46,7 +46,7 @@ def hash3(password, user):
     n = 2 ** 14
     p = 1
     salt = user.password_salt
-    user_salt: bytes = base64.b64decode(salt)
+    user_salt = base64.b64decode(salt)
     salt_separator= base64.b64decode('Bw==')
     password = bytes(password, 'utf-8')
 
@@ -76,8 +76,8 @@ class Auth:
     def login(request):
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
-        email = request.args.get('email')
-        pwd = request.args.get('password')
+        email = request.data.get('email')
+        pwd = request.data.get('password')
         for user in auth.list_users().iterate_all():
             if user.email == email:
                 '''
@@ -94,12 +94,12 @@ class Auth:
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
         
-        email = request.args.get('email')
+        email = request.data.get('email')
 
         if not email.endswith('@uw.edu'):
             return str(Status(False, f"{email} is not a valid UW email"))
 
-        pwd = request.args.get('password')
+        pwd = request.data.get('password')
 
         if len(pwd) < 6:
             return str(Status(False, 'Password must be at least 6 characters long.'))
