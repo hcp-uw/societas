@@ -73,6 +73,11 @@ def hash3(password, user):
     return hmac.compare_digest(password_hash, user.password_hash)
 
 class Auth:
+    def getuser(email):
+        for user in auth.list_users().iterate_all():
+            if user.email == email:
+                return user
+        return False
     def login(request):
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
@@ -109,7 +114,7 @@ class Auth:
                 return str(Status(False, 'Email already exists.'))
 
         user = auth.create_user(email=email, password=pwd)
-
+        user = getuser(email)
         setcurr(user.uid)
         
         return str(Status(True, f'Successfully registered {email}. {user.password_salt}'))
