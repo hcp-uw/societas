@@ -1,4 +1,4 @@
-from Flask import session
+from flask import session
 
 class Status:
     def __init__(self, success, message):
