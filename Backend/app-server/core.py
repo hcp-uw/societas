@@ -1,3 +1,5 @@
+from Flask import session
+
 class Status:
     def __init__(self, success, message):
         self.success = success
@@ -10,4 +12,5 @@ curr_user = None
 
 getcurr = lambda: curr_user
 def setcurr(new):
+    session['curr'] = new
     curr_user = new

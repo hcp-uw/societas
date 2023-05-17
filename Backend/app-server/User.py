@@ -112,7 +112,7 @@ class Auth:
 
         setcurr(user.uid)
         
-        return str(Status(True, f'Successfully registered {email}.'))
+        return str(Status(True, f'Successfully registered {email}. {user.password_salt}'))
         
         
     def logout():
