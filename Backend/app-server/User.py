@@ -114,7 +114,7 @@ class Auth:
                 return str(Status(False, 'Email already exists.'))
 
         user = auth.create_user(email=email, password=pwd)
-        user = getuser(email)
+        user = Auth.getuser(email)
         setcurr(user.uid)
         
         return str(Status(True, f'Successfully registered {email}. {user.password_salt}'))
