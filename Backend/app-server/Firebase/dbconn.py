@@ -3,7 +3,12 @@ import json
 from firebase_admin import credentials, firestore, initialize_app, auth
 from datetime import datetime as dt
 
-cred = credentials.Certificate('./res/key.json')
+path = './res/key.json'
+if os.getcwd().endswith('app-server'):
+	path = './../res/key.json'
+if os.getcwd().endswith('Firebase'):
+	path = './../../res/key.json'
+cred = credentials.Certificate(path)
 
 default_app = initialize_app(cred)
 
