@@ -1,6 +1,10 @@
 import { StyledWrapper, Titles, Btn, Spinner } from "./Login"
 import { Input, StyledInput } from "../styledComponents/inputs"
 import { FORMS } from "../../contexts/AuthContext"
+import { useAuth } from "../../hooks/useAuth"
+import { signup } from "../../firebase"
+import { toast } from "react-hot-toast"
+import { useState } from "react"
 
 export default function Register({
   setForm,
@@ -11,6 +15,29 @@ export default function Register({
 }) {
   const [email, setEmail] = emailState
   const [password, setPassword] = passwordState
+  const [creating, setLoading] = useState(false)
+
+  const { setUser } = useAuth()
+
+  function handleSubmit() {
+    setLoading(true)
+    const toastId = toast.loading("creating account")
+    signup(email, password)
+      .then((user) => {
+        setLoading(false)
+        toast.success("created account", {
+          id: toastId,
+        })
+        setUser(user)
+      })
+      .catch((err) => {
+        console.log(err)
+        toast.error("something went-wrong", {
+          id: toastId,
+        })
+      })
+  }
+
   return (
     <StyledWrapper>
       <Titles>
@@ -24,6 +51,7 @@ export default function Register({
           onChange={(e) => setEmail(e.target.value)}
           value={email}
           id="email"
+          disabled={creating}
         />
       </Input>
       <Input>
@@ -33,6 +61,7 @@ export default function Register({
           onChange={(e) => setPassword(e.target.value)}
           value={password}
           id="password"
+          disabled={creating}
         />
       </Input>
 
@@ -41,7 +70,12 @@ export default function Register({
         <span onClick={() => setForm(FORMS.LOGIN)}>Login!</span>
       </p>
 
-      <Btn type="submit" isFormValid={isFormValid()} disabled={!isFormValid()}>
+      <Btn
+        type="submit"
+        isFormValid={isFormValid()}
+        disabled={!isFormValid() || creating}
+        onClick={handleSubmit}
+      >
         {loading ? <Spinner /> : "Sign up"}
       </Btn>
     </StyledWrapper>

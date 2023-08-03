@@ -8,6 +8,7 @@ import Masonry from "react-masonry-css"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjjs.extend(relativeTime)
+import { auth } from "../firebase"
 
 export default function Home() {
   const [data, setData] = useState([])
@@ -33,24 +34,27 @@ export default function Home() {
   }
 
   return (
-    <Masonry
-      breakpointCols={breakpointColumnsObj}
-      className="masonry"
-      columnClassName="masonryCol"
-      style={{ margin: "auto", maxWidth: "80%" }}
-    >
-      {[...data, ...data].map((proj) => (
-        <StyledProj key={proj.id}>
-          <Img src={proj.imageURL} width={300} />
-          <h2>{proj.title}</h2>
-          <p>{proj.description}</p>
-          <TimeBlob>
-            <span className="material-symbols-outlined">schedule</span>
-            {dayjjs(proj.createdAt.toDate()).fromNow()}
-          </TimeBlob>
-        </StyledProj>
-      ))}
-    </Masonry>
+    <>
+      {auth.currentUser ? <h1>{auth.currentUser.email}</h1> : <h1>welcome</h1>}
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="masonry"
+        columnClassName="masonryCol"
+        style={{ margin: "auto", maxWidth: "80%" }}
+      >
+        {[...data, ...data].map((proj) => (
+          <StyledProj key={proj.id}>
+            <Img src={proj.imageURL} width={300} />
+            <h2>{proj.title}</h2>
+            <p>{proj.description}</p>
+            <TimeBlob>
+              <span className="material-symbols-outlined">schedule</span>
+              {dayjjs(proj.createdAt.toDate()).fromNow()}
+            </TimeBlob>
+          </StyledProj>
+        ))}
+      </Masonry>
+    </>
   )
 }
 

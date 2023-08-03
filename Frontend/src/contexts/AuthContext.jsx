@@ -16,7 +16,7 @@ export const FORMS = {
 }
 
 export function AuthContextProvider({ children }) {
-  const [user, setUSer] = useState("") // curent user state
+  const [user, setUser] = useState("") // curent user state
   const [authModal, setAuthModal] = useState(FORMS.NONE) // bool to show auth model or not
 
   const instance = axios.create({
@@ -49,7 +49,7 @@ export function AuthContextProvider({ children }) {
     user,
     register,
     login,
-    setUSer,
+    setUser,
     authModal,
     setAuthModal,
   } // what the context provides

@@ -18,21 +18,21 @@ export default function Modal() {
   }
 
   function handleSubmit(e) {
-    e.preventDefault()
-    setLoading(true)
-    if (authModal === FORMS.SIGNUP) {
-      register(email, password)
-        .then((res) => {
-          console.log("sucess", res)
-          toast.success("Account created")
-          setLoading(false)
-        })
-        .catch((err) => {
-          toast.error(err)
-          setLoading(false)
-          console.log(err)
-        })
-    }
+    // e.preventDefault()
+    // setLoading(true)
+    // if (authModal === FORMS.SIGNUP) {
+    //   register(email, password)
+    //     .then((res) => {
+    //       console.log("sucess", res)
+    //       toast.success("Account created")
+    //       setLoading(false)
+    //     })
+    //     .catch((err) => {
+    //       toast.error(err)
+    //       setLoading(false)
+    //       console.log(err)
+    //     })
+    // }
   }
 
   function setForm(form) {

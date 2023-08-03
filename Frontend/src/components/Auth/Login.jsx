@@ -1,6 +1,7 @@
 import styled from "styled-components"
 import { StyledInput, Input } from "../styledComponents/inputs"
 import { FORMS } from "../../contexts/AuthContext"
+import { login } from "../../firebase"
 export default function Login({
   setForm,
   emailState,
@@ -10,6 +11,17 @@ export default function Login({
 }) {
   const [email, setEmail] = emailState
   const [password, setPassword] = passwordState
+
+  function handleSubmit() {
+    console.log(email, password)
+    login(email, password)
+      .then((user) => {
+        console.log(user)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
   return (
     <StyledWrapper>
       <Titles>
@@ -46,6 +58,7 @@ export default function Login({
         isFormValid={isFormValid()}
         disabled={!isFormValid()}
         loading={loading}
+        onClick={handleSubmit}
       >
         {loading ? <Spinner /> : "Log in"}
       </Btn>
