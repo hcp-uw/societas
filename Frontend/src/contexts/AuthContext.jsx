@@ -1,19 +1,23 @@
 import axios from "axios"
-import { useState } from "react"
+import { useState, createContext } from "react"
 import PropType from "prop-types"
-import { useContext, createContext } from "react"
+// import { createContext } from "react"
 
-const AuthContext = createContext()
-
-export const useAuth = () => useContext(AuthContext) // hook to access context
+export const AuthContext = createContext()
 
 AuthContextProvider.propTypes = {
   children: PropType.node,
 }
 
+export const FORMS = {
+  LOGIN: "login",
+  SIGNUP: "signup",
+  NONE: null,
+}
+
 export function AuthContextProvider({ children }) {
   const [user, setUSer] = useState("") // curent user state
-  const [authModel, setAuthModel] = useState(false) // bool to show auth model or not
+  const [authModal, setAuthModal] = useState(FORMS.NONE) // bool to show auth model or not
 
   const instance = axios.create({
     baseURL: "http://arjunnaik.pythonanywhere.com",
@@ -23,7 +27,6 @@ export function AuthContextProvider({ children }) {
   // params:
   //    email -> email of user
   //    password -> password of user
-
   function register(email, password) {
     return instance.post("/register", {
       email: email,
@@ -35,7 +38,6 @@ export function AuthContextProvider({ children }) {
   // params:
   //    email -> email of user
   //    password -> password of user
-
   function login(email, password) {
     return instance.post("/login", {
       email: email,
@@ -48,8 +50,8 @@ export function AuthContextProvider({ children }) {
     register,
     login,
     setUSer,
-    authModel,
-    setAuthModel,
+    authModal,
+    setAuthModal,
   } // what the context provides
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -1,8 +1,11 @@
 import styled from "styled-components"
 import { useState, useRef } from "react"
-import Inputs from "./CreateProj/Inputs"
-import Files from "./CreateProj/Files"
-import SubmitBtn from "./CreateProj/SubmitBtn"
+import Inputs from "../components/CreateProj/Inputs"
+import Files from "../components/CreateProj/Files"
+import SubmitBtn from "../components/CreateProj/SubmitBtn"
+import { createProject } from "../firebase"
+import { toast } from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
 
 export default function CreateProj() {
   const [formState, setFormState] = useState({
@@ -12,25 +15,49 @@ export default function CreateProj() {
     maxMems: "",
     images: [],
   }) // state form the inputs
-
+  const [loading, setLoading] = useState(false)
   const fileInputRef = useRef()
+  const navigate = useNavigate()
 
   // handles when the form is submitted
   // params:
   //  e -> event object
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
-    fetch("http://arjunnaik.pythonanywhere.com/").then((res) => {
-      console.log(res)
-    })
+    // fetch("http://arjunnaik.pythonanywhere.com/").then((res) => {
+    //   console.log(res)
+    // })
+
+    const toastId = toast.loading("Creating project")
+    setLoading(true)
+    try {
+      await createProject(
+        formState.title,
+        formState.description,
+        formState.location,
+        formState.maxMems,
+        formState.images[0]
+      )
+      toast.success("Project created", {
+        id: toastId,
+      })
+      setLoading(false)
+
+      navigate("/home")
+    } catch (err) {
+      console.log(err)
+      toast.error("something went wrong", {
+        id: toastId,
+      })
+      setLoading(false)
+    }
   }
 
-  // handles deltetion of picture
+  // handles deletetion of picture
   // params:
   //  index -> index of picture to be deleted
-
   function handleDelPictre(index) {
     const newArr = formState.images.filter((_, i) => i !== index)
     setFormState({ ...formState, images: newArr })
@@ -49,7 +76,6 @@ export default function CreateProj() {
 
   // return true if form fields are not empty
   // false otherwiise
-
   function isFormValid() {
     for (let prop in formState) {
       if (formState[prop] === "" && prop !== "images") {
@@ -66,6 +92,7 @@ export default function CreateProj() {
         setFormState={setFormState}
         handleSubmit={handleSubmit}
         isFormValid={isFormValid}
+        loading={loading}
       />
       <Files
         fileInputRef={fileInputRef}

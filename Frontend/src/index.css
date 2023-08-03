@@ -1,0 +1,12 @@
+.masonry {
+  display: -webkit-box; /* Not needed if autoprefixing */
+  display: -ms-flexbox; /* Not needed if autoprefixing */
+  display: flex; /* gutter size offset */
+  width: auto;
+  gap: 4rem;
+}
+
+.masonryCol {
+  /* gutter size */
+  background-clip: padding-box;
+}

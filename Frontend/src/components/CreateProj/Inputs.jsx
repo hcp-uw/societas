@@ -8,6 +8,7 @@ Inputs.propTypes = {
   setFormState: PropType.func.isRequired,
   handleSubmit: PropType.func.isRequired,
   isFormValid: PropType.func.isRequired,
+  loading: PropType.bool.isRequired,
 }
 
 export default function Inputs({
@@ -15,8 +16,8 @@ export default function Inputs({
   setFormState,
   handleSubmit,
   isFormValid,
+  loading,
 }) {
-  console.log(isFormValid())
   return (
     <InputsWrapper>
       {/* Title Input */}
@@ -31,6 +32,7 @@ export default function Inputs({
           }
           value={formState.title}
           required
+          disabled={loading}
         />
       </Input>
 
@@ -47,6 +49,7 @@ export default function Inputs({
           }
           value={formState.description}
           required
+          disabled={loading}
         ></TextArea>
       </Input>
 
@@ -60,6 +63,7 @@ export default function Inputs({
           }
           value={formState.location}
           required
+          disabled={loading}
         />
       </Input>
 
@@ -75,6 +79,7 @@ export default function Inputs({
           }
           value={formState.maxMems}
           required
+          disabled={loading}
         />
       </Input>
 
@@ -82,6 +87,7 @@ export default function Inputs({
         handleSubmit={handleSubmit}
         isFormValid={isFormValid}
         desktop
+        disabled={loading}
       />
     </InputsWrapper>
   )
