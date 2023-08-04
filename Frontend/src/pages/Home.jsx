@@ -1,30 +1,58 @@
-// import React from 'react'
-
-import { useState } from "react"
-import { useEffect } from "react"
 import { getAllProjects } from "../firebase"
 import styled from "styled-components"
 import Masonry from "react-masonry-css"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjjs.extend(relativeTime)
-import { auth } from "../firebase"
+import { useUser } from "@clerk/clerk-react"
+import { useQuery } from "@tanstack/react-query"
+import Spinner from "../components/styledComponents/Spinner"
+import { NavLink } from "react-router-dom"
+
+const projectsQuery = () => ({
+  queryKey: ["projects"],
+  queryFn: getAllProjects,
+})
+
+export const loader = async (queryClient) => {
+  if (!queryClient.getQueryData(projectsQuery().queryKey)) {
+    await queryClient.fetchQuery(projectsQuery())
+  }
+}
 
 export default function Home() {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { user } = useUser()
 
-  useEffect(() => {
-    getAllProjects().then((projects) => {
-      console.log(projects)
-      setData(projects)
-      setLoading(false)
-    })
-  }, [])
+  return (
+    <>
+      {user ? (
+        <h1 style={{ padding: "1.5rem 0" }}>Welcome {user.firstName ?? ""}</h1>
+      ) : (
+        <h1 style={{ padding: "1.5rem 0" }}>Welcome</h1>
+      )}
+      <Projects />
+    </>
+  )
+}
 
-  if (loading) return <div>loading...</div>
+function Projects() {
+  const { data, isLoading } = useQuery(projectsQuery())
 
-  if (!data) return <div>There is no projects</div>
+  if (isLoading)
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "auto",
+        }}
+      >
+        <Spinner size="4rem" />
+      </div>
+    )
 
   const breakpointColumnsObj = {
     default: 4,
@@ -34,41 +62,27 @@ export default function Home() {
   }
 
   return (
-    <>
-      {auth.currentUser ? <h1>{auth.currentUser.email}</h1> : <h1>welcome</h1>}
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="masonry"
-        columnClassName="masonryCol"
-        style={{ margin: "auto", maxWidth: "80%" }}
-      >
-        {[...data, ...data].map((proj) => (
-          <StyledProj key={proj.id}>
-            <Img src={proj.imageURL} width={300} />
-            <h2>{proj.title}</h2>
-            <p>{proj.description}</p>
-            <TimeBlob>
-              <span className="material-symbols-outlined">schedule</span>
-              {dayjjs(proj.createdAt.toDate()).fromNow()}
-            </TimeBlob>
-          </StyledProj>
-        ))}
-      </Masonry>
-    </>
+    <Masonry
+      breakpointCols={breakpointColumnsObj}
+      className="masonry"
+      columnClassName="masonryCol"
+    >
+      {data.map((proj) => (
+        <StyledProj key={proj.id} to={proj.id}>
+          <Img src={proj.imageURL} width={300} />
+          <h2>{proj.title}</h2>
+          <p>{proj.description}</p>
+          <TimeBlob>
+            <span className="material-symbols-outlined">schedule</span>
+            {dayjjs(proj.createdAt.toDate()).fromNow()}
+          </TimeBlob>
+        </StyledProj>
+      ))}
+    </Masonry>
   )
 }
 
-// const Projects = styled.div`
-//   display: flex;
-//   /* flex-flow: column; */
-//   /* max-width: 80%; */
-//   margin: auto;
-//   height: min-content;
-//   gap: 4rem;
-//   align-items: flex-start;
-// `
-
-const StyledProj = styled.div`
+const StyledProj = styled(NavLink)`
   background-color: #e9e9e9;
   display: flex;
   flex-direction: column;
@@ -77,6 +91,12 @@ const StyledProj = styled.div`
   border-radius: 21px;
   gap: 1rem;
   margin-bottom: 2rem;
+  color: ${({ theme }) => theme.colors.mainText};
+  text-decoration: none;
+
+  h2 {
+    color: black;
+  }
   /* max-width: 19rem; */
 `
 

@@ -112,9 +112,10 @@ const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   color: ${({ theme }) => theme.colors.mainText};
-  max-width: 57rem;
+  /* max-width: 57rem; */
+  width: 80%;
   padding: 0.5rem;
-  gap: 4rem;
+  justify-content: space-between;
   margin: auto;
 
   @media (min-width: 62rem) {

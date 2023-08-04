@@ -97,6 +97,7 @@ const InputsWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  max-width: 57rem;
   height: min-content;
   @media (min-width: 62rem) {
     position: sticky;

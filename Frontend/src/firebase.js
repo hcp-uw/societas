@@ -9,6 +9,8 @@ import {
   serverTimestamp,
   updateDoc,
   getDocs,
+  doc,
+  getDoc,
 } from "firebase/firestore"
 
 import {
@@ -70,11 +72,25 @@ export async function createProject(
 
 export async function getAllProjects() {
   const snapshot = await getDocs(collection(db, "projects"))
+  console.log("getting projects")
+
   let docData = []
   snapshot.forEach((doc) => {
-    docData = [...docData, doc.data()]
+    docData = [...docData, { id: doc.id, ...doc.data() }]
   })
   return docData
+}
+
+export async function getProjectById(id) {
+  const docSnapshot = await getDoc(doc(db, "projects", id))
+  docSnapshot.data()
+  console.log(docSnapshot.id)
+
+  if (!docSnapshot.exists()) throw new Error("project does not exists")
+  return {
+    id: docSnapshot.id,
+    ...docSnapshot.data(),
+  }
 }
 
 // auth
