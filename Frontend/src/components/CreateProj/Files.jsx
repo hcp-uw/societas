@@ -33,7 +33,6 @@ export default function Files({
               alt=""
               key={file.name}
               width={300}
-              height={300}
             />
           </Image>
         ))}

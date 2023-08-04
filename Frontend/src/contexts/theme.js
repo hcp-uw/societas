@@ -4,6 +4,7 @@ export const theme = {
     subText: "#717171",
     lightBg: "#F9F9F9",
     primary: "#154BA5",
+    primary_600: "#0643A8",
     disabled: "#485160",
     whiteText: "#E9E9E9",
   },
