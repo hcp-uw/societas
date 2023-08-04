@@ -17,6 +17,7 @@ export const loader =
       (await queryClient.fetchQuery(query))
     )
   }
+
 export default function Project() {
   const { projectId } = useParams()
 
@@ -39,8 +40,6 @@ export default function Project() {
     )
 
   if (isError) return <div>Project was not found</div>
-
-  console.log()
 
   return (
     <div>

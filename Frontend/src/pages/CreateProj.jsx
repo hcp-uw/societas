@@ -45,7 +45,7 @@ export default function CreateProj() {
       })
       setLoading(false)
 
-      navigate("/home")
+      navigate("/")
     } catch (err) {
       console.log(err)
       toast.error("something went wrong", {

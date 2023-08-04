@@ -69,7 +69,7 @@ function Projects() {
     >
       {data.map((proj) => (
         <StyledProj key={proj.id} to={proj.id}>
-          <Img src={proj.imageURL} width={300} />
+          <Img src={proj.imageURL} width={300} height={300} />
           <h2>{proj.title}</h2>
           <p>{proj.description}</p>
           <TimeBlob>
@@ -114,4 +114,6 @@ const Img = styled.img`
   object-fit: contain;
   max-height: 15rem;
   margin: auto;
+  height: auto;
+  /* border-radius: 21px; */
 `

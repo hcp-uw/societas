@@ -1,5 +1,10 @@
 import styled from "styled-components"
+import PropTypes from "prop-types"
 
+Spinner.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.string,
+}
 export default function Spinner({ color = "#383838", size = "3rem" }) {
   return (
     <StyledSpinner color={color} size={size}>

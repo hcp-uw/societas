@@ -1,7 +1,5 @@
-import { useAuth } from "../hooks/useAuth"
 import styled from "styled-components"
 import LogoRoute from "../assets/logo.png"
-import { FORMS } from "../contexts/AuthContext"
 import { SignInButton, SignUpButton } from "@clerk/clerk-react"
 import { useUser } from "@clerk/clerk-react"
 import { NavLink } from "react-router-dom"
@@ -52,7 +50,6 @@ const StyledNav = styled.nav`
   justify-content: space-between;
   align-items: center;
   margin: auto;
-  font-family: ;
 `
 
 const AuthPrompts = styled.div`
