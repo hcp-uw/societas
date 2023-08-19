@@ -5,15 +5,15 @@ import styled from "styled-components"
 import { NavLink } from "react-router-dom"
 
 export default function ProfilePage() {
-  const [selected, setSelected] = useState("My Profile")
+  const [selected, setSelected] = useState("my-profile")
   const navigate = useNavigate()
   return (
-    <ProfilePageLayout>
+    <ProfilePageLayout className="mt-6">
       <StyledAside>
         <Link
           to="profile"
-          aria-selected={true}
-          onClick={() => setSelected("My Profile")}
+          onClick={() => setSelected("my-profile")}
+          selected={selected === "my-profile"}
         >
           <span className="material-symbols-outlined">person</span>
           My profile
@@ -43,6 +43,15 @@ export default function ProfilePage() {
           Password
         </Link>
 
+        <Link
+          to="requests"
+          onClick={() => setSelected("requests")}
+          selected={selected === "requests"}
+        >
+          <span className="material-symbols-outlined">favorite</span>
+          Requests
+        </Link>
+
         <SignOutButton signOutCallback={() => navigate("/")}>
           Sign out
         </SignOutButton>
@@ -62,6 +71,7 @@ const StyledAside = styled.aside`
   padding: 1rem 0;
   gap: 1rem;
   width: fit-content;
+  min-width: fit-content;
 `
 
 const Link = styled(NavLink)`

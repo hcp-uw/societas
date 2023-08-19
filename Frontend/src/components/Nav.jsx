@@ -17,13 +17,17 @@ export default function Nav() {
         {user ? (
           <div>
             <AccountBtn to="/account">
-              <span className="material-symbols-outlined">person</span>
+              <img
+                src={user.imageUrl}
+                alt={`${user.fullName} profile image`}
+                className="rounded-full"
+              />
             </AccountBtn>
           </div>
         ) : (
           <AuthPrompts>
             <SignInButton mode="modal">Login</SignInButton>
-            <SignUpButton mode="modal">Signup</SignUpButton>
+            <SignUpButton mode="modal">Sign up</SignUpButton>
           </AuthPrompts>
         )}
       </StyledNav>

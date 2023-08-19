@@ -11,12 +11,17 @@ import {
   getDocs,
   doc,
   getDoc,
+  arrayUnion,
+  query,
+  where,
 } from "firebase/firestore"
 
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithCustomToken,
+  signOut,
 } from "firebase/auth"
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -47,27 +52,62 @@ function uploadProjectImage(projId, image) {
 }
 
 // projects
-export async function createProject(
+export async function createProject({
   title,
   description,
   meetLocation,
   maxMembers,
-  image
-) {
+  image,
+  ownerId,
+  meetType,
+  startDate,
+}) {
   const docRef = await addDoc(collection(db, "projects"), {
     title: title,
     description: description,
     meetLocation: meetLocation,
     maxMembers: maxMembers,
     createdAt: serverTimestamp(),
+    ownerId: ownerId,
+    members: [],
+    requestants: [],
+    meetType: meetType,
+    startDate: startDate,
   })
 
   await uploadProjectImage(docRef.id, image)
   const imageRef = ref(storage, `projects/${docRef.id}`)
   const url = await getDownloadURL(imageRef)
   await updateDoc(docRef, {
-    imageURL: url,
+    imageUrl: url,
   })
+}
+
+export async function createProjectJoinRequest({
+  projectId,
+  requestantId,
+  ownerId,
+  message,
+  projectTitle,
+  imageUrl,
+}) {
+  const projectRef = doc(db, "projects", projectId)
+  await updateDoc(projectRef, {
+    requestants: arrayUnion(requestantId),
+  })
+
+  const requestRef = await addDoc(collection(db, "requests"), {
+    requestantId: requestantId,
+    projectId: projectId,
+    status: "pending",
+    ownerId: ownerId,
+    message: message,
+    createdAt: serverTimestamp(),
+    projectTitle: projectTitle,
+    imageUrl: imageUrl,
+  })
+
+  return requestRef
 }
 
 export async function getAllProjects() {
@@ -82,6 +122,7 @@ export async function getAllProjects() {
 }
 
 export async function getProjectById(id) {
+  if (id === "") return
   const docSnapshot = await getDoc(doc(db, "projects", id))
   docSnapshot.data()
   console.log(docSnapshot.id)
@@ -93,12 +134,34 @@ export async function getProjectById(id) {
   }
 }
 
-// auth
+// requests
+export async function getAllRequests(currentUserId) {
+  const requestsRef = collection(db, "requests")
+  const q = query(requestsRef, where("ownerId", "==", currentUserId))
 
-export async function signup(email, password) {
+  const qSnapShot = await getDocs(q)
+
+  let queryData = []
+  qSnapShot.forEach((doc) => {
+    queryData = [...queryData, { id: doc.id, ...doc.data() }]
+  })
+
+  return queryData
+}
+
+// auth
+export function signup(email, password) {
   return createUserWithEmailAndPassword(auth, email, password)
 }
 
-export async function login(email, password) {
+export function login(email, password) {
   return signInWithEmailAndPassword(auth, email, password)
+}
+
+export function signInWithClerkToken(token) {
+  return signInWithCustomToken(auth, token)
+}
+
+export function signOutFromFirebase() {
+  return signOut(auth)
 }
