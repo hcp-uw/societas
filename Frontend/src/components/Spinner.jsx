@@ -17,10 +17,10 @@ export default function Spinner({ color = "#383838", size = "3rem" }) {
 }
 
 const StyledSpinner = styled.div`
-  width: 1rem;
-  height: 1rem;
-  display: inline-block;
-  position: relative;
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
+  display: flex;
+  /* position: relative; */
   transform: scale(0.5);
   transform-origin: center;
   pointer-events: ${({ loading }) => (loading ? "none" : "all")};
@@ -35,8 +35,6 @@ const StyledSpinner = styled.div`
     border-radius: 50%;
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     border-color: ${({ color }) => color} transparent transparent transparent;
-    top: -15px;
-    right: -1px;
   }
   & div:nth-child(1) {
     animation-delay: -0.45s;

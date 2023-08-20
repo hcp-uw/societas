@@ -11,27 +11,28 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^4.23.2",
+    "@tanstack/react-query": "^4.32.6",
     "@tanstack/react-query-devtools": "^4.32.5",
-    "axios": "^1.4.0",
     "dayjs": "^1.11.9",
     "firebase": "^10.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-drag-drop-files": "^2.3.9",
     "react-hot-toast": "^2.4.1",
     "react-masonry-css": "^1.0.16",
-    "react-query": "^3.39.3",
-    "react-router-dom": "^6.10.0",
+    "react-router-dom": "^6.14.2",
     "styled-components": "^5.3.10"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
     "eslint": "^8.38.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
+    "postcss": "^8.4.27",
+    "tailwindcss": "^3.3.3",
     "vite": "^4.3.2"
   }
 }
