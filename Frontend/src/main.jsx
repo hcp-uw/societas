@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage.jsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.jsx"
 import Home from "./pages/Home"
 import Requests from "./pages/Requests.jsx"
+import IntroPage from "./pages/IntroPage.jsx"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
             element: <Requests />,
           },
         ],
+      },
+      {
+        path: "intro",
+        element: <IntroPage/>,
       },
     ],
   },
