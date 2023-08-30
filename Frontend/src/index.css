@@ -14,3 +14,77 @@
   /* gutter size */
   background-clip: padding-box;
 }
+
+body {
+  font-family: Inter, Manrope, "DM Sans";
+}
+
+.introTitle {
+  font-size: 55px;
+  font-weight: bolder;
+}
+
+.flex-container {
+  display: flex;
+}
+
+.flex-item {
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 33%;
+}
+
+.introText1 {
+  font-size: 35px;
+  margin-bottom: 1em;
+}
+
+.introText2 {
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.image2-container {
+  position: relative;
+  height: auto;
+  max-width: 50%;
+  left: 0;
+  bottom: 0;
+}
+
+.introText3 {
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.introButton-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 5em;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+
+.introButton {
+  background-color: #fbbc05;
+  height: 87px;
+  width: 239px;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  border-radius: 14px;
+  border: 1.5px solid #000000;
+  font-size: 24px;
+  font-weight: 900;
+}
