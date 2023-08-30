@@ -62,16 +62,6 @@ git checkout -b xxxx (next time when you work, create a new branch)
 git pull origin main (make sure you have the latest version of the main branch before you work)
 ```
 
-## Fonts
-Inter: href="https://fonts.googleapis.com/css?family=Inter"
-
-Manrope: href="https://fonts.googleapis.com/css?family=Manrope"
-
-Lexend: href="https://fonts.googleapis.com/css?family=Lexend"
-
-DM Sans: href="https://fonts.googleapis.com/css?family=DM Sans"
-
-
 ## Credits
 
 Vincent: PM Github:VincentLiu777
