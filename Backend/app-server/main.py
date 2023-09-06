@@ -1,19 +1,17 @@
 import os
 import User
-from flask import Flask, request
+from flask import Flask, request, session
 from flask_cors import CORS
 
 
 app = Flask(__name__)
+app.secret_key = 'l'
 
 CORS(app)
 
-
-
 @app.route("/", methods = ['GET'])
 def hello_world():
-    return "hello world"
-
+    return f"hello world: {session.get('curr')}"
 
 @app.route(User.ROUTE + 'login', methods = ['POST'])
 def login():
