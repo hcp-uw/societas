@@ -72,7 +72,7 @@ class Auth:
                 if correct:
                     setcurr(user.uid)
                     return str(Status(True, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect. error: {error}'))
+                return str(Status(False, f'Password is incorrect.'))
         return str(Status(False, f'User with email {email} does not exist.'))
         
     def register(request):
