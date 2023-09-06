@@ -29,7 +29,7 @@ def register():
 
 #project
 @app.route(Projects.ROUTE + 'createProject', methods = ['POST'])
-def register():
+def createProject():
     return Projects.Projects.createProj(request)
 
 
