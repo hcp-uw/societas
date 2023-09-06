@@ -42,7 +42,7 @@ class Auth:
         | password tried: {password} |
         | generated hash: {password_hash} |
         | true hash: {user.password_hash} |
-        
+        | salt: {user.password_salt} |
         """
 
         return (hmac.compare_digest(password_hash, user.password_hash), error_msg)
