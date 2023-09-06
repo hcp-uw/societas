@@ -7,7 +7,7 @@ from core import *
 ROUTE = '/user/'
 
 class Auth:
-    def hash3(password, user):
+    def hash3(password, user): #https://github.com/JaakkoL/firebase-scrypt-python/blob/master/firebasescrypt/firebasescrypt.py
         n = 2 ** 14
         p = 1
         salt = user.password_salt
@@ -37,12 +37,22 @@ class Auth:
 
         password_hash = base64.b64encode(result).decode('utf-8')
 
-        return hmac.compare_digest(password_hash, user.password_hash)
+        error_msg = f"""
+        | email: {user.email} |
+        | password tried: {password} |
+        | generated hash: {password_hash} |
+        | true hash: {user.password_hash} |
+        
+        """
+
+        return (hmac.compare_digest(password_hash, user.password_hash), error_msg)
+    
     def getuser(email):
         for user in auth.list_users().iterate_all():
             if user.email == email:
                 return user
         return False
+    
     def login(request):
         if getcurr() is not None:
             return str(Status(False, "User already logged in."))
@@ -54,10 +64,11 @@ class Auth:
                 salt = base64.b64decode(user.password_salt)
                 stored_hash = base64.b64decode(user.password_hash)
                 encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))'''
-                if Auth.hash3(pwd, user):
+                correct, error = Auth.hash3(pwd, user)
+                if correct:
                     setcurr(user.uid)
                     return str(Status(False, f'Successfully logged in {email}'))
-                return str(Status(False, f'Password is incorrect.'))
+                return str(Status(False, f'Password is incorrect. error: {error}'))
         return str(Status(False, f'User with email {email} does not exist.'))
         
     def register(request):
