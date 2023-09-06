@@ -103,3 +103,5 @@ class Auth:
     def logout():
         setcurr(None)
         return str(Status(True, "Successfully logged out."))
+    
+

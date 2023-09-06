@@ -1,5 +1,6 @@
 import os
 import User
+import Projects
 from flask import Flask, request, session
 from flask_cors import CORS
 
@@ -13,6 +14,7 @@ CORS(app)
 def hello_world():
     return f"hello world: {session.get('curr')}"
 
+#user
 @app.route(User.ROUTE + 'login', methods = ['POST'])
 def login():
     return User.Auth.login(request)
@@ -24,6 +26,11 @@ def logout():
 @app.route(User.ROUTE + 'register', methods = ['POST'])
 def register():
     return User.Auth.register(request)
+
+#project
+@app.route(Projects.ROUTE + 'createProject', methods = ['POST'])
+def register():
+    return Projects.Projects.createProj(request)
 
 
 if __name__ == "__main__":
