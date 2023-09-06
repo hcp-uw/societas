@@ -22,7 +22,8 @@ class Projects:
             "location": location,
             "maxMembers": maxMembers,
             "meetType": meetType,
-            "startDate":startDate
+            "startDate":startDate,
+            "title":title
         }
         try:
             create("Projects", project)
