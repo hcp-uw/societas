@@ -40,8 +40,8 @@ class Auth:
         error_msg = f"""
         | email: {user.email} |
         | password tried: {password} |
-        | generated hash: {password_hash} |
-        | true hash: {user.password_hash} |
+        | generated hash: {base64.b64decode(password_hash)} |
+        | true hash: {base64.b64decode(user.password_hash)} |
         | salt: {user.password_salt} |
         """
 
