@@ -40,12 +40,16 @@ class Auth:
         error_msg = f"""
         | email: {user.email} |
         | password tried: {password} |
-        | generated hash: {base64.b64decode(password_hash)} |
-        | true hash: {base64.b64decode(user.password_hash)} |
+        | generated hash: {password_hash} |
+        | true hash: {user.password_hash} |
         | salt: {user.password_salt} |
         """
 
-        return (hmac.compare_digest(password_hash, user.password_hash), error_msg)
+        p_hash_1 = ''.join(char for char in str(password_hash) if char.isalnum())
+        p_hash_2 = ''.join(char for char in str(user.password_hash) if char.isalnum())
+
+        
+        return (p_hash_1 == p_hash_2, error_msg)
     
     def getuser(email):
         for user in auth.list_users().iterate_all():
