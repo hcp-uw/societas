@@ -10,8 +10,8 @@ class Projects:
         location = request.form.get('location')
         try:
             maxMembers = int(request.form.get('location'))
-        except:
-            return str(Status(False, f'maxMembers must be an int'))
+        except Exception as e:
+            return str(Status(False, f'maxMembers must be an int: {e}'))
         meetType = request.form.get("meetType")
         startDate = request.form.get("startDate")
         title = request.form.get("title")
