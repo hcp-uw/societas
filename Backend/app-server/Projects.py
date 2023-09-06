@@ -9,9 +9,9 @@ class Projects:
         description = request.form.get('description')
         location = request.form.get('location')
         try:
-            maxMembers = int(request.form.get('location'))
+            maxMembers = int(request.form.get('maxMembers'))
         except Exception as e:
-            return str(Status(False, f'maxMembers must be an int: {e}'))
+            return str(Status(False, f'maxMembers must be an int'))
         meetType = request.form.get("meetType")
         startDate = request.form.get("startDate")
         title = request.form.get("title")
