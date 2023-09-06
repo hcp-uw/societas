@@ -71,7 +71,7 @@ class Auth:
                 correct, error = Auth.hash3(pwd, user)
                 if correct:
                     setcurr(user.uid)
-                    return str(Status(False, f'Successfully logged in {email}'))
+                    return str(Status(True, f'Successfully logged in {email}'))
                 return str(Status(False, f'Password is incorrect. error: {error}'))
         return str(Status(False, f'User with email {email} does not exist.'))
         
