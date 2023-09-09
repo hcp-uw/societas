@@ -17,8 +17,8 @@ db = firestore.client()
 def create(collection, new):
 	try:
 		coll = db.collection(collection)
-		coll.add(new)
-		return ("Success", True, 200)
+		ut, ref = coll.add(new)
+		return ("{ref.id}", True, 200)
 	except Exception as e:
 		return (f"Failed: {e}", False, 000)
 	
@@ -27,7 +27,7 @@ def read(collection):
 		coll = db.collection(collection)
 		vals = {}
 		for i in coll.stream():
-			vals[i] = i.to_dict()
+			vals[i.id] = i.to_dict()
 		return (vals, True, 200)
 	except Exception as e:
 		return (f"Failed: {e}", False, 000)
@@ -47,3 +47,12 @@ def delete(collection, id):
 		return ("Success", True, 200)
 	except Exception as e:
 		return (f"Failed: {e}", False, 000)
+
+def getIDFromIdentifier(collection, identifier, value):
+	vals = read(collection)
+	for id, doc in vals.items():
+		for key, val in doc.items():
+			if (key == identifier):
+				if (value == val):
+					return id
+			break

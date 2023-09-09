@@ -3,30 +3,39 @@ from core import *
 ROUTE = '/projects/'
 
 class Projects:
-    def createProj(request):
-        if getcurr() is None:
-            return str(Status(False, "User must be logged in."))
-        description = request.form.get('description')
-        location = request.form.get('location')
+    def deleteProject(request):
         try:
-            maxMembers = int(request.form.get('maxMembers'))
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            delete("Projects", request.form.get("id"))
+            return str(Status(True, f'Successfully deleted project.'))
         except Exception as e:
-            return str(Status(False, f'maxMembers must be an int'))
-        meetType = request.form.get("meetType")
-        startDate = request.form.get("startDate")
-        title = request.form.get("title")
-        project = {
-            "created": datetime.now(),
-            "description": description,
-            "host_id": getcurr(),
-            "location": location,
-            "maxMembers": maxMembers,
-            "meetType": meetType,
-            "startDate":startDate,
-            "title":title
-        }
+            return str(Status(False, f'project deletion failed. error: {e}'))
+
+    def createProject(request):
         try:
-            create("Projects", project)
-            return str(Status(True, f'Successfully created project.'))
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            description = request.form.get('description')
+            location = request.form.get('location')
+            try:
+                maxMembers = int(request.form.get('maxMembers'))
+            except Exception as e:
+                return str(Status(False, f'maxMembers must be an int'))
+            meetType = request.form.get("meetType")
+            startDate = request.form.get("startDate")
+            title = request.form.get("title")
+            project = {
+                "created": datetime.now(),
+                "description": description,
+                "host_id": getcurr(),
+                "location": location,
+                "maxMembers": maxMembers,
+                "meetType": meetType,
+                "startDate":startDate,
+                "title":title
+            }  
+            id=create("Projects", project)[0]
+            return str(Status(True, f'Successfully created project. id: {id}'))
         except Exception as e:
             return str(Status(False, f'project creation failed. error: {e}'))

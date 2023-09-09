@@ -30,7 +30,11 @@ def register():
 #project
 @app.route(Projects.ROUTE + 'createProject', methods = ['POST'])
 def createProject():
-    return Projects.Projects.createProj(request)
+    return Projects.Projects.createProject(request)
+
+@app.route(Projects.ROUTE + 'deleteProject', methods = ['POST'])
+def deleteProject():
+    return Projects.Projects.deleteProject(request)
 
 
 if __name__ == "__main__":
