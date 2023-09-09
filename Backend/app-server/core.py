@@ -29,3 +29,4 @@ def stringify(vals):
     for id in vals:
         new = str(vals[id])
         vals[id]=new
+    return vals
