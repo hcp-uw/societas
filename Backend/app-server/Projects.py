@@ -11,7 +11,7 @@ class Projects:
                 raise Exception("firebase error")
             return str(Status(True, f'Successfully deleted project.'))
         except Exception as e:
-            return str(Status(False, f'project deletion failed. error: {e.with_traceback}'))
+            return str(Status(False, f'project deletion failed. error: {e.with_traceback()}'))
 
     def getProjectInfo(request):
         try:
@@ -25,7 +25,7 @@ class Projects:
                     return str(Status(True, stringify(vals[id])))
             raise Exception("project doesn't exist")
         except Exception as e:
-            return str(Status(False, f'project deletion failed. error: {e.with_traceback}'))
+            return str(Status(False, f'project deletion failed. error: {e.with_traceback()}'))
 
     def createProject(request):
         try:
@@ -55,4 +55,4 @@ class Projects:
                  raise Exception("firebase error")
             return str(Status(True, f'Successfully created project. id: {id[0]}'))
         except Exception as e:
-            return str(Status(False, f'project creation failed. error: {e.with_traceback}'))
+            return str(Status(False, f'project creation failed. error: {e.with_traceback()}'))

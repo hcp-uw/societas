@@ -29,4 +29,4 @@ class Preferences:
                 Preferences.setPreference(i)
             return str(Status(True, f'Successfully set preferences.'))
         except Exception as e:
-            return str(Status(False, f'setting preferences failed. error: {e.with_traceback}'))
+            return str(Status(False, f'setting preferences failed. error: {e.with_traceback()}'))
