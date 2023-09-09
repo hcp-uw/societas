@@ -7,7 +7,8 @@ class Projects:
         try:
             if getcurr() is None:
                 return str(Status(False, "User must be logged in."))
-            delete("Projects", request.form.get("id"))
+            if not delete("Projects", request.form.get("id"))[1]:
+                raise Exception("firebase error")
             return str(Status(True, f'Successfully deleted project.'))
         except Exception as e:
             return str(Status(False, f'project deletion failed. error: {e}'))
@@ -35,7 +36,9 @@ class Projects:
                 "startDate":startDate,
                 "title":title
             }  
-            id=create("Projects", project)[0]
-            return str(Status(True, f'Successfully created project. id: {id}'))
+            id=create("Projects", project)
+            if not id[1]:
+                 raise Exception("firebase error")
+            return str(Status(True, f'Successfully created project. id: {id[0]}'))
         except Exception as e:
             return str(Status(False, f'project creation failed. error: {e}'))
