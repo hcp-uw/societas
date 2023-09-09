@@ -18,7 +18,7 @@ def create(collection, new):
 	try:
 		coll = db.collection(collection)
 		ut, ref = coll.add(new)
-		return ("{ref.id}", True, 200)
+		return (f"{ref.id}", True, 200)
 	except Exception as e:
 		return (f"Failed: {e}", False, 000)
 	
