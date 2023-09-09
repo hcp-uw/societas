@@ -40,6 +40,9 @@ def getProjectInfo():
     return Projects.Projects.getProjectInfo(request)
 
 #preferences
+@app.route(Projects.ROUTE + 'getPreferences', methods = ['POST'])
+def getPreferences():
+    return Preferences.Preferences.getPreferences(request)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
