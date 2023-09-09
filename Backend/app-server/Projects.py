@@ -22,7 +22,7 @@ class Projects:
             projectID = request.form.get("id")
             for id in vals:
                 if str(id) == projectID:
-                    return str(Status(True, str(vals[id])))
+                    return str(Status(True, stringify(vals[id])))
             raise Exception("project doesn't exist")
         except Exception as e:
             return str(Status(False, f'project deletion failed. error: {e}'))
