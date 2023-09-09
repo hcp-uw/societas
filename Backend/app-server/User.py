@@ -7,7 +7,7 @@ from core import *
 ROUTE = '/user/'
 
 class Auth:
-    def hash3(password, user): #https://github.com/JaakkoL/firebase-scrypt-python/blob/master/firebasescrypt/firebasescrypt.py
+    def hash(password, user): #https://github.com/JaakkoL/firebase-scrypt-python/blob/master/firebasescrypt/firebasescrypt.py
         n = 2 ** 14
         p = 1
         salt = user.password_salt
@@ -68,7 +68,7 @@ class Auth:
                 salt = base64.b64decode(user.password_salt)
                 stored_hash = base64.b64decode(user.password_hash)
                 encoded_hash = base64.b64decode(hash2(pwd, user.password_salt))'''
-                correct, error = Auth.hash3(pwd, user)
+                correct, error = Auth.hash(pwd, user)
                 if correct:
                     setcurr(user.uid)
                     return str(Status(True, f'Successfully logged in {email}'))

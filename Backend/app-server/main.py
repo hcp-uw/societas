@@ -1,6 +1,5 @@
 import os
-import User
-import Projects
+import User, Projects, Preferences
 from flask import Flask, request, session
 from flask_cors import CORS
 
@@ -40,6 +39,7 @@ def deleteProject():
 def getProjectInfo():
     return Projects.Projects.getProjectInfo(request)
 
+#preferences
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
