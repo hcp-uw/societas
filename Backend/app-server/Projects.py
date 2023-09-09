@@ -13,6 +13,20 @@ class Projects:
         except Exception as e:
             return str(Status(False, f'project deletion failed. error: {e}'))
 
+    def getProjectInfo(request):
+        try:
+            res = read("Projects")
+            if not res[1]:
+                raise Exception("firebase error")
+            vals = res[0]
+            projectID = request.form.get("id")
+            for id in vals:
+                if str(id) == projectID:
+                    return str(Status(True, str(vals[id])))
+            raise Exception("project doesn't exist")
+        except Exception as e:
+            return str(Status(False, f'project deletion failed. error: {e}'))
+
     def createProject(request):
         try:
             if getcurr() is None:
