@@ -40,7 +40,7 @@ def getProjectInfo():
     return Projects.Projects.getProjectInfo(request)
 
 #preferences
-@app.route(Projects.ROUTE + 'setPreferences', methods = ['POST'])
+@app.route(Preferences.ROUTE + 'setPreferences', methods = ['POST'])
 def setPreferences():
     return Preferences.Preferences.setPreferences(request)
 
