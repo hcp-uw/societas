@@ -3,6 +3,14 @@ from core import *
 ROUTE = '/preferences/'
 
 class Preferences:
+    def resetPreferences():
+        vals = read("Preferences")
+        for id in vals:
+            obj = vals[id]
+            if obj["id"] == getcurr() and bool(obj["user"]):
+                if not delete("Preferences", id)[1]:
+                    raise Exception("firebase error")
+
     def setPreference(preference):
         res = create("Preferences", {
             "id":getcurr(),
@@ -15,6 +23,7 @@ class Preferences:
         try:
             if getcurr() is None:
                 return str(Status(False, "User must be logged in."))
+            Preferences.resetPreferences()
             preferences = request.form.get("preferences").split("|")
             for i in preferences:
                 Preferences.setPreference(i)
