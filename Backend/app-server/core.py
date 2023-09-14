@@ -24,3 +24,9 @@ def cprint(string):
     text += '\n'+f'{datetime.now()} --- {string}'
     with open(logpath, 'w') as f:
         f.write(text)
+
+def stringify(vals):
+    for id in vals:
+        new = str(vals[id])
+        vals[id]=new
+    return vals
