@@ -25,7 +25,7 @@ class Projects:
                     return str(Status(True, stringify(vals[id])))
             raise Exception(f"project {projectID} doesn't exist")
         except Exception as e:
-            return str(Status(False, f'get project info failed error: {e}'))
+            return str(Status(False, f'get project info failed. error: {e}'))
 
     def createProject(request):
         try:
