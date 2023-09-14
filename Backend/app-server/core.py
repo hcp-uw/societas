@@ -1,6 +1,6 @@
 from flask import session, app
 from datetime import datetime
-import os
+import os, json
 
 class Status:
     def __init__(self, success, message):
@@ -8,7 +8,7 @@ class Status:
         self.message = message
     
     def __str__(self):
-        return str({'success':self.success,'message':self.message})
+        return json.dumps({'success':self.success,'message':self.message}, indent=4)
     
 
 getcurr = lambda: session.get('curr')
