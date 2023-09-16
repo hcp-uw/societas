@@ -239,7 +239,7 @@ function FilesView({ formState, handleAddPicture, handleDelPicture }) {
         <input
           type="file"
           accept="image/*"
-          className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-2"
+          className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
           name="image"
           id="image"
           onChange={(e) => {

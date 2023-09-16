@@ -6,12 +6,19 @@ import { ClerkProvider } from "@clerk/clerk-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { loader as projectsLoader } from "./pages/Home"
-import { loader as projectLoader, action as reqAction } from "./pages/Project"
+import {
+  createPostAction,
+  postsLoader as projectPostsLoader,
+  ProjectInfo,
+  infoLoader as projectInfoLoader,
+  ProjectPosts,
+  action as reqAction,
+} from "./pages/Project"
 import Project from "./pages/Project"
 import ProfilePage from "./pages/ProfilePage.jsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.jsx"
 import Home from "./pages/Home"
-import Requests from "./pages/Requests.jsx"
+import Requests, { resquestAcceptAction } from "./pages/Requests.jsx"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,7 +38,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    loader: () => projectsLoader(queryClient),
+    loader: projectsLoader(queryClient),
     children: [
       {
         index: true,
@@ -40,8 +47,24 @@ const router = createBrowserRouter([
       {
         path: ":projectId",
         element: <Project />,
-        loader: () => projectLoader(queryClient),
+        loader: projectInfoLoader(queryClient),
         action: reqAction(queryClient),
+        children: [
+          {
+            index: true,
+            element: <ProjectInfo />,
+          },
+          {
+            path: "posts",
+            element: <ProjectPosts />,
+            loader: projectPostsLoader(queryClient),
+          },
+
+          {
+            path: "createPost",
+            action: createPostAction(queryClient),
+          },
+        ],
       },
       {
         path: "account",
@@ -55,6 +78,11 @@ const router = createBrowserRouter([
           {
             path: "requests",
             element: <Requests />,
+          },
+          {
+            path: "requests/acceptReq",
+            element: <Requests />,
+            action: resquestAcceptAction(queryClient),
           },
         ],
       },

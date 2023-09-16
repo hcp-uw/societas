@@ -14,6 +14,7 @@ import {
   arrayUnion,
   query,
   where,
+  arrayRemove,
 } from "firebase/firestore"
 
 import {
@@ -135,9 +136,13 @@ export async function getProjectById(id) {
 }
 
 // requests
-export async function getAllRequests(currentUserId) {
+export async function getAllPendingRequests(currentUserId) {
   const requestsRef = collection(db, "requests")
-  const q = query(requestsRef, where("ownerId", "==", currentUserId))
+  const q = query(
+    requestsRef,
+    where("ownerId", "==", currentUserId),
+    where("status", "==", "pending")
+  )
 
   const qSnapShot = await getDocs(q)
 
@@ -147,6 +152,43 @@ export async function getAllRequests(currentUserId) {
   })
 
   return queryData
+}
+
+export async function acceptRequest(requestId, projectId, requestantId) {
+  await updateDoc(doc(db, "requests", requestId), {
+    status: "accepted",
+  })
+
+  await updateDoc(doc(db, "projects", projectId), {
+    members: arrayUnion(requestantId),
+    requestants: arrayRemove(requestantId),
+  })
+
+  console.log("success")
+}
+
+function addIdToSnapShot(snapshot) {
+  let queryData = []
+  snapshot.forEach((doc) => {
+    queryData = [...queryData, { id: doc.id, ...doc.data() }]
+  })
+
+  return queryData
+}
+// project posts
+export async function getAllProjectPosts(projectId) {
+  const projPostsSnap = await getDocs(
+    collection(db, `projects/${projectId}/posts`)
+  )
+
+  return addIdToSnapShot(projPostsSnap)
+}
+export async function createProjectPost(projectId, post) {
+  await addDoc(collection(db, `projects/${projectId}/posts`), {
+    title: post.title,
+    likes: 0,
+    createdAt: serverTimestamp(),
+  })
 }
 
 // auth

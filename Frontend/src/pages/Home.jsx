@@ -14,7 +14,7 @@ const projectsQuery = () => ({
   queryFn: getAllProjects,
 })
 
-export const loader = async (queryClient) => {
+export const loader = (queryClient) => async () => {
   if (!queryClient.getQueryData(projectsQuery().queryKey)) {
     return await queryClient.fetchQuery(projectsQuery())
   }
@@ -78,7 +78,12 @@ function Projects() {
           to={proj.id}
           className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-4 mb-8 transition-colors hover:outline-2 hover:outline hover:outline-zinc-300"
         >
-          <Img src={proj.imageUrl} width={300} height={300} />
+          <img
+            src={proj.imageUrl}
+            width={500}
+            height={300}
+            className="object-fill max-h-60 w-fit m-auto h-auto rounded-lg"
+          />
           <h2 className="text-2xl font-bold text-zinc-900">{proj.title}</h2>
           <p className="text-zinc-800 leading-loose">{proj.description}</p>
           <div className="flex gap-2 flex-wrap">
@@ -105,24 +110,6 @@ function Projects() {
   )
 }
 
-// const StyledProj = styled(NavLink)`
-//   background-color: #e9e9e9;
-//   display: flex;
-//   flex-direction: column;
-//   font-family: ${({ theme }) => theme.fonts.default};
-//   padding: 1.5rem;
-//   border-radius: 21px;
-//   gap: 1rem;
-//   margin-bottom: 2rem;
-//   color: ${({ theme }) => theme.colors.mainText};
-//   text-decoration: none;
-
-//   h2 {
-//     color: black;
-//   }
-//   /* max-width: 19rem; */
-// `
-
 const TimeBlob = styled.p`
   background-color: #d9d9d9;
   border-radius: 10px;
@@ -131,12 +118,4 @@ const TimeBlob = styled.p`
   display: flex;
   align-items: center;
   gap: 0.25rem;
-`
-
-const Img = styled.img`
-  object-fit: contain;
-  max-height: 15rem;
-  margin: auto;
-  height: auto;
-  /* border-radius: 21px; */
 `

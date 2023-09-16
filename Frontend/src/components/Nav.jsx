@@ -8,7 +8,7 @@ export default function Nav() {
   const { user } = useUser()
 
   return (
-    <header>
+    <header className="border-b-2 py-2">
       <StyledNav>
         <NavLink to="/">
           <img src={LogoRoute} alt="Societas Logo" width={70} />
