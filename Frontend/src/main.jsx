@@ -11,8 +11,11 @@ import {
   postsLoader as projectPostsLoader,
   ProjectInfo,
   infoLoader as projectInfoLoader,
-  ProjectPosts,
+  ProjectPostsLayout,
   action as reqAction,
+  CreatePost,
+  ProjectPost,
+  postLoader,
 } from "./pages/Project"
 import Project from "./pages/Project"
 import ProfilePage from "./pages/ProfilePage.jsx"
@@ -56,14 +59,32 @@ const router = createBrowserRouter([
           },
           {
             path: "posts",
-            element: <ProjectPosts />,
+            element: <ProjectPostsLayout />,
             loader: projectPostsLoader(queryClient),
+            children: [
+              {
+                path: ":postId",
+                element: <ProjectPost />,
+                loader: postLoader(queryClient),
+              },
+            ],
           },
-
           {
-            path: "createPost",
+            path: "posts/new",
+            element: <CreatePost />,
+            loader: projectPostsLoader(queryClient),
             action: createPostAction(queryClient),
           },
+          // {
+          //   path: "create",
+          //   loader: projectPostsLoader(queryClient),
+          //   element: <CreatePost />,
+          // },
+
+          // {
+          //   path: "createPost",
+          //   action: createPostAction(queryClient),
+          // },
         ],
       },
       {

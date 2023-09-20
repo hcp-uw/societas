@@ -14,3 +14,7 @@
   /* gutter size */
   background-clip: padding-box;
 }
+
+.material-symbols-fill {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}

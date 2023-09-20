@@ -5,16 +5,19 @@ import {
   createProjectPost,
   getAllProjectPosts,
   getProjectById,
+  getProjectPostById,
 } from "../firebase"
 import Spinner from "../components/Spinner"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useUser } from "@clerk/clerk-react"
-import { TextArea } from "../components/inputs"
-import { useState } from "react"
+import { TextArea, Input, StyledInput } from "../components/inputs"
+import { useRef, useState } from "react"
 import { useEffect } from "react"
+import toast from "react-hot-toast"
 // import axios from "axios"
 import { Form, NavLink, Outlet } from "react-router-dom"
+import Markdown from "marked-react"
 
 dayjjs.extend(relativeTime)
 
@@ -26,6 +29,11 @@ const projectInfoQuery = (id) => ({
 const projectPostsQuery = (id) => ({
   queryKey: ["projects", id, "posts"],
   queryFn: () => getAllProjectPosts(id),
+})
+
+const projectPostQuery = (projectId, postId) => ({
+  queryKey: ["projects", projectId, "posts", postId],
+  queryFn: () => getProjectPostById(projectId, postId),
 })
 
 export const infoLoader =
@@ -42,6 +50,16 @@ export const postsLoader =
   (queryClient) =>
   async ({ params }) => {
     const query = projectPostsQuery(params.projectId)
+    return (
+      queryClient.getQueryData(query.queryKey) ??
+      (await queryClient.fetchQuery(query))
+    )
+  }
+
+export const postLoader =
+  (queryClient) =>
+  async ({ params }) => {
+    const query = projectPostQuery(params.projectId, params.postId)
     return (
       queryClient.getQueryData(query.queryKey) ??
       (await queryClient.fetchQuery(query))
@@ -74,14 +92,20 @@ export const createPostAction =
   async ({ request }) => {
     const formData = await request.formData()
     const inputs = Object.fromEntries(formData)
+    // console.log(inputs)
 
-    await createProjectPost(inputs.projectId, { title: inputs.postTitle })
+    // return null
+
+    await createProjectPost(inputs.projectId, {
+      title: inputs.title,
+      comment: inputs.comment,
+    })
 
     queryClient.invalidateQueries({
       queryKey: ["projects", inputs.projectId, "posts"],
     })
 
-    return redirect(`/${inputs.projectId}`)
+    return redirect(`/${inputs.projectId}/posts`)
   }
 export default function Project() {
   const { projectId } = useParams()
@@ -183,16 +207,36 @@ export default function Project() {
           </div>
         )}
 
-        <div className="w-full max-w-6xl m-auto border-2 overflow-hidden rounded-lg h-fit">
-          <div className="bg-[#D9D9D9] flex flex-col">
-            <div className="flex justify-between items-center p-4 w-full max-w-7xl m-auto">
+        <div className="w-full max-w-6xl m-auto">
+          <nav className="py-8 w-full flex gap-4">
+            <NavLink
+              to={`/${projectId}`}
+              end
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-zinc-400 py-3 px-6 inline-block border-b-4 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
+                  : "bg-zinc-400 py-3 px-6 inline-block hover:bg-zinc-300 transition-colors"
+              }
+            >
+              Project Info
+            </NavLink>
+            <NavLink
+              to={`/${projectId}/posts`}
+              className={({ isActive }) =>
+                isActive
+                  ? "bg-zinc-400 py-3 px-6 inline-block border-b-4 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
+                  : "bg-zinc-400 py-3 px-6 inline-block hover:bg-zinc-300 transition-colors"
+              }
+            >
+              Blog Posts
+            </NavLink>
+          </nav>
+          <div className="flex flex-col">
+            <div className="flex justify-between items-center w-full m-auto">
               <div className="flex flex-col">
-                <h2 className="text-2xl font-bold text-zinc-800 flex items-center">
+                <h2 className="text-3xl font-bold text-zinc-800 flex items-center">
                   {data.title}
                 </h2>
-                <p className="text-zinc-800 leading-7 max-w-lg">
-                  {data.description}
-                </p>
               </div>
 
               {user && data.requestants.find((member) => member === user.id) ? (
@@ -205,9 +249,17 @@ export default function Project() {
               ) : user && data.members.find((member) => member === user.id) ? (
                 <p className="bg-slate-400 py-2 px-6 rounded-lg">Member</p>
               ) : user && data.ownerId === user.id ? (
-                <p className="bg-green-600 py-2 px-6 text-zinc-100 rounded-lg">
-                  Owner
-                </p>
+                <div className="flex gap-4 items-center">
+                  <NavLink
+                    to="posts/new"
+                    className="inline-block bg-zinc-500 py-2 px-6 rounded-lg border-2 border-zinc-300 text-zinc-100 font-medium"
+                  >
+                    New Post
+                  </NavLink>
+                  <p className="bg-green-600 py-2 px-6 text-zinc-100 rounded-lg">
+                    Owner
+                  </p>
+                </div>
               ) : !user ? (
                 <div> Login to send request</div>
               ) : (
@@ -219,71 +271,98 @@ export default function Project() {
                 </button>
               )}
             </div>
-            <div className="w-[95%] m-auto h-[3px] max-w-7xl bg-zinc-400 rounded-full"></div>
-            <div className="flex">
-              <NavLink
-                to={`/${projectId}`}
-                end
-                className="flex-1 flex items-center justify-center hover:bg-zinc-200 bg-opacity-75 px-6 py-4 transition-colors"
-              >
-                {({ isActive }) => (
-                  <span
-                    className={
-                      isActive
-                        ? "text-zinc-900 font-medium relative after:absolute after:w-full after:h-1 after:bg-[#FBBC05] after:content-[''] after:-bottom-2 after:left-0"
-                        : "text-zinc-900 font-medium"
-                    }
-                  >
-                    Project Info
-                  </span>
-                )}
-              </NavLink>
-              <NavLink
-                to={`/${projectId}/posts`}
-                className="flex-1 flex items-center justify-center hover:bg-zinc-200 bg-opacity-75 px-6 py-4 transition-colors"
-              >
-                {({ isActive }) => (
-                  <span
-                    className={
-                      isActive
-                        ? "text-zinc-900 font-medium relative after:absolute after:w-full after:h-1 after:bg-[#FBBC05] after:content-[''] after:-bottom-2 after:left-0"
-                        : "text-zinc-900 font-medium"
-                    }
-                  >
-                    Blog Posts
-                  </span>
-                )}
-              </NavLink>
-            </div>
+            <div className="w-full m-auto h-[2px] max-w-7xl bg-zinc-300 rounded-full my-4"></div>
           </div>
 
-          <div className="p-4 max-w-7xl m-auto">
-            <Outlet />
-          </div>
+          <Outlet />
         </div>
       </div>
-
-      <Form method="post" action="createPost">
-        <input type="text" className="border" name="postTitle" />
-        <input type="hidden" name="projectId" value={projectId} />
-        <button>Create post</button>
-      </Form>
     </>
   )
 }
 
-export function ProjectInfo() {
+function useGetProjectData() {
   const { projectId } = useParams()
-  const { data, isLoading, isError } = useQuery(projectInfoQuery(projectId))
+  const query = useQuery(projectInfoQuery(projectId))
+
+  return {
+    projectId,
+    ...query,
+  }
+}
+
+function SubmitFetcherBtn({ fetcher, message }) {
   return (
-    <div className="flex justify-between w-full">
+    <button
+      type="submit"
+      className="bg-blue-600 text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-500"
+      disabled={fetcher.state === "submitting"}
+    >
+      {fetcher.state === "submitting" ? (
+        <Spinner color="white" />
+      ) : (
+        <p className="py-2">{message}</p>
+      )}
+    </button>
+  )
+}
+
+export function CreatePost() {
+  const { user } = useUser()
+  const { data, isLoading, projectId } = useGetProjectData()
+  const [isPreview, setIsPreview] = useState(false)
+  const [comment, setComment] = useState("")
+  const fetcher = useFetcher()
+
+  if (isLoading) return <div>loading</div>
+
+  if (data.ownerId !== user.id) {
+    toast.error("Can only create post if owner")
+    return redirect("..")
+  }
+
+  return (
+    <div className="flex gap-4 items-start flex-col">
+      <button onClick={() => setIsPreview((prev) => !prev)}>switch view</button>
+      <fetcher.Form method="post">
+        <Input>
+          <StyledInput placeholder="Title" name="title" id="title" />
+        </Input>
+        {isPreview ? (
+          <article className="prose prose-base prose-slate">
+            <Markdown>{comment}</Markdown>
+          </article>
+        ) : (
+          <TextArea
+            name=""
+            id="comment"
+            cols="30"
+            rows="10"
+            className="w-full resize-none"
+            placeholder="comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+        )}
+        <input type="hidden" name="comment" value={comment} />
+        <input type="hidden" name="projectId" value={projectId} />
+        <SubmitFetcherBtn fetcher={fetcher} message="Create Post" />
+      </fetcher.Form>
+    </div>
+  )
+}
+
+export function ProjectInfo() {
+  const { data, isLoading, isError } = useGetProjectData()
+
+  return (
+    <div className="flex justify-between w-full gap-16">
       <div className="flex flex-col gap-4">
-        {/* <p>
-          <span className="underline font-semibold mr-3 underline-offset-4">
-            Description:
-          </span>
-          {data.description}
-        </p> */}
+        <p className="text-zinc-800 leading-7">
+          {data.description} Lorem ipsum dolor sit amet consectetur adipisicing
+          elit. Alias sit ipsam illum libero at debitis eos corporis corrupti
+          tempora maxime?
+        </p>
         <p>
           <span className="underline font-semibold mr-3 underline-offset-4">
             Meet Location:
@@ -308,7 +387,7 @@ export function ProjectInfo() {
   )
 }
 
-export function ProjectPosts() {
+export function ProjectPostsLayout() {
   const { projectId } = useParams()
   const { data, isLoading, isError } = useQuery(projectPostsQuery(projectId))
 
@@ -324,10 +403,50 @@ export function ProjectPosts() {
     )
 
   return (
-    <div>
-      {data.map((post) => (
-        <div key={post.id}>{post.title}</div>
-      ))}
+    <div className="flex justify-between gap-8">
+      <div className="flex w-fit gap-4 flex-col">
+        {data.map((post) => (
+          <NavLink
+            key={post.id}
+            className={({ isActive }) =>
+              isActive
+                ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-blue-500 max-w-xs rounded-lg"
+                : "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-400 max-w-xs rounded-lg hover:border-zinc-500 transition-all"
+            }
+            to={`${post.id}`}
+          >
+            <div>
+              <p className="font-medium text-zinc-800">{post.title}</p>
+              <p className="text-sm text-zinc-600">
+                {dayjjs(post.createdAt.toDate()).toDate().toLocaleDateString()}
+              </p>
+            </div>
+            <span className="material-symbols-outlined hover:text-zinc-500 text-zinc-700 transition-colors">
+              favorite
+            </span>
+          </NavLink>
+        ))}
+      </div>
+      <Outlet />
+    </div>
+  )
+}
+
+export function ProjectPost() {
+  const params = useParams()
+  const { data, isLoading, isError } = useQuery(
+    projectPostQuery(params.projectId, params.postId)
+  )
+
+  if (isLoading) return <div>loading..</div>
+
+  if (isError) return <div>something went wrong</div>
+
+  return (
+    <div className="flex-1 border-2 border-zinc-400 rounded-lg p-4">
+      <article className="prose prose-base prose-slate">
+        <Markdown>{data.comment}</Markdown>
+      </article>
     </div>
   )
 }

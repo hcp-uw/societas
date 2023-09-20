@@ -184,11 +184,23 @@ export async function getAllProjectPosts(projectId) {
   return addIdToSnapShot(projPostsSnap)
 }
 export async function createProjectPost(projectId, post) {
+  console.log(projectId, post)
   await addDoc(collection(db, `projects/${projectId}/posts`), {
     title: post.title,
+    comment: post.comment,
     likes: 0,
     createdAt: serverTimestamp(),
   })
+}
+
+export async function getProjectPostById(projectId, projectPostId) {
+  const postSnapShot = await getDoc(
+    doc(db, `projects/${projectId}/posts/${projectPostId}`)
+  )
+  return {
+    id: postSnapShot.id,
+    ...postSnapShot.data(),
+  }
 }
 
 // auth
