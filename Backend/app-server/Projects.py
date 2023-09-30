@@ -3,6 +3,49 @@ from core import *
 ROUTE = '/projects/'
 
 class Projects:
+    def sendAnnouncement(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            res = create("Announcements", {
+                'content':request.form.get('content'),
+                'pid':request.form.get('pid'),
+                'title':request.form.get('title'),
+                'sender':getcurr(),
+                'time':datetime.now()
+            })
+            if res[1]:
+                return str(Status(True, "Successfully sent announcement"))
+            else:
+                raise Exception("Firebase error")
+        except Exception as e:
+            return str(Status(False, f'Announcement failed. error: {e}'))
+        
+    def getAnnouncements(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            res = read('Announcements')
+            if res[1]:
+                return str(Status(True, str(res[0])))
+            else:
+                raise Exception("Firebase error")
+        except Exception as e:
+            return str(Status(False, f'Failed to get announcements. error: {e}'))
+
+    def getAllProjects(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            res = read('Projects')
+            projects = None
+            if res[1]:
+                projects = res[0]
+            else:
+                raise Exception("Firebase error")
+            return str(Status(True, str(projects)))
+        except Exception as e:
+            return str(Status(False, f'project deletion failed. error: {e}'))
     def deleteProject(request):
         try:
             if getcurr() is None:

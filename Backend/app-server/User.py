@@ -6,6 +6,37 @@ from Firebase.dbconn import *
 from core import *
 ROUTE = '/user/'
 
+class User:
+    def getAllProjects():
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User not logged in."))
+            res = read('Participants')
+            if res[1]:
+                participants = res[0]
+                projects = []
+                for id in participants:
+                    if participants[id]['uid'] == getcurr():
+                        projects.append(participants[id]['pid'])
+                return str(Status(True, str(projects)))
+            else:
+                raise Exception("Firebase error")
+        except Exception as e:
+            return str(Status(False, f'Failed to retrieve projects. error: {e}'))
+        
+    def joinProject(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User not logged in."))
+            res = create('Participants',{'uid':getcurr(),'pid':request.form.get("pid")})
+            if res[1]:
+                return str(Status(True, "Successfully joined project"))
+            else:
+                raise Exception("Firebase error")
+        except Exception as e:
+            return str(Status(False, f'Failed to join project. error: {e}'))
+        
+
 class Auth:
     def hash(password, user): #https://github.com/JaakkoL/firebase-scrypt-python/blob/master/firebasescrypt/firebasescrypt.py
         n = 2 ** 14
@@ -98,7 +129,17 @@ class Auth:
         setcurr(user.uid)
         
         return str(Status(True, f'Successfully registered {email}. {user.password_salt}'))
-        
+    
+    def newRegister(request):
+        Auth.logout()
+        email = request.form.get('email')
+        uid = request.form.get('uid')
+        create("Users", {"email":email,"uid":uid})
+        Auth.newLogin()
+        return str(Status(True, f'Successfully registered {email}.'))
+
+    def newLogin(request):
+        setcurr(request.get('uid'))
         
     def logout():
         setcurr(None)
