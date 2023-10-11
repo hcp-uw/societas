@@ -70,10 +70,6 @@ Santiago: Frontend Github:SantiagoG14
 
 Angela: Frontend Github:Ajyang5
 
-Ben: Frontend Github:bene34
-
-Ronit : Backend Github:ronitdasgupta
-
 Arjun: Backend Github:Aleph-Null-123
 
 Sid: Backend GitHub :Szzzz234
