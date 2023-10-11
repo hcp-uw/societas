@@ -45,7 +45,7 @@ class Projects:
                 raise Exception("Firebase error")
             return str(Status(True, projstr(projects)))
         except Exception as e:
-            return str(Status(False, f'project deletion failed. error: {e}')))
+            return str(Status(False, f'project deletion failed. error: {e}'))
     def deleteProject(request):
         try:
             if getcurr() is None:
