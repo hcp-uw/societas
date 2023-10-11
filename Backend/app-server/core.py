@@ -33,5 +33,5 @@ def stringify(vals):
 
 def projstr(projects):
     for i in projects:
-        projects["created"] = str(projects["created"])
+        projects[i]["created"] = str(projects[i]["created"])
     return projects
