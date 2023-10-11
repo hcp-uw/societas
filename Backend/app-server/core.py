@@ -30,3 +30,8 @@ def stringify(vals):
         new = str(vals[id])
         vals[id]=new
     return vals
+
+def projstr(projects):
+    for i in projects:
+        projects["created"] = str(projects["created"])
+    return projects
