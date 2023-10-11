@@ -16,7 +16,7 @@ def hello_world():
 #user
 @app.route(User.ROUTE + 'login', methods = ['POST'])
 def login():
-    return User.Auth.login(request)
+    return User.Auth.newLogin(request)
 
 @app.route(User.ROUTE + 'logout', methods = ['POST'])
 def logout():
@@ -24,7 +24,15 @@ def logout():
 
 @app.route(User.ROUTE + 'register', methods = ['POST'])
 def register():
-    return User.Auth.register(request)
+    return User.Auth.newRegister(request)
+
+@app.route(User.ROUTE + 'getAllProjects', methods = ['POST'])
+def getAllProjects():
+    return User.User.getAllProjects(request)
+
+@app.route(User.ROUTE + 'joinProject', methods = ['POST'])
+def joinProject():
+    return User.User.joinProject(request)
 
 #project
 @app.route(Projects.ROUTE + 'createProject', methods = ['POST'])
@@ -38,6 +46,18 @@ def deleteProject():
 @app.route(Projects.ROUTE + 'getProjectInfo', methods = ['POST'])
 def getProjectInfo():
     return Projects.Projects.getProjectInfo(request)
+
+@app.route(Projects.ROUTE + 'getAllProjects', methods = ['POST'])
+def getAllProjects():
+    return Projects.Projects.getAllProjects(request)
+
+@app.route(Projects.ROUTE + 'sendAnnouncement', methods = ['POST'])
+def sendAnnouncement():
+    return Projects.Projects.sendAnnouncement(request)
+
+@app.route(Projects.ROUTE + 'getAnnouncements', methods = ['POST'])
+def getAnnouncements():
+    return Projects.Projects.getAnnouncements(request)
 
 #preferences
 @app.route(Preferences.ROUTE + 'setPreferences', methods = ['POST'])
