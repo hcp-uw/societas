@@ -8,7 +8,7 @@ class Status:
         self.message = message
     
     def __str__(self):
-        return json.dumps({"success":self.success,"message":self.message}, indent=, separators =(", ", " : "),)
+        return json.dumps({"success":self.success,"message":self.message}, indent=4, separators =(", ", " : "),)
     
 
 getcurr = lambda: session.get('curr')
