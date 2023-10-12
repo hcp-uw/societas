@@ -92,7 +92,8 @@ class Projects:
                 "maxMembers": maxMembers,
                 "meetType": meetType,
                 "startDate":startDate,
-                "title":title
+                "title":title,
+                "image":request.form.get("image")
             }  
             id=create("Projects", project)
             if not id[1]:
