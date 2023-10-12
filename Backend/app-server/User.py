@@ -145,7 +145,7 @@ class Auth:
             if i == id:
                 setcurr(request.form.get('uid'))
                 return str(Status(True, f'Successfully logged in {id}'))
-        return Auth.newRegister()
+        return Auth.newRegister(request)
         
     def logout():
         setcurr(None)

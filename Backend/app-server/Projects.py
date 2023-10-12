@@ -72,8 +72,9 @@ class Projects:
 
     def createProject(request):
         try:
-            if getcurr() is None:
-                return str(Status(False, "User must be logged in."))
+            #if getcurr() is None:
+            #    return str(Status(False, "User must be logged in."))
+            host_id = request.form.get("host_id")
             description = request.form.get('description')
             location = request.form.get('location')
             try:
@@ -86,7 +87,7 @@ class Projects:
             project = {
                 "created": datetime.now(),
                 "description": description,
-                "host_id": getcurr(),
+                "host_id": host_id,
                 "location": location,
                 "maxMembers": maxMembers,
                 "meetType": meetType,
