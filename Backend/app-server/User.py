@@ -139,7 +139,7 @@ class Auth:
         return str(Status(True, f'Successfully registered {email}.'))
 
     def newLogin(request):
-        setcurr(request.get('uid'))
+        setcurr(request.form.get('uid'))
         
     def logout():
         setcurr(None)
