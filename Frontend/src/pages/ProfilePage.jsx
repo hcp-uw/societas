@@ -10,47 +10,47 @@ export default function ProfilePage() {
   return (
     <ProfilePageLayout className="mt-6">
       <StyledAside>
-        <Link
+        <NavLink
           to="profile"
           onClick={() => setSelected("my-profile")}
           selected={selected === "my-profile"}
         >
           <span className="material-symbols-outlined">person</span>
           My profile
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to="create"
           onClick={() => setSelected("create-proj")}
           selected={selected === "create-proj"}
         >
           <span className="material-symbols-outlined">add_circle</span>
           Create Project
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to="edit-profile"
           onClick={() => setSelected("edit-profile")}
           selected={selected === "edit-profile"}
         >
           <span className="material-symbols-outlined">edit</span>
           Edit Profile
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to="password"
           onClick={() => setSelected("password")}
           selected={selected === "password"}
         >
           <span className="material-symbols-outlined">lock</span>
           Password
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           to="requests"
           onClick={() => setSelected("requests")}
           selected={selected === "requests"}
         >
           <span className="material-symbols-outlined">favorite</span>
           Requests
-        </Link>
+        </NavLink>
 
         <SignOutButton signOutCallback={() => navigate("/")}>
           Sign out

@@ -8,6 +8,7 @@ import { useUser } from "@clerk/clerk-react"
 import { useQuery } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
 import { Link } from "react-router-dom"
+import { useEffect } from "react"
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
@@ -24,6 +25,22 @@ export const loader = (queryClient) => async () => {
 
 export default function Home() {
   const { user } = useUser()
+
+  useEffect(() => {
+    let requestOptions = {
+      method: "POST",
+      redirect: "follow",
+    }
+
+    fetch(
+      "https://arjunnaik.pythonanywhere.com/projects/getAllProjects",
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((result) => console.log(result))
+
+      .catch((error) => console.log("error", error))
+  }, [])
 
   return (
     <>

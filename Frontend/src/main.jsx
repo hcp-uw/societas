@@ -22,6 +22,10 @@ import ProfilePage from "./pages/ProfilePage.jsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.jsx"
 import Home from "./pages/Home"
 import Requests, { resquestAcceptAction } from "./pages/Requests.jsx"
+import IntroPage from "./pages/IntroPage.jsx"
+import PreferencePage from "./pages/PreferencePage.jsx"
+import WhoopsPage from "./pages/WhoopsPage.jsx"
+import ReportPage from "./pages/ReportPage.jsx"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,6 +110,22 @@ const router = createBrowserRouter([
             action: resquestAcceptAction(queryClient),
           },
         ],
+      },
+      {
+        path: "intro",
+        element: <IntroPage />,
+      },
+      {
+        path: "preference",
+        element: <PreferencePage />,
+      },
+      {
+        path: "whoops",
+        element: <WhoopsPage />,
+      },
+      {
+        path: "report",
+        element: <ReportPage />,
       },
     ],
   },

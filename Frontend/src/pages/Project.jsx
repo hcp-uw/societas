@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { redirect, useFetcher, useParams } from "react-router-dom"
+import { redirect, useFetcher, useNavigate, useParams } from "react-router-dom"
 import {
   createProjectJoinRequest,
   createProjectPost,
@@ -12,11 +12,11 @@ import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { useUser } from "@clerk/clerk-react"
 import { TextArea, Input, StyledInput } from "../components/inputs"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useEffect } from "react"
 import toast from "react-hot-toast"
 // import axios from "axios"
-import { Form, NavLink, Outlet } from "react-router-dom"
+import { NavLink, Outlet } from "react-router-dom"
 import Markdown from "marked-react"
 
 dayjjs.extend(relativeTime)
@@ -291,11 +291,11 @@ function useGetProjectData() {
   }
 }
 
-function SubmitFetcherBtn({ fetcher, message }) {
+function SubmitFetcherBtn({ fetcher, message, className }) {
   return (
     <button
       type="submit"
-      className="bg-blue-600 text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-500"
+      className={`bg-blue-600 text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-500 ${className}`}
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
@@ -314,7 +314,7 @@ export function CreatePost() {
   const [comment, setComment] = useState("")
   const fetcher = useFetcher()
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading || !user) return <div>loading</div>
 
   if (data.ownerId !== user.id) {
     toast.error("Can only create post if owner")
@@ -324,7 +324,7 @@ export function CreatePost() {
   return (
     <div className="flex gap-4 items-start flex-col">
       <button onClick={() => setIsPreview((prev) => !prev)}>switch view</button>
-      <fetcher.Form method="post">
+      <fetcher.Form method="post" className="flex gap-4 flex-col w-full">
         <Input>
           <StyledInput placeholder="Title" name="title" id="title" />
         </Input>
@@ -346,7 +346,11 @@ export function CreatePost() {
         )}
         <input type="hidden" name="comment" value={comment} />
         <input type="hidden" name="projectId" value={projectId} />
-        <SubmitFetcherBtn fetcher={fetcher} message="Create Post" />
+        <SubmitFetcherBtn
+          fetcher={fetcher}
+          message="Create Post"
+          className="w-fit"
+        />
       </fetcher.Form>
     </div>
   )
@@ -358,11 +362,7 @@ export function ProjectInfo() {
   return (
     <div className="flex justify-between w-full gap-16">
       <div className="flex flex-col gap-4">
-        <p className="text-zinc-800 leading-7">
-          {data.description} Lorem ipsum dolor sit amet consectetur adipisicing
-          elit. Alias sit ipsam illum libero at debitis eos corporis corrupti
-          tempora maxime?
-        </p>
+        <p className="text-zinc-800 leading-7">{data.description} </p>
         <p>
           <span className="underline font-semibold mr-3 underline-offset-4">
             Meet Location:
@@ -388,8 +388,18 @@ export function ProjectInfo() {
 }
 
 export function ProjectPostsLayout() {
-  const { projectId } = useParams()
+  const { projectId, postId } = useParams()
   const { data, isLoading, isError } = useQuery(projectPostsQuery(projectId))
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (postId === undefined && !isLoading) {
+      console.log("here")
+
+      if (data.length === 0) return
+      navigate(`/${projectId}/posts/${data[0].id}`)
+    }
+  }, [])
 
   if (isLoading) return <div>loading posts</div>
 
@@ -408,9 +418,11 @@ export function ProjectPostsLayout() {
         {data.map((post) => (
           <NavLink
             key={post.id}
-            className={({ isActive }) =>
+            className={({ isActive, isPending }) =>
               isActive
                 ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-blue-500 max-w-xs rounded-lg"
+                : isPending
+                ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-500 bg-zinc-400 max-w-xs rounded-lg"
                 : "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-400 max-w-xs rounded-lg hover:border-zinc-500 transition-all"
             }
             to={`${post.id}`}
