@@ -34,4 +34,9 @@ def stringify(vals):
 def projstr(projects):
     for i in projects:
         projects[i]["created"] = str(projects[i]["created"])
-    return projects
+    pr = []
+    for i in projects:
+        new = projects[i]
+        new["ID"] = i
+        pr.append(new)
+    return pr
