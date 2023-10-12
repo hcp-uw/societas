@@ -135,11 +135,17 @@ class Auth:
         email = request.form.get('email')
         uid = request.form.get('uid')
         create("Users", {"email":email,"uid":uid})
-        Auth.newLogin()
+        setcurr('uid')
         return str(Status(True, f'Successfully registered {email}.'))
 
     def newLogin(request):
-        setcurr(request.form.get('uid'))
+        id = request.form.get('uid')
+        res = read("Users")
+        for i in res[0]:
+            if i == id:
+                setcurr(request.form.get('uid'))
+                return str(Status(True, f'Successfully logged in {id}'))
+        return Auth.newRegister()
         
     def logout():
         setcurr(None)
