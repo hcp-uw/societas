@@ -66,7 +66,7 @@ class Projects:
             for id in vals:
                 if str(id) == projectID:
                     return str(Status(True, stringify(vals[id])))
-            raise Exception(f"project {projectID} doesn't exist")
+            raise Exception(f"project {projectID} doesnt exist")
         except Exception as e:
             return str(Status(False, f'get project info failed. error: {e}'))
 
