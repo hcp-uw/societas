@@ -58,8 +58,6 @@ class Projects:
 
     def getProjectInfo(request):
         try:
-            if getcurr() is None:
-                return str(Status(False, "User must be logged in."))
             res = read("Projects")
             if not res[1]:
                 raise Exception("firebase error")
