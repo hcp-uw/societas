@@ -58,6 +58,8 @@ class Projects:
 
     def getProjectInfo(request):
         try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
             res = read("Projects")
             if not res[1]:
                 raise Exception("firebase error")
@@ -65,8 +67,37 @@ class Projects:
             projectID = request.form.get("id")
             for id in vals:
                 if str(id) == projectID:
-                    return str(Status(True, stringify(vals[id])))
+                    new = vals[id]
+                    new['participants'] = Projects.gp(projectID)
+                    return str(Status(True, stringify(new)))
             raise Exception(f"project {projectID} doesnt exist")
+        except Exception as e:
+            return str(Status(False, f'get project info failed. error: {e}'))
+        
+    def joinProject(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            res = create('Participants', {'pid': request.form.get("id"), 'uid': getcurr()})
+            if not res[1]:
+                raise Exception("firebase error")
+        except Exception as e:
+            return str(Status(False, f'get project info failed. error: {e}'))
+        
+    def gp(projectID):
+        res = read('Participants')
+        users = []
+        for id in res[0]:
+            if projectID == res[0][str(id)]['pid']:
+                users.append(res[0][str(id)]['uid'])
+        return users
+        
+    def getParticipants(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            users = Projects.gp(request.form.get("id"))
+            return str(Status(True, str(users)))
         except Exception as e:
             return str(Status(False, f'get project info failed. error: {e}'))
 
