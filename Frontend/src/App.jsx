@@ -21,7 +21,12 @@ function App() {
         return
       }
 
-      await signInWithClerkToken(token)
+      await fetch("https://arjunnaik.pythonanywhere.com/user/login", {
+        method: "POST",
+        body: {
+          uid: token,
+        },
+      })
     }
 
     signInWithFirebase()

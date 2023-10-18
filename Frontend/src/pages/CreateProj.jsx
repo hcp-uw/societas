@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { useState } from "react"
-import { createProject } from "../firebase"
+import { uploadProjectImage } from "../firebase"
 import { toast } from "react-hot-toast"
 import { redirect, useFetcher } from "react-router-dom"
 import { useUser } from "@clerk/clerk-react"
@@ -11,19 +11,14 @@ export const createProjectAction =
   (queryClient) =>
   async ({ request }) => {
     const formData = await request.formData()
-    console.log(formData.forEach((e) => console.log(e)))
     const inputs = Object.fromEntries(formData)
-    console.log(inputs)
+    const imageUrl = await uploadProjectImage(inputs.image)
+    formData.append("image", imageUrl)
 
-    await createProject({
-      title: inputs.title,
-      description: inputs.description,
-      meetLocation: inputs.meetLocation,
-      image: inputs.image,
-      maxMembers: inputs.maxMems,
-      ownerId: inputs.ownerId,
-      meetType: inputs.meetType,
-      startDate: inputs.startDate,
+    await fetch("https://arjunnaik.pythonanywhere.com/projects/createProject", {
+      body: formData,
+      method: "POST",
+      redirect: "follow",
     })
 
     toast.success("Project Created")
@@ -97,7 +92,7 @@ export default function CreateProj() {
         loading={fetcher.state === "submitting"}
       />
 
-      <input type="hidden" name="ownerId" value={user.id} />
+      <input type="hidden" name="host_id" value={user.id} />
 
       {/* Submit button for mobile view */}
       <SubmitBtnView
@@ -158,7 +153,7 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
         <StyledInput
           type="text"
           id="meetLocation"
-          name="meetLocation"
+          name="location"
           placeholder="Enter Project Location Here"
           onChange={(e) =>
             setFormState({ ...formState, location: e.target.value })
@@ -198,7 +193,7 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
             <StyledInput
               type="number"
               id="maxMems"
-              name="maxMems"
+              name="maxMembers"
               min={0}
               max={100}
               placeholder="5"

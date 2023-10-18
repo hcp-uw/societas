@@ -23,7 +23,21 @@ dayjjs.extend(relativeTime)
 
 const projectInfoQuery = (id) => ({
   queryKey: ["projects", id, "info"],
-  queryFn: () => getProjectById(id),
+  queryFn: async () => {
+    const data = new FormData()
+    data.append("id", id)
+    console.log(id, Object.fromEntries(data))
+    const res = await fetch(
+      "https://arjunnaik.pythonanywhere.com/projects/getProjectInfo",
+      {
+        method: "POST",
+        redirect: "follow",
+        body: data,
+      }
+    )
+
+    return res.json().then((res) => res.message)
+  },
 })
 
 const projectPostsQuery = (id) => ({
@@ -112,6 +126,7 @@ export default function Project() {
 
   const { user } = useUser()
   const fetcher = useFetcher()
+  console.log(projectId)
   const { data, isLoading, isError } = useQuery(projectInfoQuery(projectId))
   const [showModal, setShowModal] = useState(false)
   // console.log(data)
@@ -124,20 +139,6 @@ export default function Project() {
     }
   }, [fetcher.state])
 
-  // useEffect(() => {
-  //   fetch("http://arjunnaik.pythonanywhere.com/projects/getProjectInfo", {
-  //     body: "id=EH07BmN5QEIo7uQUMGSk",
-  //     method: "post",
-  //     headers: {
-  //       "Content-Type": "application/x-www-form-urlencoded",
-
-  //     },
-  //   }).then(async (res) => {
-  //     const data = await res.json()
-  //     console.log(data)
-  //     console.log(res)
-  //   })
-  // }, [])
   if (isLoading)
     return (
       <div
@@ -155,6 +156,8 @@ export default function Project() {
     )
 
   if (isError) return <div>Project was not found</div>
+
+  console.log(data)
 
   return (
     <>
@@ -359,6 +362,9 @@ export function CreatePost() {
 export function ProjectInfo() {
   const { data, isLoading, isError } = useGetProjectData()
 
+  if (isLoading) return <div>loading</div>
+
+  console.log(data)
   return (
     <div className="flex justify-between w-full gap-16">
       <div className="flex flex-col gap-4">
@@ -373,11 +379,11 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>
-          {dayjjs(data.createdAt.toDate()).fromNow()}
+          {dayjjs(new Date(data.create)).fromNow()}
         </p>
       </div>
       <img
-        src={data.imageUrl}
+        src={data.image}
         alt=""
         width={400}
         height={400}

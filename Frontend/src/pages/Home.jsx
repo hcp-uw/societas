@@ -12,7 +12,13 @@ import { useEffect } from "react"
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
-  queryFn: getAllProjects,
+  queryFn: () =>
+    fetch("https://arjunnaik.pythonanywhere.com/projects/getAllProjects", {
+      method: "post",
+      redirect: "follow",
+    })
+      .then((res) => res.json())
+      .then((res) => res.message),
 })
 
 export const loader = (queryClient) => async () => {
@@ -91,12 +97,12 @@ function Projects() {
     >
       {data.map((proj) => (
         <Link
-          key={proj.id}
-          to={proj.id}
-          className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-4 mb-8 transition-colors hover:outline-2 hover:outline hover:outline-zinc-300"
+          key={proj.ID}
+          to={proj.ID}
+          className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-3 mb-8 transition-colors hover:outline-2 hover:outline hover:outline-zinc-300"
         >
           <img
-            src={proj.imageUrl}
+            src={proj.image}
             width={500}
             height={300}
             className="object-fill max-h-60 w-fit m-auto h-auto rounded-lg"
@@ -106,10 +112,10 @@ function Projects() {
           <div className="flex gap-2 flex-wrap">
             <TimeBlob>
               <span className="material-symbols-outlined">schedule</span>
-              {dayjjs(proj.createdAt.toDate()).fromNow()}
+              {dayjjs(new Date(proj.created)).fromNow()}
             </TimeBlob>
             <TimeBlob>
-              {proj.meetType === "in-person" ? (
+              {proj.meetType === "in person" ? (
                 <span className="material-symbols-outlined">groups</span>
               ) : proj.meetType === "remote" ? (
                 <span className="material-symbols-outlined">language</span>

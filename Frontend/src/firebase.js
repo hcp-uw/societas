@@ -24,7 +24,7 @@ import {
   signInWithCustomToken,
   signOut,
 } from "firebase/auth"
-
+import { v4 as uuidv4 } from "uuid"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -47,9 +47,12 @@ export const storage = getStorage(app)
 export const db = getFirestore(app)
 export const auth = getAuth(app)
 
-function uploadProjectImage(projId, image) {
-  const storageRef = ref(storage, `projects/${projId}`)
-  return uploadBytes(storageRef, image)
+export async function uploadProjectImage(image) {
+  const uuid = uuidv4()
+  const imageRef = ref(storage, `projects/${uuid}`)
+  await uploadBytes(imageRef, image)
+  const url = await getDownloadURL(imageRef)
+  return url
 }
 
 // projects
