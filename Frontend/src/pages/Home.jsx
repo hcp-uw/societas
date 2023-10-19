@@ -108,7 +108,9 @@ function Projects() {
             className="object-fill max-h-60 w-fit m-auto h-auto rounded-lg"
           />
           <h2 className="text-2xl font-bold text-zinc-900">{proj.title}</h2>
-          <p className="text-zinc-800 leading-loose">{proj.description}</p>
+          <p className="text-zinc-800 leading-loose text-ellipsis overflow-y-scroll max-h-36">
+            {proj.description}
+          </p>
           <div className="flex gap-2 flex-wrap">
             <TimeBlob>
               <span className="material-symbols-outlined">schedule</span>

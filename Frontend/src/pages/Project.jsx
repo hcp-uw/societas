@@ -36,7 +36,14 @@ const projectInfoQuery = (id) => ({
       }
     )
 
-    return res.json().then((res) => res.message)
+    return res
+      .text()
+      .then(
+        (res) =>
+          JSON.parse(res, (key, value) =>
+            key == "participants" ? JSON.parse(value) : value
+          ).message
+      )
   },
 })
 
@@ -106,9 +113,6 @@ export const createPostAction =
   async ({ request }) => {
     const formData = await request.formData()
     const inputs = Object.fromEntries(formData)
-    // console.log(inputs)
-
-    // return null
 
     await createProjectPost(inputs.projectId, {
       title: inputs.title,
@@ -126,10 +130,8 @@ export default function Project() {
 
   const { user } = useUser()
   const fetcher = useFetcher()
-  console.log(projectId)
   const { data, isLoading, isError } = useQuery(projectInfoQuery(projectId))
   const [showModal, setShowModal] = useState(false)
-  // console.log(data)
 
   useEffect(() => {
     return () => {
@@ -157,13 +159,11 @@ export default function Project() {
 
   if (isError) return <div>Project was not found</div>
 
-  console.log(data)
-
   return (
     <>
       <div className="flex justify-between mt-6">
         {showModal && (
-          <div className="absolute w-screen h-screen bg-slate-200 bg-opacity-75 top-0 left-0 flex items-center justify-center">
+          <div className="absolute w-screen h-screen bg-zinc-200 bg-opacity-75 top-0 left-0 flex items-center justify-center">
             <fetcher.Form method="POST">
               <label
                 htmlFor="textAreaProj"
@@ -171,7 +171,7 @@ export default function Project() {
               >
                 Why do you want to join this project?
                 <button
-                  className="w-8 h-8 bg-slate-500 flex items-center justify-center rounded-full transition-colors hover:bg-gray-700 hover:text-slate-100"
+                  className="w-8 h-8 bg-zing-500 flex items-center justify-center rounded-full transition-colors hover:bg-zinc-700 hover:text-zinc-100"
                   type="button"
                   onClick={() => setShowModal(false)}
                 >
@@ -195,7 +195,8 @@ export default function Project() {
               <input type="hidden" value={data.ownerId} name="ownerId" />
               <input type="hidden" value={data.title} name="projectTitle" />
               <input type="hidden" value={data.imageUrl} name="imageUrl" />
-              <button
+              <SubmitFetcherBtn fetcher={fetcher} message="Send join request" />
+              {/* <button
                 type="submit"
                 className="bg-blue-600 text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-500"
                 disabled={fetcher.state === "submitting"}
@@ -205,53 +206,58 @@ export default function Project() {
                 ) : (
                   <p className="py-2">Send join request</p>
                 )}
-              </button>
+              </button> */}
             </fetcher.Form>
           </div>
         )}
 
-        <div className="w-full max-w-6xl m-auto">
-          <nav className="py-8 w-full flex gap-4">
-            <NavLink
-              to={`/${projectId}`}
-              end
-              className={({ isActive }) =>
-                isActive
-                  ? "bg-zinc-400 py-3 px-6 inline-block border-b-4 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
-                  : "bg-zinc-400 py-3 px-6 inline-block hover:bg-zinc-300 transition-colors"
-              }
-            >
-              Project Info
-            </NavLink>
-            <NavLink
-              to={`/${projectId}/posts`}
-              className={({ isActive }) =>
-                isActive
-                  ? "bg-zinc-400 py-3 px-6 inline-block border-b-4 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
-                  : "bg-zinc-400 py-3 px-6 inline-block hover:bg-zinc-300 transition-colors"
-              }
-            >
-              Blog Posts
-            </NavLink>
-          </nav>
-          <div className="flex flex-col">
-            <div className="flex justify-between items-center w-full m-auto">
-              <div className="flex flex-col">
-                <h2 className="text-3xl font-bold text-zinc-800 flex items-center">
-                  {data.title}
-                </h2>
-              </div>
+        <div className="w-full max-w-6xl m-auto flex flex-col gap-4">
+          <h2 className="text-3xl font-bold text-zinc-800 flex items-center">
+            {data.title}
+          </h2>
+          <nav className="w-full flex gap-4 border-b-2 justify-between items-center">
+            <div className="flex gap-4">
+              <NavLink
+                to={`/${projectId}`}
+                end
+                className={({ isActive }) =>
+                  isActive
+                    ? " font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
+                    : " border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors"
+                }
+              >
+                Project Info
+              </NavLink>
+              <NavLink
+                to={`/${projectId}/posts`}
+                className={({ isActive }) =>
+                  isActive
+                    ? " font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
+                    : " border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors"
+                }
+              >
+                Blog Posts
+              </NavLink>
+            </div>
 
-              {user && data.requestants.find((member) => member === user.id) ? (
+            <button
+              className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
+              onClick={() => setShowModal(true)}
+            >
+              Join
+            </button>
+          </nav>
+          {/* {user && data.requestants.find((member) => member === user.id) ? (
                 <button className=" bg-zinc-400 text-zinc-700 p-2 rounded-xl group hover:bg-red-500 hover:outline-none hover:text-zinc-100 transition-colors min-w-[7.5rem]">
                   <span className="group-hover:hidden">Request Sent</span>
                   <span className="hidden group-hover:inline-block">
                     Unrequest
                   </span>
                 </button>
-              ) : user && data.members.find((member) => member === user.id) ? (
+              ) : user &&
+                data.participants.find((member) => member === user.id) ? (
                 <p className="bg-slate-400 py-2 px-6 rounded-lg">Member</p>
-              ) : user && data.ownerId === user.id ? (
+              ) : user && data.host_id === user.id ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
@@ -272,10 +278,8 @@ export default function Project() {
                 >
                   Join
                 </button>
-              )}
-            </div>
-            <div className="w-full m-auto h-[2px] max-w-7xl bg-zinc-300 rounded-full my-4"></div>
-          </div>
+              )} */}
+          {/* <div className="w-full m-auto h-[2px] max-w-7xl bg-zinc-200 rounded-full my-4"></div> */}
 
           <Outlet />
         </div>
@@ -298,7 +302,7 @@ function SubmitFetcherBtn({ fetcher, message, className }) {
   return (
     <button
       type="submit"
-      className={`bg-blue-600 text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-500 ${className}`}
+      className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400 ${className}`}
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
@@ -364,7 +368,6 @@ export function ProjectInfo() {
 
   if (isLoading) return <div>loading</div>
 
-  console.log(data)
   return (
     <div className="flex justify-between w-full gap-16">
       <div className="flex flex-col gap-4">
@@ -373,7 +376,7 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Meet Location:
           </span>
-          {data.meetLocation}
+          {data.location}
         </p>
         <p>
           <span className="underline font-semibold mr-3 underline-offset-4">

@@ -18,7 +18,7 @@ import {
   postLoader,
 } from "./pages/Project"
 import Project from "./pages/Project"
-import ProfilePage from "./pages/ProfilePage.jsx"
+import ProfileLayout from "./pages/ProfileLayout.jsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.jsx"
 import Home from "./pages/Home"
 import Requests, { resquestAcceptAction } from "./pages/Requests.jsx"
@@ -26,6 +26,7 @@ import IntroPage from "./pages/IntroPage.jsx"
 import PreferencePage from "./pages/PreferencePage.jsx"
 import WhoopsPage from "./pages/WhoopsPage.jsx"
 import ReportPage from "./pages/ReportPage.jsx"
+import Profile from "./pages/Profile.jsx"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,26 +80,20 @@ const router = createBrowserRouter([
             loader: projectPostsLoader(queryClient),
             action: createPostAction(queryClient),
           },
-          // {
-          //   path: "create",
-          //   loader: projectPostsLoader(queryClient),
-          //   element: <CreatePost />,
-          // },
-
-          // {
-          //   path: "createPost",
-          //   action: createPostAction(queryClient),
-          // },
         ],
       },
       {
         path: "account",
-        element: <ProfilePage />,
+        element: <ProfileLayout />,
         children: [
           {
             path: "create",
             element: <CreateProj />,
             action: createProjectAction(queryClient),
+          },
+          {
+            index: true,
+            element: <Profile />,
           },
           {
             path: "requests",

@@ -28,7 +28,9 @@ export const resquestAcceptAction =
 
 export default function Requests() {
   const { user } = useUser()
-  const { data, isLoading, isError } = useQuery(requestsQuery(user.id ?? ""))
+  const { data, isLoading, isError } = useQuery(
+    requestsQuery(user ? user.id : "")
+  )
 
   if (isLoading) return <div>loading</div>
 

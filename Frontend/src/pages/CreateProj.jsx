@@ -77,7 +77,7 @@ export default function CreateProj() {
   return (
     <fetcher.Form
       method="post"
-      className="flex justify-around w-full"
+      className="flex justify-between w-full"
       encType="multipart/form-data"
     >
       <FilesView
@@ -212,7 +212,7 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
         </div>
       </div>
 
-      <SubmitBtnView isFormValid={isFormValid} desktop loading={loading} />
+      <SubmitBtnView isFormValid={isFormValid} desktop loading={true} />
     </InputsWrapper>
   )
 }
@@ -229,7 +229,7 @@ function FilesView({ formState, handleAddPicture, handleDelPicture }) {
     <FilesWrapper className="h-fit">
       <div>
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
-          Select up to 3 Files for your project
+          Select a picture
         </h1>
         <input
           type="file"
@@ -301,7 +301,7 @@ function SubmitBtnView({ isFormValid, desktop, loading }) {
           Create Project
         </p>
 
-        <div className="absolute pointer-events-none opacity-0 group-aria-busy:opacity-100">
+        <div className="absolute pointer-events-none group-aria-busy:opacity-100">
           <LoadingSpinner size={24} />
         </div>
       </button>
