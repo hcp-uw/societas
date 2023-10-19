@@ -321,9 +321,11 @@ export function CreatePost() {
   const [comment, setComment] = useState("")
   const fetcher = useFetcher()
 
-  if (isLoading || !user) return <div>loading</div>
+  if (isLoading) return <div>loading</div>
 
-  if (data.ownerId !== user.id) {
+  if (!user) return <div>loading</div>
+
+  if (data.host_id !== user.id) {
     toast.error("Can only create post if owner")
     return redirect("..")
   }
@@ -378,7 +380,7 @@ export function ProjectInfo() {
           </span>
           {data.location}
         </p>
-        <p>
+        <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>

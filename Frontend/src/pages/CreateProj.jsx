@@ -91,9 +91,7 @@ export default function CreateProj() {
         isFormValid={isFormValid}
         loading={fetcher.state === "submitting"}
       />
-
       <input type="hidden" name="host_id" value={user.id} />
-
       {/* Submit button for mobile view */}
       <SubmitBtnView
         isFormValid={isFormValid}
@@ -212,7 +210,7 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
         </div>
       </div>
 
-      <SubmitBtnView isFormValid={isFormValid} desktop loading={true} />
+      <SubmitBtnView isFormValid={isFormValid} desktop loading={loading} />
     </InputsWrapper>
   )
 }
@@ -301,7 +299,11 @@ function SubmitBtnView({ isFormValid, desktop, loading }) {
           Create Project
         </p>
 
-        <div className="absolute pointer-events-none group-aria-busy:opacity-100">
+        <div
+          className={`absolute pointer-events-none ${
+            loading ? "opacity-100" : "opacity-0"
+          }`}
+        >
           <LoadingSpinner size={24} />
         </div>
       </button>

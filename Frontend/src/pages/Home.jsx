@@ -8,7 +8,6 @@ import { useUser } from "@clerk/clerk-react"
 import { useQuery } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
 import { Link } from "react-router-dom"
-import { useEffect } from "react"
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
@@ -18,7 +17,8 @@ const projectsQuery = () => ({
       redirect: "follow",
     })
       .then((res) => res.json())
-      .then((res) => res.message),
+      .then((res) => res.message)
+      .catch((err) => console.log(err)),
 })
 
 export const loader = (queryClient) => async () => {
@@ -32,21 +32,21 @@ export const loader = (queryClient) => async () => {
 export default function Home() {
   const { user } = useUser()
 
-  useEffect(() => {
-    let requestOptions = {
-      method: "POST",
-      redirect: "follow",
-    }
+  // useEffect(() => {
+  //   let requestOptions = {
+  //     method: "POST",
+  //     redirect: "follow",
+  //   }
 
-    fetch(
-      "https://arjunnaik.pythonanywhere.com/projects/getAllProjects",
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => console.log(result))
+  //   fetch(
+  //     "https://arjunnaik.pythonanywhere.com/projects/getAllProjects",
+  //     requestOptions
+  //   )
+  //     .then((response) => response.json())
+  //     .then((result) => console.log(result))
 
-      .catch((error) => console.log("error", error))
-  }, [])
+  //     .catch((error) => console.log("error", error))
+  // }, [])
 
   return (
     <>
@@ -65,6 +65,8 @@ export default function Home() {
 
 function Projects() {
   const { data, isLoading } = useQuery(projectsQuery())
+
+  console.log
 
   if (isLoading)
     return (

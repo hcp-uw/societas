@@ -2,9 +2,15 @@ import { SignOutButton } from "@clerk/clerk-react"
 import { Outlet, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { NavLink } from "react-router-dom"
+import toast from "react-hot-toast"
 
 export default function ProfileLayout() {
   const navigate = useNavigate()
+
+  function handleSignout() {
+    navigate("/")
+    toast.success("Successfully Signout")
+  }
   return (
     <Layout className="mt-6 gap-32">
       <StyledAside>
@@ -23,8 +29,8 @@ export default function ProfileLayout() {
           Requests
         </ProfileLink>
 
-        <SignOutButton signOutCallback={() => navigate("/")}>
-          <div className="flex p-2 rounded gap-2 items-center hover:bg-zinc-300 transition-colors cursor-pointer">
+        <SignOutButton signOutCallback={handleSignout}>
+          <div className="flex p-2 rounded gap-2 items-center hover:bg-red-400 hover:text-zinc-100 transition-colors cursor-pointer">
             <span className="material-symbols-outlined">logout</span>
             Sign out
           </div>
