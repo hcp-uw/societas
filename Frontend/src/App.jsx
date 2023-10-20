@@ -4,15 +4,20 @@ import { theme } from "./contexts/theme"
 import Nav from "./components/Nav"
 import { Toaster } from "react-hot-toast"
 import "./index.css"
-import { Outlet } from "react-router-dom"
+import { Outlet, redirect } from "react-router-dom"
 import { useAuth } from "@clerk/clerk-react"
 import { useEffect } from "react"
 import { signInWithClerkToken, signOutFromFirebase } from "./firebase"
+import { useNavigate } from "react-router-dom"
 
 function App() {
   const { getToken } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
+    if (localStorage.getItem("firstTimeUser") === "true") {
+      navigate("/intro")
+    }
     const signInWithFirebase = async () => {
       const token = await getToken({ template: "integration_firebase" })
 
@@ -21,12 +26,14 @@ function App() {
         return
       }
 
-      await fetch("https://arjunnaik.pythonanywhere.com/user/login", {
-        method: "POST",
-        body: {
-          uid: token,
-        },
-      })
+      console.log("here")
+
+      // await fetch("https://arjunnaik.pythonanywhere.com/user/login", {
+      //   method: "POST",
+      //   body: {
+      //     uid: token,
+      //   },
+      // })
     }
 
     signInWithFirebase()

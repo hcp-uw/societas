@@ -22,7 +22,7 @@ import ProfileLayout from "./pages/ProfileLayout.jsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.jsx"
 import Home from "./pages/Home"
 import Requests, { resquestAcceptAction } from "./pages/Requests.jsx"
-import IntroPage from "./pages/IntroPage.jsx"
+import Intro from "./pages/Intro.jsx"
 import PreferencePage from "./pages/PreferencePage.jsx"
 import WhoopsPage from "./pages/WhoopsPage.jsx"
 import ReportPage from "./pages/ReportPage.jsx"
@@ -42,7 +42,18 @@ if (!import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY) {
 
 const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY
 
+if (
+  localStorage.getItem("firstTimeUser") == null &&
+  localStorage.getItem("firstTimeUser") !== "false"
+) {
+  localStorage.setItem("firstTimeUser", true)
+}
+
 const router = createBrowserRouter([
+  {
+    path: "/intro",
+    element: <Intro />,
+  },
   {
     path: "/",
     element: <App />,
@@ -105,10 +116,6 @@ const router = createBrowserRouter([
             action: resquestAcceptAction(queryClient),
           },
         ],
-      },
-      {
-        path: "intro",
-        element: <IntroPage />,
       },
       {
         path: "preference",
