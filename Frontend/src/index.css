@@ -288,6 +288,6 @@ input.RP-form-control:focus {
   -webkit-box-shadow: none;
 }
 
-::-webkit-input-placeholder {
+/* ::-webkit-input-placeholder {
   font-weight: 800;
-}
+} */

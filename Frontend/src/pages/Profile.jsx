@@ -1,8 +1,7 @@
 import { useUser } from "@clerk/clerk-react"
-import { redirect } from "react-router-dom"
 
 export default function Profile() {
-  const { user, isLoaded } = useUser()
+  const { user } = useUser()
 
   if (!user) return <div>loading</div>
 

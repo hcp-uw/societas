@@ -141,8 +141,6 @@ export default function Project() {
     }
   }, [fetcher.state])
 
-  if (!user) return <div>loading</div>
-
   if (isLoading)
     return (
       <div
@@ -243,7 +241,7 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              {data.host_id === user.id ? (
+              {user && data.host_id === user.id ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
