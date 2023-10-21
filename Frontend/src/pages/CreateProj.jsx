@@ -19,7 +19,7 @@ export const createProjectAction =
       title: inputs.title,
       description: inputs.description,
       meetLocation: inputs.meetLocation,
-      image: inputs.image,
+      image: inputs.imageUrl,
       maxMembers: inputs.maxMembers,
       ownerId: inputs.ownerId,
       meetType: inputs.meetType,
