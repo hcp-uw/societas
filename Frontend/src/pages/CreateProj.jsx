@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { useState } from "react"
-import { uploadProjectImage } from "../firebase"
+import { createProject } from "../firebase"
 import { toast } from "react-hot-toast"
 import { redirect, useFetcher } from "react-router-dom"
 import { useUser } from "@clerk/clerk-react"
@@ -11,14 +11,19 @@ export const createProjectAction =
   (queryClient) =>
   async ({ request }) => {
     const formData = await request.formData()
+    console.log(formData.forEach((e) => console.log(e)))
     const inputs = Object.fromEntries(formData)
-    const imageUrl = await uploadProjectImage(inputs.image)
-    formData.append("image", imageUrl)
+    console.log(inputs)
 
-    await fetch("https://arjunnaik.pythonanywhere.com/projects/createProject", {
-      body: formData,
-      method: "POST",
-      redirect: "follow",
+    await createProject({
+      title: inputs.title,
+      description: inputs.description,
+      meetLocation: inputs.meetLocation,
+      image: inputs.image,
+      maxMembers: inputs.maxMems,
+      ownerId: inputs.ownerId,
+      meetType: inputs.meetType,
+      startDate: inputs.startDate,
     })
 
     toast.success("Project Created")
@@ -91,7 +96,7 @@ export default function CreateProj() {
         isFormValid={isFormValid}
         loading={fetcher.state === "submitting"}
       />
-      <input type="hidden" name="host_id" value={user.id} />
+      <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
       <SubmitBtnView
         isFormValid={isFormValid}
@@ -151,7 +156,7 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
         <StyledInput
           type="text"
           id="meetLocation"
-          name="location"
+          name="meetLocation"
           placeholder="Enter Project Location Here"
           onChange={(e) =>
             setFormState({ ...formState, location: e.target.value })
@@ -233,7 +238,7 @@ function FilesView({ formState, handleAddPicture, handleDelPicture }) {
           type="file"
           accept="image/*"
           className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
-          name="image"
+          name="imageUrl"
           id="image"
           onChange={(e) => {
             setError(null)

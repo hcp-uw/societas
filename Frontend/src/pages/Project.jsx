@@ -23,28 +23,7 @@ dayjjs.extend(relativeTime)
 
 const projectInfoQuery = (id) => ({
   queryKey: ["projects", id, "info"],
-  queryFn: async () => {
-    const data = new FormData()
-    data.append("id", id)
-    console.log(id, Object.fromEntries(data))
-    const res = await fetch(
-      "https://arjunnaik.pythonanywhere.com/projects/getProjectInfo",
-      {
-        method: "POST",
-        redirect: "follow",
-        body: data,
-      }
-    )
-
-    return res
-      .text()
-      .then(
-        (res) =>
-          JSON.parse(res, (key, value) =>
-            key == "participants" ? JSON.parse(value) : value
-          ).message
-      )
-  },
+  queryFn: () => getProjectById(id),
 })
 
 const projectPostsQuery = (id) => ({
@@ -241,7 +220,7 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              {user && data.host_id === user.id ? (
+              {user && data.ownerId === user.id ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
@@ -250,13 +229,15 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : (
+              ) : user ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
                 >
                   Join
                 </button>
+              ) : (
+                <div>Log in to join!</div>
               )}
             </div>
           </nav>
@@ -338,7 +319,7 @@ export function CreatePost() {
 
   if (!user) return <div>loading</div>
 
-  if (data.host_id !== user.id) {
+  if (data.ownerId !== user.id) {
     toast.error("Can only create post if owner")
     return redirect("..")
   }
@@ -391,17 +372,17 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Meet Location:
           </span>
-          {data.location}
+          {data.meetLocation}
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>
-          {dayjjs(new Date(data.create)).fromNow()}
+          {dayjjs(data.createdAt.toDate()).fromNow()}
         </p>
       </div>
       <img
-        src={data.image}
+        src={data.imageUrl}
         alt=""
         width={400}
         height={400}
@@ -457,9 +438,6 @@ export function ProjectPostsLayout() {
                 {dayjjs(post.createdAt.toDate()).toDate().toLocaleDateString()}
               </p>
             </div>
-            <span className="material-symbols-outlined hover:text-zinc-500 text-zinc-700 transition-colors">
-              favorite
-            </span>
           </NavLink>
         ))}
       </div>

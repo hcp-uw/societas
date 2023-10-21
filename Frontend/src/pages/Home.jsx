@@ -11,14 +11,7 @@ import { Link } from "react-router-dom"
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
-  queryFn: () =>
-    fetch("https://arjunnaik.pythonanywhere.com/projects/getAllProjects", {
-      method: "post",
-      redirect: "follow",
-    })
-      .then((res) => res.json())
-      .then((res) => res.message)
-      .catch((err) => console.log(err)),
+  queryFn: () => getAllProjects(),
 })
 
 export const loader = (queryClient) => async () => {
@@ -31,22 +24,6 @@ export const loader = (queryClient) => async () => {
 
 export default function Home() {
   const { user } = useUser()
-
-  // useEffect(() => {
-  //   let requestOptions = {
-  //     method: "POST",
-  //     redirect: "follow",
-  //   }
-
-  //   fetch(
-  //     "https://arjunnaik.pythonanywhere.com/projects/getAllProjects",
-  //     requestOptions
-  //   )
-  //     .then((response) => response.json())
-  //     .then((result) => console.log(result))
-
-  //     .catch((error) => console.log("error", error))
-  // }, [])
 
   return (
     <>
@@ -65,8 +42,6 @@ export default function Home() {
 
 function Projects() {
   const { data, isLoading } = useQuery(projectsQuery())
-
-  console.log
 
   if (isLoading)
     return (
@@ -99,12 +74,12 @@ function Projects() {
     >
       {data.map((proj) => (
         <Link
-          key={proj.ID}
-          to={proj.ID}
+          key={proj.id}
+          to={proj.id}
           className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-3 mb-8 transition-colors hover:outline-2 hover:outline hover:outline-zinc-300"
         >
           <img
-            src={proj.image}
+            src={proj.imageUrl}
             width={500}
             height={300}
             className="object-fill max-h-60 w-fit m-auto h-auto rounded-lg"
@@ -116,7 +91,7 @@ function Projects() {
           <div className="flex gap-2 flex-wrap">
             <TimeBlob>
               <span className="material-symbols-outlined">schedule</span>
-              {dayjjs(new Date(proj.created)).fromNow()}
+              {dayjjs(proj.createdAt.toDate()).fromNow()}
             </TimeBlob>
             <TimeBlob>
               {proj.meetType === "in person" ? (

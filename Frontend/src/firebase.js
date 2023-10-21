@@ -24,12 +24,7 @@ import {
   signInWithCustomToken,
   signOut,
 } from "firebase/auth"
-import { v4 as uuidv4 } from "uuid"
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
   authDomain: import.meta.env.VITE_AUTH_DOMAIN,
@@ -47,9 +42,8 @@ export const storage = getStorage(app)
 export const db = getFirestore(app)
 export const auth = getAuth(app)
 
-export async function uploadProjectImage(image) {
-  const uuid = uuidv4()
-  const imageRef = ref(storage, `projects/${uuid}`)
+export async function uploadProjectImage(projId, image) {
+  const imageRef = ref(storage, `projects/${projId}`)
   await uploadBytes(imageRef, image)
   const url = await getDownloadURL(imageRef)
   return url
@@ -79,9 +73,7 @@ export async function createProject({
     startDate: startDate,
   })
 
-  await uploadProjectImage(docRef.id, image)
-  const imageRef = ref(storage, `projects/${docRef.id}`)
-  const url = await getDownloadURL(imageRef)
+  const url = await uploadProjectImage(docRef.id, image)
   await updateDoc(docRef, {
     imageUrl: url,
   })

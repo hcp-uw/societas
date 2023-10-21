@@ -25,13 +25,6 @@ function App() {
         signOutFromFirebase()
         return
       }
-
-      // await fetch("https://arjunnaik.pythonanywhere.com/user/login", {
-      //   method: "POST",
-      //   body: {
-      //     uid: token,
-      //   },
-      // })
     }
 
     signInWithFirebase()
