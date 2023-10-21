@@ -59,6 +59,14 @@ def sendAnnouncement():
 def getAnnouncements():
     return Projects.Projects.getAnnouncements(request)
 
+@app.route(Projects.ROUTE + 'getStatus', methods = ['POST'])
+def getStatus():
+    return Projects.Projects.getStatus(request)
+
+@app.route(Projects.ROUTE + 'acceptUser', methods = ['POST'])
+def acceptUser():
+    return Projects.Projects.acceptUser(request)
+
 #preferences
 @app.route(Preferences.ROUTE + 'setPreferences', methods = ['POST'])
 def setPreferences():

@@ -76,12 +76,61 @@ class Projects:
         try:
             if getcurr() is None:
                 return str(Status(False, "User must be logged in."))
-            res = create('Participants', {'pid': request.form.get("id"), 'uid': getcurr()})
+            pid = request.form.get("id")
+            s = Projects.getStatusU(pid, getcurr())
+            if s != 'none':
+                return str(Status(False, f'user has status: {s}'))
+            res = create('Participants', {'pid': pid, 'uid': getcurr(), 'status':'pending'})
             if not res[1]:
                 raise Exception("firebase error")
+            return str(Status(True, "requested to join project"))
         except Exception as e:
             return str(Status(False, f'get project info failed. error: {e}'))
         
+    def acceptUser(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            pid = request.form.get("pid")
+            uid = request.form.get("uid")
+            s = Projects.getStatusU(pid, getcurr())
+            if s != 'host':
+                return str(Status(False, f'you must be host'))
+            
+            s = Projects.getStatusU(pid, uid)
+            if s != 'pending':
+                return str(Status(False, f'user has status: {s}'))
+            res = update('Participants', {'pid': pid, 'uid': getcurr(), 'status':'member'})
+            if not res[1]:
+                raise Exception("firebase error")
+            return str(Status(True, "accepted user"))
+        except Exception as e:
+            return str(Status(False, f'get project info failed. error: {e}'))
+        
+    def getStatusU(pid, uid):
+        #pid = request.form.get("pid")
+        #uid = request.form.get("uid")
+        res1 = read('Projects')
+        v1 = res1[0]
+        for id in v1:
+            if (str(v1[id]) == pid) and (v1[id]['host_id'] == uid):
+                return 'host'
+        res = read('Participants')
+        vals = res[0]
+        for id in vals:
+            if (vals[id]['pid'] == pid) and (vals[id]['uid'] == uid):
+                return vals[id]['status']
+        return 'none'
+    
+    def getStatus(request):
+        try:
+            if getcurr() is None:
+                return str(Status(False, "User must be logged in."))
+            pid = request.form.get("id")
+            return str(Status(True, Projects.getStatusU(pid, getcurr())))
+        except Exception as e:
+            return str(Status(False, f'get project info failed. error: {e}'))
+            
     def gp(projectID):
         res = read('Participants')
         users = []
