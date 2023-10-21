@@ -17,34 +17,44 @@ export default function Intro() {
         </p>
       </h1>
 
-      <div className="flex flex-col gap-6 justify-center items-center relative">
-        <div className="after:bg-intro-gradient-orange after:w-full after:-left-24 after:top-6 after:-z-10 after:max-w-3xl after:h-36 after:rotate-12 content-[''] after:absolute">
-          <img src={TeamWork} alt="Teamwork" width={350} className="w-60" />
-        </div>
-        <div className="flex flex-col gap-4 px-4">
-          <p className="text-2xl font-bold leading-5 whitespace-nowrap">
-            Together, we improve!
-          </p>
-          <p>
-            Societas creates a judgment-free zone for you to find other
-            like-minded peers to make your passion project come true.
-          </p>
+      <div className="flex justify-center items-center relative after:bg-intro-gradient-orange after:w-full after:-left-12 after:-translate-y-[100px] after:-z-10 after:max-w-xl after:h-36 after:rotate-12 content-[''] after:absolute md:after:translate-y-[40px] md:after:h-52 xl:after:-translate-y-[10px] xl:after:max-w-3xl">
+        <div className="max-w-7xl w-full flex justify-center items-center flex-col gap-6 md:flex-row md:items-center md:justify-between md:py-12">
+          <img
+            src={TeamWork}
+            alt="Teamwork"
+            width={350}
+            className="w-60 xl:w-[350px]"
+          />
+          <div className="flex flex-col gap-4 px-4 max-w-md">
+            <p className="text-2xl font-bold leading-5 whitespace-nowrap">
+              Together, we improve!
+            </p>
+            <p>
+              Societas creates a judgment-free zone for you to find other
+              like-minded peers to make your passion project come true.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 justify-center items-center relative">
-        <div className="after:bg-intro-gradient-blue after:w-full after:-right-12 after:-translate-y-[170px] mb-4 after:-z-10 after:max-w-3xl after:h-36 after:-rotate-12 content-[''] after:absolute">
-          <img src={SurferRoute} alt="Surfer" width={350} className="w-64" />
-        </div>
-        <div className="flex flex-col gap-4 px-4">
-          <p className="text-2xl font-bold leading-5 whitespace-nowrap">
-            Let your passion shine!
-          </p>
-          <p>
-            The entire process of joining a project is completely anonymous, so
-            be sure to show your passion for the project you are either creating
-            or joining! That is the only thing that others will see.
-          </p>
+      <div className="flex justify-center items-center relative after:bg-intro-gradient-blue after:w-full after:-right-12 after:-translate-y-[100px] after:-z-10 after:max-w-3xl after:h-36 after:-rotate-12 content-[''] after:absolute md:after:translate-y-[40px] md:after:h-52 xl:after:-translate-y-[35px] xl:after:max-w-3xl">
+        <div className="max-w-7xl w-full flex justify-center items-center flex-col gap-6 md:flex-row-reverse md:items-center md:justify-between md:py-12">
+          <img
+            src={SurferRoute}
+            alt="Surfer"
+            width={500}
+            className="w-64 xl:w-[500px]"
+          />
+          <div className="flex flex-col gap-4 px-4 max-w-md">
+            <p className="text-2xl font-bold leading-5 whitespace-nowrap">
+              Let your passion shine!
+            </p>
+            <p>
+              The entire process of joining a project is completely anonymous,
+              so be sure to show your passion for the project you are either
+              creating or joining! That is the only thing that others will see.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -65,6 +75,11 @@ export default function Intro() {
           </p>
         </div>
       </div> */}
+
+      <h2 className="m-auto">
+        We value your time, so we will just let the experience speak for
+        itself...
+      </h2>
 
       <div className="introButton-container">
         <Link

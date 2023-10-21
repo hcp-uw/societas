@@ -26,8 +26,6 @@ function App() {
         return
       }
 
-      console.log("here")
-
       // await fetch("https://arjunnaik.pythonanywhere.com/user/login", {
       //   method: "POST",
       //   body: {

@@ -141,6 +141,8 @@ export default function Project() {
     }
   }, [fetcher.state])
 
+  if (!user) return <div>loading</div>
+
   if (isLoading)
     return (
       <div
@@ -240,12 +242,25 @@ export default function Project() {
               </NavLink>
             </div>
 
-            <button
-              className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
-              onClick={() => setShowModal(true)}
-            >
-              Join
-            </button>
+            <div className="flex gap-4 flex-row-reverse">
+              {data.host_id === user.id ? (
+                <div className="flex gap-4 items-center">
+                  <NavLink
+                    to="posts/new"
+                    className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
+                  >
+                    New Post
+                  </NavLink>
+                </div>
+              ) : (
+                <button
+                  className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
+                  onClick={() => setShowModal(true)}
+                >
+                  Join
+                </button>
+              )}
+            </div>
           </nav>
           {/* {user && data.requestants.find((member) => member === user.id) ? (
                 <button className=" bg-zinc-400 text-zinc-700 p-2 rounded-xl group hover:bg-red-500 hover:outline-none hover:text-zinc-100 transition-colors min-w-[7.5rem]">
