@@ -30,9 +30,9 @@ def register():
 def getAllProjects():
     return User.User.getAllProjects(request)
 
-@app.route(User.ROUTE + 'joinProject', methods = ['POST'])
+@app.route(Projects.ROUTE + 'joinProject', methods = ['POST'])
 def joinProject():
-    return User.User.joinProject(request)
+    return Projects.Projects.joinProject(request)
 
 #project
 @app.route(Projects.ROUTE + 'createProject', methods = ['POST'])
