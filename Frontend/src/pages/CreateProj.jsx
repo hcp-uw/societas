@@ -20,7 +20,7 @@ export const createProjectAction =
       description: inputs.description,
       meetLocation: inputs.meetLocation,
       image: inputs.image,
-      maxMembers: inputs.maxMems,
+      maxMembers: inputs.maxMembers,
       ownerId: inputs.ownerId,
       meetType: inputs.meetType,
       startDate: inputs.startDate,
