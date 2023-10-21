@@ -26,7 +26,7 @@ import Intro from "./pages/Intro.jsx"
 import PreferencePage from "./pages/PreferencePage.jsx"
 import WhoopsPage from "./pages/WhoopsPage.jsx"
 import ReportPage from "./pages/ReportPage.jsx"
-import Profile from "./pages/Profile.jsx"
+import Profile, { EditProfile } from "./pages/Profile.jsx"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -105,6 +105,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <Profile />,
+          },
+          {
+            path: "edit",
+            element: <EditProfile />,
           },
           {
             path: "requests",
