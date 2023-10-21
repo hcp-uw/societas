@@ -18,6 +18,7 @@ import toast from "react-hot-toast"
 // import axios from "axios"
 import { NavLink, Outlet } from "react-router-dom"
 import Markdown from "marked-react"
+import { baseURL, createJoinRequest } from "../../utils/api"
 
 dayjjs.extend(relativeTime)
 
@@ -26,7 +27,6 @@ const projectInfoQuery = (id) => ({
   queryFn: async () => {
     const data = new FormData()
     data.append("id", id)
-    console.log(id, Object.fromEntries(data))
     const res = await fetch(
       "https://arjunnaik.pythonanywhere.com/projects/getProjectInfo",
       {
@@ -36,14 +36,13 @@ const projectInfoQuery = (id) => ({
       }
     )
 
-    return res
-      .text()
-      .then(
-        (res) =>
-          JSON.parse(res, (key, value) =>
-            key == "participants" ? JSON.parse(value) : value
-          ).message
-      )
+    // const text = await res.text()
+    // console.log(text)
+
+    return res.json().then((res) => {
+      console.log(res)
+      return res.message
+    })
   },
 })
 
@@ -91,19 +90,19 @@ export const action =
   (queryClient) =>
   async ({ request }) => {
     const formData = await request.formData()
-    const inputs = Object.fromEntries(formData)
-    console.log(inputs.imageUrl)
-    await createProjectJoinRequest({
-      projectId: inputs.projectId,
-      imageUrl: inputs.imageUrl,
-      message: inputs.message,
-      ownerId: inputs.ownerId,
-      projectTitle: inputs.projectTitle,
-      requestantId: inputs.requestantId,
+    console.log(Object.fromEntries(formData))
+    const pid = formData.get("pid")
+    const res = await fetch(`${baseURL}/projects/joinProject`, {
+      method: "POST",
+      redirect: "follow",
+      body: formData,
     })
 
+    const data = await res.json()
+    console.log(data)
+
     queryClient.invalidateQueries({
-      queryKey: ["projects", inputs.projectId, "info"],
+      queryKey: ["projects", pid, "info"],
     })
     return null
   }
@@ -190,11 +189,11 @@ export default function Project() {
                 rows="5"
                 name="message"
               />
-              <input type="hidden" value={projectId} name="projectId" />
-              <input type="hidden" value={user.id} name="requestantId" />
-              <input type="hidden" value={data.ownerId} name="ownerId" />
-              <input type="hidden" value={data.title} name="projectTitle" />
-              <input type="hidden" value={data.imageUrl} name="imageUrl" />
+              <input type="hidden" value={projectId} name="pid" />
+              {/* <input type="hidden" value={user.id} name="requestantId" /> */}
+              <input type="hidden" value={user.id} name="uid" />
+              {/* <input type="hidden" value={data.title} name="projectTitle" /> */}
+              {/* <input type="hidden" value={data.imageUrl} name="imageUrl" /> */}
               <SubmitFetcherBtn fetcher={fetcher} message="Send join request" />
               {/* <button
                 type="submit"
