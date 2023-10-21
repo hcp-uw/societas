@@ -66,7 +66,7 @@ class Projects:
             for id in vals:
                 if str(id) == projectID:
                     new = vals[id]
-                    new['participants'] = Projects.gp(projectID)
+                    #new['participants'] = Projects.gp(projectID)
                     return str(Status(True, stringify(new)))
             raise Exception(f"project {projectID} doesnt exist")
         except Exception as e:
