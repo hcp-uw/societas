@@ -74,13 +74,12 @@ class Projects:
         
     def joinProject(request):
         try:
-            if getcurr() is None:
-                return str(Status(False, "User must be logged in."))
-            pid = request.form.get("id")
-            s = Projects.getStatusU(pid, getcurr())
+            uid = request.form.get("uid")
+            pid = request.form.get("pid")
+            s = Projects.getStatusU(pid, uid)
             if s != 'none':
                 return str(Status(False, f'user has status: {s}'))
-            res = create('Participants', {'pid': pid, 'uid': getcurr(), 'status':'pending'})
+            res = create('Participants', {'pid': pid, 'uid': uid, 'status':'pending'})
             if not res[1]:
                 raise Exception("firebase error")
             return str(Status(True, "requested to join project"))
