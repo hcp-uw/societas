@@ -18,16 +18,16 @@ function App() {
     if (localStorage.getItem("firstTimeUser") === "true") {
       navigate("/intro")
     }
-    const signInWithFirebase = async () => {
-      const token = await getToken({ template: "integration_firebase" })
+    // const signInWithFirebase = async () => {
+    //   const token = await getToken({ template: "integration_firebase" })
 
-      if (!token) {
-        signOutFromFirebase()
-        return
-      }
-    }
+    //   if (!token) {
+    //     signOutFromFirebase()
+    //     return
+    //   }
+    // }
 
-    signInWithFirebase()
+    // signInWithFirebase()
   }, [])
 
   return (
