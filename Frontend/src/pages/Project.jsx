@@ -15,9 +15,8 @@ import { TextArea, Input, StyledInput } from "../components/inputs"
 import { useState } from "react"
 import { useEffect } from "react"
 import toast from "react-hot-toast"
-// import axios from "axios"
 import { NavLink, Outlet } from "react-router-dom"
-import Markdown from "marked-react"
+import Markdown from "react-markdown"
 
 dayjjs.extend(relativeTime)
 
@@ -373,6 +372,12 @@ export function ProjectInfo() {
             Meet Location:
           </span>
           {data.meetLocation}
+        </p>
+        <p className="capitalize">
+          <span className="underline font-semibold mr-3 underline-offset-4">
+            Star Date:
+          </span>
+          {data.startDate}
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">

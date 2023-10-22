@@ -94,7 +94,7 @@ function Projects() {
               {dayjjs(proj.createdAt.toDate()).fromNow()}
             </TimeBlob>
             <TimeBlob>
-              {proj.meetType === "in person" ? (
+              {proj.meetType === "in-person" ? (
                 <span className="material-symbols-outlined">groups</span>
               ) : proj.meetType === "remote" ? (
                 <span className="material-symbols-outlined">language</span>

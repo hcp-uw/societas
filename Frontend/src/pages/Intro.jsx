@@ -4,10 +4,10 @@ import SurferRoute from "../assets/surfer.png"
 import TelescopeRoute from "../assets/Telescope.png"
 import TeamWork from "../assets/Teamwork.svg"
 export default function Intro() {
-  if (localStorage.getItem("firstTimeUser") === "false") {
-    console.log("here")
-    return redirect("/")
-  }
+  // if (localStorage.getItem("firstTimeUser") === "false") {
+  //   console.log("here")
+  //   return redirect("/")
+  // }
   return (
     <div className=" w-full m-auto pt-8 flex flex-col gap-4 overflow-hidden">
       <h1 className="flex flex-col items-center text-4xl relative">

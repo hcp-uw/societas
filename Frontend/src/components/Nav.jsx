@@ -11,7 +11,12 @@ export default function Nav() {
     <header className="border-b-2 py-2">
       <StyledNav>
         <NavLink to="/">
-          <img src={LogoRoute} alt="Societas Logo" width={70} />
+          <img
+            src={LogoRoute}
+            alt="Societas Logo"
+            width={70}
+            className="object-cover"
+          />
         </NavLink>
 
         {user ? (
@@ -20,7 +25,8 @@ export default function Nav() {
               <img
                 src={user.imageUrl}
                 alt={`${user.fullName} profile image`}
-                className="rounded-full"
+                width={70}
+                className="rounded-full object-cover w-14 h-14"
               />
             </AccountBtn>
           </div>
@@ -36,7 +42,7 @@ export default function Nav() {
 }
 
 const AccountBtn = styled(NavLink)`
-  width: 3rem;
+  /* width: 3rem;
   height: 3rem;
   background-color: #e9e9e9;
   display: flex;
@@ -44,7 +50,7 @@ const AccountBtn = styled(NavLink)`
   justify-content: center;
   border-radius: 50%;
   text-decoration: none;
-  color: #717171;
+  color: #717171; */
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 `
 

@@ -20,7 +20,7 @@ export default function Profile() {
         <img
           src={user.imageUrl}
           alt={`Your profile picture`}
-          className="rounded-full object-contain h-min"
+          className="rounded-full object-cover w-20 h-20"
           width={75}
           height={75}
         />
