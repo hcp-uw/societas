@@ -15,7 +15,8 @@ export default function Nav() {
             src={LogoRoute}
             alt="Societas Logo"
             width={70}
-            className="object-cover"
+            className="object-cover w-[70px]"
+            loading="eager"
           />
         </NavLink>
 

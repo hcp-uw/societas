@@ -76,16 +76,21 @@ function Projects() {
         <Link
           key={proj.id}
           to={proj.id}
-          className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-3 mb-8 transition-colors hover:outline-2 hover:outline hover:outline-zinc-300"
+          className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-3 mb-8 hover:scale-[1.009] hover:shadow-md hover:shadow-zinc500/50 transition-all"
         >
           <img
             src={proj.imageUrl}
-            width={500}
-            height={300}
-            className="object-fill max-h-60 w-fit m-auto h-auto rounded-lg"
+            width={350}
+            height={400}
+            loading="lazy"
+            className="object-cover rounded-lg max-h-[400px] opacity-0 transition-opacity"
+            onLoad={(e) => {
+              e.target.classList.remove("opacity-0")
+              e.target.classList.add("opacity-1")
+            }}
           />
-          <h2 className="text-2xl font-bold text-zinc-900">{proj.title}</h2>
-          <p className="text-zinc-800 leading-loose text-ellipsis overflow-y-scroll max-h-36">
+          <h2 className="text-2xl font-bold text-zinc-950">{proj.title}</h2>
+          <p className="text-zinc-800 leading-loose line-clamp-4">
             {proj.description}
           </p>
           <div className="flex gap-2 flex-wrap">

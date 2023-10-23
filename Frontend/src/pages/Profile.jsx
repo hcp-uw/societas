@@ -1,6 +1,6 @@
 import { useUser } from "@clerk/clerk-react"
 import { useEffect, useState } from "react"
-import { Link, redirect, useFetcher, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Input, StyledInput } from "../components/inputs"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
