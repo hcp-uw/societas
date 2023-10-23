@@ -174,17 +174,6 @@ export default function Project() {
               <input type="hidden" value={data.title} name="projectTitle" />
               <input type="hidden" value={data.imageUrl} name="imageUrl" />
               <SubmitFetcherBtn fetcher={fetcher} message="Send join request" />
-              {/* <button
-                type="submit"
-                className="bg-blue-600 text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-500"
-                disabled={fetcher.state === "submitting"}
-              >
-                {fetcher.state === "submitting" ? (
-                  <Spinner color="white" />
-                ) : (
-                  <p className="py-2">Send join request</p>
-                )}
-              </button> */}
             </fetcher.Form>
           </div>
         )}
@@ -336,7 +325,7 @@ export function CreatePost() {
           </article>
         ) : (
           <TextArea
-            name=""
+            name="comment"
             id="comment"
             cols="30"
             rows="10"
