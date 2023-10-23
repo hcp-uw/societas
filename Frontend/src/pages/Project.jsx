@@ -454,8 +454,8 @@ export function ProjectPostsLayout() {
     )
 
   return (
-    <div className="flex justify-between gap-8">
-      <div className="flex w-fit gap-4 flex-col">
+    <div className="flex justify-between gap-8 w-full overflow-hidden max-h-[600px]">
+      <div className="flex w-fit gap-4 flex-col overflow-y-auto">
         {data.map((post) => (
           <NavLink
             key={post.id}
@@ -493,7 +493,7 @@ export function ProjectPost() {
   if (isError) return <div>something went wrong</div>
 
   return (
-    <div className="flex-1 border-2 border-zinc-400 rounded-lg p-4">
+    <div className="flex-1 border-2 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
       <article className="prose prose-base prose-slate">
         <Markdown>{data.comment}</Markdown>
       </article>
