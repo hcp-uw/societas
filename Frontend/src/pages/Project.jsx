@@ -301,6 +301,7 @@ export function CreatePost() {
   const { data, isLoading, projectId } = useGetProjectData()
   const [isPreview, setIsPreview] = useState(false)
   const [comment, setComment] = useState("")
+  const [title, setTitle] = useState("")
   const fetcher = useFetcher()
 
   if (isLoading) return <div>loading</div>
@@ -314,26 +315,67 @@ export function CreatePost() {
 
   return (
     <div className="flex gap-4 items-start flex-col">
-      <button onClick={() => setIsPreview((prev) => !prev)}>switch view</button>
+      <div>
+        <button
+          onClick={() => setIsPreview((prev) => !prev)}
+          className="bg-zinc-100 hover:bg-zinc-200 transition-colors py-2 px-6 rounded-lg"
+        >
+          {isPreview ? "Edit Text" : "Preview"}
+        </button>
+      </div>
       <fetcher.Form method="post" className="flex gap-4 flex-col w-full">
-        <Input>
-          <StyledInput placeholder="Title" name="title" id="title" />
-        </Input>
         {isPreview ? (
-          <article className="prose prose-base prose-slate">
-            <Markdown>{comment}</Markdown>
-          </article>
+          <>
+            <h1 className="text-xl font-bold">
+              {title.length > 0 ? (
+                title
+              ) : (
+                <span className="italic text-zinc-400">No title</span>
+              )}
+            </h1>
+            <article className="prose prose-base prose-slate border min-h-[16px] rounded-lg p-2">
+              {comment.length > 0 ? (
+                <Markdown>{comment}</Markdown>
+              ) : (
+                <p className="text-zinc-200">No content</p>
+              )}
+            </article>
+          </>
         ) : (
-          <TextArea
-            name="comment"
-            id="comment"
-            cols="30"
-            rows="10"
-            className="w-full resize-none"
-            placeholder="comment"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
+          <>
+            <Input>
+              <StyledInput
+                placeholder="Title"
+                name="title"
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </Input>
+            <div>
+              <TextArea
+                name="comment"
+                id="comment"
+                cols="30"
+                rows="10"
+                className="w-full resize-none"
+                placeholder="Comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                required
+              />
+              <a
+                href="https://www.markdownguide.org/basic-syntax/"
+                target="_blank"
+                className="text-zinc-400 flex items-center transition-colors hover:text-blue-400"
+                rel="noreferrer"
+              >
+                Styling with Markdown is supported
+                <span className="material-symbols-outlined">markdown</span>
+              </a>
+            </div>
+          </>
         )}
         <input type="hidden" name="comment" value={comment} />
         <input type="hidden" name="projectId" value={projectId} />
