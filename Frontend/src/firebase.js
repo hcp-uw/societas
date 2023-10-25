@@ -130,6 +130,20 @@ export async function getProjectById(id) {
   }
 }
 
+export async function getProjectsByUserId(userId) {
+  if (userId.length < 1) return
+  const projsRef = collection(db, "projects")
+  const q = query(projsRef, where("ownerId", "==", userId))
+  const qSnapShot = await getDocs(q)
+
+  let queryData = []
+  qSnapShot.forEach((doc) => {
+    queryData = [...queryData, { id: doc.id, ...doc.data() }]
+  })
+
+  return queryData
+}
+
 // requests
 export async function getAllPendingRequests(currentUserId) {
   const requestsRef = collection(db, "requests")

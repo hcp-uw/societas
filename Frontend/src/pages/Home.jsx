@@ -76,7 +76,7 @@ function Projects() {
         <Link
           key={proj.id}
           to={proj.id}
-          className="bg-[#e9e9e9] flex flex-col p-6 rounded-2xl gap-3 mb-8 hover:scale-[1.009] hover:shadow-md hover:shadow-zinc500/50 transition-all"
+          className="bg-zinc-200 flex flex-col p-6 rounded-2xl gap-3 mb-8 hover:scale-[1.009] hover:shadow-lg hover:shadow-zinc400/50 transition-all"
         >
           <img
             src={proj.imageUrl}
@@ -94,11 +94,11 @@ function Projects() {
             {proj.description}
           </p>
           <div className="flex gap-2 flex-wrap">
-            <TimeBlob>
+            <Blob>
               <span className="material-symbols-outlined">schedule</span>
               {dayjjs(proj.createdAt.toDate()).fromNow()}
-            </TimeBlob>
-            <TimeBlob>
+            </Blob>
+            <Blob>
               {proj.meetType === "in-person" ? (
                 <span className="material-symbols-outlined">groups</span>
               ) : proj.meetType === "remote" ? (
@@ -109,7 +109,7 @@ function Projects() {
                 </span>
               )}
               {proj.meetType}
-            </TimeBlob>
+            </Blob>
           </div>
         </Link>
       ))}
@@ -117,12 +117,8 @@ function Projects() {
   )
 }
 
-const TimeBlob = styled.p`
-  background-color: #d9d9d9;
-  border-radius: 10px;
-  width: fit-content;
-  padding: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-`
+const Blob = ({ children }) => (
+  <p className="bg-zinc-300 rounded-lg flex items-center w-fit text-sm text-zinc-700 gap-1 p-1">
+    {children}
+  </p>
+)

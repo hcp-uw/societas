@@ -454,7 +454,7 @@ export function ProjectPostsLayout() {
     )
 
   return (
-    <div className="flex justify-between gap-8 w-full overflow-hidden max-h-[600px]">
+    <div className="flex justify-between gap-8 w-full overflow-hidden max-h-[800px]">
       <div className="flex w-fit gap-4 flex-col overflow-y-auto">
         {data.map((post) => (
           <NavLink
@@ -463,7 +463,7 @@ export function ProjectPostsLayout() {
               isActive
                 ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-blue-500 max-w-xs rounded-lg"
                 : isPending
-                ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-500 bg-zinc-400 max-w-xs rounded-lg"
+                ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-500 animate-pulse max-w-xs rounded-lg"
                 : "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-400 max-w-xs rounded-lg hover:border-zinc-500 transition-all"
             }
             to={`${post.id}`}

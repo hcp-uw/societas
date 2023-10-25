@@ -4,9 +4,17 @@ import { Link, useNavigate } from "react-router-dom"
 import { Input, StyledInput } from "../components/inputs"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
+import { getProjectsByUserId } from "../firebase"
+import { useQuery } from "@tanstack/react-query"
+
+const myProjsQuery = (userId) => ({
+  queryKey: ["projects", "my"],
+  queryFn: () => getProjectsByUserId(userId),
+})
 
 export default function Profile() {
   const { user } = useUser()
+  const { data, isError, isLoading } = useQuery(myProjsQuery(user.id))
 
   // user.setProfileImage({
   //   file:
