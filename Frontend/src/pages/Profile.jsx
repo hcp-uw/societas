@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { getProjectsByUserId } from "../firebase"
 import { useQuery } from "@tanstack/react-query"
+import ProjectsView from "../components/ProjectsView"
 
 const myProjsQuery = (userId) => ({
   queryKey: ["projects", "my"],
@@ -14,13 +15,22 @@ const myProjsQuery = (userId) => ({
 
 export default function Profile() {
   const { user } = useUser()
-  const { data, isError, isLoading } = useQuery(myProjsQuery(user.id))
+  const { data, isError, isLoading } = useQuery(
+    myProjsQuery(user ? user.id : null)
+  )
 
+  const breakpointColumnsObj = {
+    default: 3,
+    1347: 2,
+    900: 1,
+  }
   // user.setProfileImage({
   //   file:
   // })
 
   if (!user) return <div>loading</div>
+
+  console.log(data)
 
   return (
     <div className="flex w-full gap-6 flex-col">
@@ -36,16 +46,22 @@ export default function Profile() {
           <h1 className="text-3xl font-medium">{user.fullName}</h1>
           <p>{user.unsafeMetadata.bio ?? "No bio"}</p>
         </div>
+
+        <Link
+          to="edit"
+          className="py-2 px-6 bg-blue-400 text-zinc-100 w-fit rounded-lg transition-colors hover:bg-blue-500"
+        >
+          Edit Profile
+        </Link>
       </div>
 
       <h1 className="font-medium text-2xl">My Projects</h1>
 
-      <Link
-        to="edit"
-        className="py-2 px-6 bg-blue-400 text-zinc-100 w-fit rounded-lg transition-colors hover:bg-blue-500"
-      >
-        Edit Profile
-      </Link>
+      {isLoading ? (
+        <div>Fetching projects</div>
+      ) : (
+        <ProjectsView projects={data} breakPoints={breakpointColumnsObj} />
+      )}
     </div>
   )
 }

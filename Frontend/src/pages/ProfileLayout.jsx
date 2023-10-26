@@ -69,4 +69,8 @@ const StyledAside = styled.aside`
   gap: 1rem;
   width: fit-content;
   min-width: fit-content;
+  position: sticky;
+  top: 2rem;
+  height: 100%;
+  justify-items: flex-start;
 `

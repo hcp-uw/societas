@@ -17,6 +17,7 @@ import { useEffect } from "react"
 import toast from "react-hot-toast"
 import { NavLink, Outlet } from "react-router-dom"
 import Markdown from "react-markdown"
+import { useMemo } from "react"
 
 dayjjs.extend(relativeTime)
 
@@ -106,10 +107,24 @@ export const createPostAction =
 export default function Project() {
   const { projectId } = useParams()
 
-  const { user } = useUser()
+  const { user, isLoaded: userIsLoaded } = useUser()
   const fetcher = useFetcher()
   const { data, isLoading, isError } = useQuery(projectInfoQuery(projectId))
   const [showModal, setShowModal] = useState(false)
+  const role = useMemo(() => getRole(), [data, user])
+
+  function getRole() {
+    if (!data || !user) return
+    if (data.ownerId === user.id) {
+      return "owner"
+    } else if (data.members.find((member) => member === user.id)) {
+      return "member"
+    } else if (data.requestants.find((requestant) => requestant === user.id)) {
+      return "requestant"
+    } else {
+      return "none"
+    }
+  }
 
   useEffect(() => {
     return () => {
@@ -208,7 +223,7 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              {user && data.ownerId === user.id ? (
+              {role === "owner" ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
@@ -217,13 +232,21 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : user ? (
+              ) : role === "none" ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
                 >
                   Join
                 </button>
+              ) : role === "requestant" ? (
+                <div className="py-1 px-6 bg-zinc-200 rounded-lg cursor-default">
+                  Requested
+                </div>
+              ) : role === "member" ? (
+                <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
+                  Member
+                </div>
               ) : (
                 <div>Log in to join!</div>
               )}

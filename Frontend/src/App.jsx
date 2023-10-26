@@ -33,11 +33,15 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <Nav />
-      <Toaster position="bottom-center" />
-      <StyledAppLayout>
-        <Outlet />
-      </StyledAppLayout>
+      <body className="h-screen overflow-hidden">
+        <Nav />
+        <Toaster position="bottom-center" />
+        <main className="h-full overflow-scroll overscroll-y-contain">
+          <StyledAppLayout>
+            <Outlet />
+          </StyledAppLayout>
+        </main>
+      </body>
     </ThemeProvider>
   )
 }
