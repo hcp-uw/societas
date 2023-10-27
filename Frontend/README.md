@@ -2,7 +2,7 @@
 
 We are using [**Vite**](https://vitejs.dev/) to create the project. We also use [**React Query**](https://tanstack.com/query/latest/docs/react/overview) to handle our queries, enabling caching, as well as error and loading states. For our routing, we use [**React Router**](https://reactrouter.com/en/main) v6, where we take advantage of loader functions to get data as soon as possible, we also take advantage of their actions to handle any form submission in a super minimalistic and granular fashion, something that is surprisingly difficult to do with React.js.
 
-For our authentication we use [**Clerk**](https://clerk.com), this library make authentication really easy and is packed with nice features, such as email verification and user metadata. We decided to go with "easy route" with authentication because we believe auth kills projects, since most people decide to implemnt it first. Thankfully Clerk has our back!
+For our authentication we use [**Clerk**](https://clerk.com), this library make authentication really easy and is packed with nice features, such as email verification and user metadata. We decided to go with the "easy route" with authentication because we believe auth kills projects, since most people decide to implemnt it first. Thankfully Clerk has our back!
 
 The frontend team first started stlying with [**styled-components**](https://styled-components.com/), however we moved on to [**tailwind**](https://tailwindcss.com/) because of their utility first approach. The most annoying part about writing CSS is definitely naming classes, and tailwinds gets rid of that, and adds a bunch of cool features. We also use a index.css file, since we have team members that learning web development.
 
