@@ -48,7 +48,7 @@ def getProjectInfo():
     return Projects.Projects.getProjectInfo(request)
 
 @app.route(Projects.ROUTE + 'getAllProjects', methods = ['POST'])
-def getAllProjects():
+def getAllProjects2():
     return Projects.Projects.getAllProjects(request)
 
 @app.route(Projects.ROUTE + 'sendAnnouncement', methods = ['POST'])

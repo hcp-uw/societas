@@ -4,37 +4,44 @@ import { theme } from "./contexts/theme"
 import Nav from "./components/Nav"
 import { Toaster } from "react-hot-toast"
 import "./index.css"
-import { Outlet } from "react-router-dom"
+import { Outlet, redirect } from "react-router-dom"
 import { useAuth } from "@clerk/clerk-react"
 import { useEffect } from "react"
 import { signInWithClerkToken, signOutFromFirebase } from "./firebase"
+import { useNavigate } from "react-router-dom"
 
 function App() {
   const { getToken } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const signInWithFirebase = async () => {
-      const token = await getToken({ template: "integration_firebase" })
-
-      if (!token) {
-        signOutFromFirebase()
-        return
-      }
-
-      await signInWithClerkToken(token)
+    if (localStorage.getItem("firstTimeUser") === "true") {
+      navigate("/intro")
     }
+    // const signInWithFirebase = async () => {
+    //   const token = await getToken({ template: "integration_firebase" })
 
-    signInWithFirebase()
+    //   if (!token) {
+    //     signOutFromFirebase()
+    //     return
+    //   }
+    // }
+
+    // signInWithFirebase()
   }, [])
 
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <Nav />
-      <Toaster position="bottom-center" />
-      <StyledAppLayout>
-        <Outlet />
-      </StyledAppLayout>
+      <body className="h-screen overflow-hidden">
+        <Nav />
+        <Toaster position="bottom-center" />
+        <main className="h-full overflow-scroll overscroll-y-contain">
+          <StyledAppLayout>
+            <Outlet />
+          </StyledAppLayout>
+        </main>
+      </body>
     </ThemeProvider>
   )
 }

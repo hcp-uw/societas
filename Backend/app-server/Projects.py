@@ -35,8 +35,8 @@ class Projects:
 
     def getAllProjects(request):
         try:
-            if getcurr() is None:
-                return str(Status(False, "User must be logged in."))
+            #if getcurr() is None:
+            #   return str(Status(False, "User must be logged in."))
             res = read('Projects')
             projects = None
             if res[1]:

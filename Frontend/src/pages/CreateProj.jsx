@@ -19,8 +19,8 @@ export const createProjectAction =
       title: inputs.title,
       description: inputs.description,
       meetLocation: inputs.meetLocation,
-      image: inputs.image,
-      maxMembers: inputs.maxMems,
+      image: inputs.imageUrl,
+      maxMembers: inputs.maxMembers,
       ownerId: inputs.ownerId,
       meetType: inputs.meetType,
       startDate: inputs.startDate,
@@ -82,7 +82,7 @@ export default function CreateProj() {
   return (
     <fetcher.Form
       method="post"
-      className="flex justify-around w-full"
+      className="flex justify-between w-full"
       encType="multipart/form-data"
     >
       <FilesView
@@ -96,9 +96,7 @@ export default function CreateProj() {
         isFormValid={isFormValid}
         loading={fetcher.state === "submitting"}
       />
-
       <input type="hidden" name="ownerId" value={user.id} />
-
       {/* Submit button for mobile view */}
       <SubmitBtnView
         isFormValid={isFormValid}
@@ -198,7 +196,7 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
             <StyledInput
               type="number"
               id="maxMems"
-              name="maxMems"
+              name="maxMembers"
               min={0}
               max={100}
               placeholder="5"
@@ -234,13 +232,13 @@ function FilesView({ formState, handleAddPicture, handleDelPicture }) {
     <FilesWrapper className="h-fit">
       <div>
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
-          Select up to 3 Files for your project
+          Select a picture
         </h1>
         <input
           type="file"
           accept="image/*"
-          className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-2"
-          name="image"
+          className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
+          name="imageUrl"
           id="image"
           onChange={(e) => {
             setError(null)
@@ -306,7 +304,11 @@ function SubmitBtnView({ isFormValid, desktop, loading }) {
           Create Project
         </p>
 
-        <div className="absolute pointer-events-none opacity-0 group-aria-busy:opacity-100">
+        <div
+          className={`absolute pointer-events-none ${
+            loading ? "opacity-100" : "opacity-0"
+          }`}
+        >
           <LoadingSpinner size={24} />
         </div>
       </button>

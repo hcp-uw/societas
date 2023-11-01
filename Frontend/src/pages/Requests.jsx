@@ -1,23 +1,47 @@
 import { useQuery } from "@tanstack/react-query"
-import { getAllRequests } from "../firebase"
+import { getAllPendingRequests } from "../firebase"
 import { useUser } from "@clerk/clerk-react"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { Form } from "react-router-dom"
+import { Form, redirect } from "react-router-dom"
+import { acceptRequest } from "../firebase"
+import toast from "react-hot-toast"
 dayjjs.extend(relativeTime)
 
 const requestsQuery = (currentUserId) => ({
   queryKey: ["requests"],
-  queryFn: () => getAllRequests(currentUserId),
+  queryFn: () => getAllPendingRequests(currentUserId),
 })
+
+export const resquestAcceptAction =
+  (queryClient) =>
+  async ({ request }) => {
+    const formData = await request.formData()
+    const inputs = Object.fromEntries(formData)
+    await acceptRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
+    queryClient.invalidateQueries({
+      queryKey: ["requests"],
+    })
+    toast.success("Accepted into project")
+    return redirect("/account/requests")
+  }
 
 export default function Requests() {
   const { user } = useUser()
-  const { data, isLoading } = useQuery(requestsQuery(user.id ?? ""))
+  const { data, isLoading, isError } = useQuery(
+    requestsQuery(user ? user.id : "")
+  )
 
   if (isLoading) return <div>loading</div>
 
-  if (!data) return <div>something went wrong</div>
+  if (isError) return <div>something went wrong</div>
+
+  if (data.length == 0)
+    return (
+      <h1 className="text-lg font-medium w-full text-center">
+        You have no requests to view
+      </h1>
+    )
 
   return (
     <div className="w-full flex flex-col gap-4 ml-8">
@@ -41,6 +65,13 @@ export default function Requests() {
           </div>
           <div className="flex gap-4 items-center">
             <Form method="post" action="acceptReq">
+              <input type="hidden" name="requestId" value={request.id} />
+              <input type="hidden" name="projectId" value={request.projectId} />
+              <input
+                type="hidden"
+                name="requestantId"
+                value={request.requestantId}
+              />
               <button className="bg-blue-600 p-2 h-fit text-zinc-100 rounded-xl">
                 Accept
               </button>

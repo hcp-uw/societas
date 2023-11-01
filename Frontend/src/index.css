@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  scroll-behavior: none;
+  height: 100vh;
+}
+
 .masonry {
   display: -webkit-box; /* Not needed if autoprefixing */
   display: -ms-flexbox; /* Not needed if autoprefixing */
@@ -15,9 +20,12 @@
   background-clip: padding-box;
 }
 
-body {
-  font-family: Inter, Manrope, "DM Sans";
+.material-symbols-fill {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
 }
+/* body {
+  font-family: Inter, Manrope, "DM Sans";
+} */
 
 .introTitle {
   font-size: 55px;
@@ -91,200 +99,200 @@ body {
 
 /* ################Reference Page################# */
 .PP-title {
-    font-size:50px;
-    font-weight:400;
+  font-size: 50px;
+  font-weight: 400;
 }
 
 .PPwrapper {
-    display: flex;
-    flex-direction: column;
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5em;
-    margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5em;
+  margin-bottom: 0;
 }
 
 .PP-text1 {
-    font-size:20px;
+  font-size: 20px;
 }
 
 .PPbutton-container {
-    justify-content: space-between;
-    align-items: center; 
+  justify-content: space-between;
+  align-items: center;
 }
 
 .PP-button {
-    border-radius: 8px;
-    border: none;
-    padding: 11px 25px;
-    text-align: center;
-    margin-bottom: 1em;
-    margin-right: 1em;
+  border-radius: 8px;
+  border: none;
+  padding: 11px 25px;
+  text-align: center;
+  margin-bottom: 1em;
+  margin-right: 1em;
 }
 
 .PP-button-purple {
-    background-color: #914E9E;
+  background-color: #914e9e;
 }
 
 .PP-button-purple:hover {
-    background-color: #b28fb9d4;
+  background-color: #b28fb9d4;
 }
 
 .PP-button-red {
-    background-color: #BE375F;
+  background-color: #be375f;
 }
 
 .PP-button-red:hover {
-    background-color: #d76b8bc1;
+  background-color: #d76b8bc1;
 }
 
 .PP-button-orange {
-    background-color: #ED8554;
+  background-color: #ed8554;
 }
 
 .PP-button-orange:hover {
-    background-color: #edb091d6;
+  background-color: #edb091d6;
 }
 
 .PP-button-yellow {
-    background-color: #F5EB6D;
+  background-color: #f5eb6d;
 }
 
 .PP-button-yellow:hover {
-    background-color: #f5f1b7c5;
+  background-color: #f5f1b7c5;
 }
 
 .PP-button-green {
-    background-color: #77C68C;
-    border: 1px solid black;
-    padding: 15px 45px;
-    font-weight: bold;
-    font-size: 17px;
-    margin-right: 2em;
-    margin-top: 1em;
+  background-color: #77c68c;
+  border: 1px solid black;
+  padding: 15px 45px;
+  font-weight: bold;
+  font-size: 17px;
+  margin-right: 2em;
+  margin-top: 1em;
 }
 
 .PP-text2 {
-    font-size:20px;
-    margin-top: 2em;
+  font-size: 20px;
+  margin-top: 2em;
 }
 
 .PPWrapper2 {
-    flex-direction: row;
-    margin-bottom: 6em;
-    margin-top: 1em;
-    justify-content: space-between;
+  flex-direction: row;
+  margin-bottom: 6em;
+  margin-top: 1em;
+  justify-content: space-between;
 }
 
 .form-control {
-    border-radius: 20px;
-    border: 2px solid black;
-    border-left: none;
-    text-align: center;
-    background-color: #E9E9E9;
-    width: 330px !important;
+  border-radius: 20px;
+  border: 2px solid black;
+  border-left: none;
+  text-align: center;
+  background-color: #e9e9e9;
+  width: 330px !important;
 }
 
 .PP-addButton {
-    border-radius: 20px;
-    border: 2px solid black;
-    border-right: none;
-    width: 35px;
-    padding-left: 1em;
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
-    background-color: #E9E9E9;
+  border-radius: 20px;
+  border: 2px solid black;
+  border-right: none;
+  width: 35px;
+  padding-left: 1em;
+  text-align: center;
+  font-weight: bold;
+  font-size: larger;
+  background-color: #e9e9e9;
 }
 
 .form-select {
-    outline: none;
+  outline: none;
 }
 
 input.form-control:focus {
-    outline: none;
-    outline-width: 0;
-    border: 2px solid black;
-    border-left: none;
-    background-color: #E9E9E9;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
+  outline: none;
+  outline-width: 0;
+  border: 2px solid black;
+  border-left: none;
+  background-color: #e9e9e9;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
 /* ##############Woops Page############### */
 .WP-text1 {
-    font-size: 15px;
-    margin-bottom: 0;
+  font-size: 15px;
+  margin-bottom: 0;
 }
 
 .WP-wrapper {
-    margin-top: 6em;
+  margin-top: 6em;
 }
 
 .WP-title {
-    margin-top: 1em;
-    font-size:65px;
-    font-weight:900;
+  margin-top: 1em;
+  font-size: 65px;
+  font-weight: 900;
 }
 
 .WP-button-container {
-    display: flex;
-    justify-content:space-between;
-    padding-bottom: 5em;
-    margin-bottom: 0;
-    margin-top: 7em;
-    margin-left:0;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 5em;
+  margin-bottom: 0;
+  margin-top: 7em;
+  margin-left: 0;
 }
 
 .WP-button {
-    background-color:#fbbc05;
-    height:48px;
-    width:180px;
-    border-radius:14px;
-    border: none;
-    font-size: 20px;
+  background-color: #fbbc05;
+  height: 48px;
+  width: 180px;
+  border-radius: 14px;
+  border: none;
+  font-size: 20px;
 }
 
 /* ############Report Page############### */
 .RP-title {
-    margin: 2em 0;
+  margin: 2em 0;
 }
 
 .RP-text1 {
-    font-size:22px;
-    font-weight: bold;
+  font-size: 22px;
+  font-weight: bold;
 }
 
 .RP-form-control {
-    border: 1px solid black;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    margin: none;
-    width: 100%;
+  border: 1px solid black;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  margin: none;
+  width: 100%;
 }
 
 .RP-button {
-    background-color:#EA4335;
-    height:52px;
-    width:145px;
-    border-radius:12px;
-    border: none;
-    font-size: 18px;
-    color:#FFFFFF;
+  background-color: #ea4335;
+  height: 52px;
+  width: 145px;
+  border-radius: 12px;
+  border: none;
+  font-size: 18px;
+  color: #ffffff;
 }
 
 input.RP-form-control:focus {
-    outline: none;
-    outline-width: 0;
-    border: none;
-    border-bottom: 1px solid black;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
+  outline: none;
+  outline-width: 0;
+  border: none;
+  border-bottom: 1px solid black;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
 }
 
-::-webkit-input-placeholder {
-    font-weight: 800;
-}
+/* ::-webkit-input-placeholder {
+  font-weight: 800;
+} */
