@@ -3,15 +3,21 @@ import { Link } from "react-router-dom"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjjs.extend(relativeTime)
+import type { Project } from "../firebase"
 
-export default function ProjectsView({ projects, breakPoints }) {
+type BreakPoints = "default" | "1826" | "1347" | "900"
+
+export default function ProjectsView(props: {
+  projects: Project[]
+  breakPoints: Record<BreakPoints, number>
+}) {
   return (
     <Masonry
-      breakpointCols={breakPoints}
+      breakpointCols={props.breakPoints}
       className="masonry"
       columnClassName="masonryCol"
     >
-      {projects.map((proj) => (
+      {props.projects.map((proj) => (
         <Link
           key={proj.id}
           to={`/${proj.id}`}
@@ -24,8 +30,8 @@ export default function ProjectsView({ projects, breakPoints }) {
             loading="lazy"
             className="object-cover rounded-lg max-h-[400px] opacity-0 transition-opacity m-auto"
             onLoad={(e) => {
-              e.target.classList.remove("opacity-0")
-              e.target.classList.add("opacity-1")
+              e.currentTarget.classList.remove("opacity-0")
+              e.currentTarget.classList.add("opacity-1")
             }}
           />
           <h2 className="text-2xl font-bold text-zinc-950">{proj.title}</h2>
@@ -56,8 +62,8 @@ export default function ProjectsView({ projects, breakPoints }) {
   )
 }
 
-const Blob = ({ children }) => (
-  <p className="bg-zinc-300 rounded-lg flex items-center w-fit text-sm text-zinc-700 gap-1 p-1">
-    {children}
+const Blob = (props: { children: React.ReactNode }) => (
+  <p className="bg-zinc-300 rounded-xl flex items-center w-fit text-sm text-zinc-700 gap-1 p-1">
+    {props.children}
   </p>
 )

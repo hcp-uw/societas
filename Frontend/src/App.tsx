@@ -7,7 +7,7 @@ import "./index.css"
 import { Outlet, redirect } from "react-router-dom"
 import { useAuth } from "@clerk/clerk-react"
 import { useEffect } from "react"
-import { signInWithClerkToken, signOutFromFirebase } from "./firebase"
+// import { signInWithClerkToken, signOutFromFirebase } from "./firebase"
 import { useNavigate } from "react-router-dom"
 
 function App() {
@@ -31,18 +31,18 @@ function App() {
   }, [])
 
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyles />
-      <body className="h-screen overflow-hidden">
+    <div className="h-screen overflow-hidden">
+      <ThemeProvider theme={theme}>
+        <GlobalStyles />
         <Nav />
         <Toaster position="bottom-center" />
-        <main className="h-full overflow-scroll overscroll-y-contain">
+        <main className="h-full overflow-auto overscroll-y-contain">
           <StyledAppLayout>
             <Outlet />
           </StyledAppLayout>
         </main>
-      </body>
-    </ThemeProvider>
+      </ThemeProvider>
+    </div>
   )
 }
 

@@ -1,6 +1,6 @@
 import { getAllProjects } from "../firebase"
 import { useUser } from "@clerk/clerk-react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, type QueryClient } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
 import ProjectsView from "../components/ProjectsView"
 
@@ -9,7 +9,7 @@ const projectsQuery = () => ({
   queryFn: () => getAllProjects(),
 })
 
-export const loader = (queryClient) => async () => {
+export const loader = (queryClient: QueryClient) => async () => {
   if (!queryClient.getQueryData(projectsQuery().queryKey)) {
     return await queryClient.fetchQuery(projectsQuery())
   }
@@ -21,7 +21,7 @@ export default function Home() {
   const { user } = useUser()
 
   return (
-    <>
+    <div className="pb-24">
       {user ? (
         <h1 className="py-6 text-4xl font-bold text-zinc-800">
           Welcome {user.firstName}
@@ -31,7 +31,7 @@ export default function Home() {
       )}
 
       <Projects />
-    </>
+    </div>
   )
 }
 
@@ -53,6 +53,8 @@ function Projects() {
         <Spinner size="4rem" />
       </div>
     )
+
+  if (!data) return <div>Something went wrong!</div>
 
   const breakpointColumnsObj = {
     default: 4,

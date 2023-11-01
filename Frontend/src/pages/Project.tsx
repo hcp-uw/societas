@@ -1,5 +1,13 @@
-import { useQuery } from "@tanstack/react-query"
-import { redirect, useFetcher, useNavigate, useParams } from "react-router-dom"
+import { QueryClient, useQuery } from "@tanstack/react-query"
+import {
+  ActionFunctionArgs,
+  FetcherWithComponents,
+  LoaderFunctionArgs,
+  redirect,
+  useFetcher,
+  useNavigate,
+  useParams,
+} from "react-router-dom"
 import {
   createProjectJoinRequest,
   createProjectPost,
@@ -18,27 +26,29 @@ import toast from "react-hot-toast"
 import { NavLink, Outlet } from "react-router-dom"
 import Markdown from "react-markdown"
 import { useMemo } from "react"
+import { z } from "zod"
 
 dayjjs.extend(relativeTime)
 
-const projectInfoQuery = (id) => ({
+const projectInfoQuery = (id: string) => ({
   queryKey: ["projects", id, "info"],
   queryFn: () => getProjectById(id),
 })
 
-const projectPostsQuery = (id) => ({
+const projectPostsQuery = (id: string) => ({
   queryKey: ["projects", id, "posts"],
   queryFn: () => getAllProjectPosts(id),
 })
 
-const projectPostQuery = (projectId, postId) => ({
+const projectPostQuery = (projectId: string, postId: string) => ({
   queryKey: ["projects", projectId, "posts", postId],
   queryFn: () => getProjectPostById(projectId, postId),
 })
 
 export const infoLoader =
-  (queryClient) =>
-  async ({ params }) => {
+  (queryClient: QueryClient) =>
+  async ({ params }: LoaderFunctionArgs) => {
+    if (!params.projectId) throw Error("No Project Id found in url params")
     const query = projectInfoQuery(params.projectId)
     return (
       queryClient.getQueryData(query.queryKey) ??
@@ -47,8 +57,9 @@ export const infoLoader =
   }
 
 export const postsLoader =
-  (queryClient) =>
-  async ({ params }) => {
+  (queryClient: QueryClient) =>
+  async ({ params }: LoaderFunctionArgs) => {
+    if (!params.projectId) throw new Error("no project Id found in url params")
     const query = projectPostsQuery(params.projectId)
     return (
       queryClient.getQueryData(query.queryKey) ??
@@ -57,8 +68,10 @@ export const postsLoader =
   }
 
 export const postLoader =
-  (queryClient) =>
-  async ({ params }) => {
+  (queryClient: QueryClient) =>
+  async ({ params }: LoaderFunctionArgs) => {
+    if (!params.projectId) throw new Error("no project Id found in url params")
+    if (!params.postId) throw new Error("no post Id found in url params")
     const query = projectPostQuery(params.projectId, params.postId)
     return (
       queryClient.getQueryData(query.queryKey) ??
@@ -67,11 +80,18 @@ export const postLoader =
   }
 // send request
 export const action =
-  (queryClient) =>
-  async ({ request }) => {
+  (queryClient: QueryClient) =>
+  async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
-    const inputs = Object.fromEntries(formData)
-    console.log(inputs.imageUrl)
+    const inputsSchema = z.object({
+      projectId: z.string(),
+      imageUrl: z.string(),
+      message: z.string(),
+      ownerId: z.string(),
+      projectTitle: z.string(),
+      requestantId: z.string(),
+    })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData))
     await createProjectJoinRequest({
       projectId: inputs.projectId,
       imageUrl: inputs.imageUrl,
@@ -88,10 +108,15 @@ export const action =
   }
 
 export const createPostAction =
-  (queryClient) =>
-  async ({ request }) => {
+  (queryClient: QueryClient) =>
+  async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
-    const inputs = Object.fromEntries(formData)
+    const inputsSchema = z.object({
+      title: z.string(),
+      comment: z.string(),
+      projectId: z.string(),
+    })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData))
 
     await createProjectPost(inputs.projectId, {
       title: inputs.title,
@@ -107,11 +132,15 @@ export const createPostAction =
 export default function Project() {
   const { projectId } = useParams()
 
-  const { user, isLoaded: userIsLoaded } = useUser()
+  const { user } = useUser()
   const fetcher = useFetcher()
-  const { data, isLoading, isError } = useQuery(projectInfoQuery(projectId))
+  const { data, isLoading, isError } = useQuery(
+    projectInfoQuery(projectId ?? "")
+  )
   const [showModal, setShowModal] = useState(false)
   const role = useMemo(() => getRole(), [data, user])
+
+  if (!data) return <div>User not found</div>
 
   function getRole() {
     if (!data || !user) return
@@ -179,12 +208,16 @@ export default function Project() {
               <TextArea
                 id="textAreaProj"
                 className="w-full"
-                cols="70"
-                rows="5"
+                cols={70}
+                rows={70}
                 name="message"
               />
               <input type="hidden" value={projectId} name="projectId" />
-              <input type="hidden" value={user.id} name="requestantId" />
+              <input
+                type="hidden"
+                value={user ? user.id : ""}
+                name="requestantId"
+              />
               <input type="hidden" value={data.ownerId} name="ownerId" />
               <input type="hidden" value={data.title} name="projectTitle" />
               <input type="hidden" value={data.imageUrl} name="imageUrl" />
@@ -252,40 +285,6 @@ export default function Project() {
               )}
             </div>
           </nav>
-          {/* {user && data.requestants.find((member) => member === user.id) ? (
-                <button className=" bg-zinc-400 text-zinc-700 p-2 rounded-xl group hover:bg-red-500 hover:outline-none hover:text-zinc-100 transition-colors min-w-[7.5rem]">
-                  <span className="group-hover:hidden">Request Sent</span>
-                  <span className="hidden group-hover:inline-block">
-                    Unrequest
-                  </span>
-                </button>
-              ) : user &&
-                data.participants.find((member) => member === user.id) ? (
-                <p className="bg-slate-400 py-2 px-6 rounded-lg">Member</p>
-              ) : user && data.host_id === user.id ? (
-                <div className="flex gap-4 items-center">
-                  <NavLink
-                    to="posts/new"
-                    className="inline-block bg-zinc-500 py-2 px-6 rounded-lg border-2 border-zinc-300 text-zinc-100 font-medium"
-                  >
-                    New Post
-                  </NavLink>
-                  <p className="bg-green-600 py-2 px-6 text-zinc-100 rounded-lg">
-                    Owner
-                  </p>
-                </div>
-              ) : !user ? (
-                <div> Login to send request</div>
-              ) : (
-                <button
-                  className="text-zinc-100 py-2 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
-                  onClick={() => setShowModal(true)}
-                >
-                  Join
-                </button>
-              )} */}
-          {/* <div className="w-full m-auto h-[2px] max-w-7xl bg-zinc-200 rounded-full my-4"></div> */}
-
           <Outlet />
         </div>
       </div>
@@ -295,7 +294,7 @@ export default function Project() {
 
 function useGetProjectData() {
   const { projectId } = useParams()
-  const query = useQuery(projectInfoQuery(projectId))
+  const query = useQuery(projectInfoQuery(projectId ?? ""))
 
   return {
     projectId,
@@ -303,7 +302,16 @@ function useGetProjectData() {
   }
 }
 
-function SubmitFetcherBtn({ fetcher, message, className }) {
+type SubmitFetcherBtnProps = {
+  fetcher: FetcherWithComponents<any>
+  message: string
+  className?: string
+}
+function SubmitFetcherBtn({
+  fetcher,
+  message,
+  className,
+}: SubmitFetcherBtnProps) {
   return (
     <button
       type="submit"
@@ -326,14 +334,17 @@ export function CreatePost() {
   const [comment, setComment] = useState("")
   const [title, setTitle] = useState("")
   const fetcher = useFetcher()
+  const navigate = useNavigate()
 
   if (isLoading) return <div>loading</div>
 
   if (!user) return <div>loading</div>
 
+  if (!data) return <div>something went wrong! Try reloading</div>
+
   if (data.ownerId !== user.id) {
     toast.error("Can only create post if owner")
-    return redirect("..")
+    navigate("..")
   }
 
   return (
@@ -380,8 +391,8 @@ export function CreatePost() {
               <TextArea
                 name="comment"
                 id="comment"
-                cols="30"
-                rows="10"
+                cols={30}
+                rows={10}
                 className="w-full resize-none"
                 placeholder="Comment"
                 value={comment}
@@ -413,9 +424,11 @@ export function CreatePost() {
 }
 
 export function ProjectInfo() {
-  const { data, isLoading, isError } = useGetProjectData()
+  const { data, isLoading } = useGetProjectData()
 
   if (isLoading) return <div>loading</div>
+
+  if (!data) return <div>something went wrong, Try again!</div>
 
   return (
     <div className="flex justify-between w-full gap-16">
@@ -453,11 +466,13 @@ export function ProjectInfo() {
 
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams()
-  const { data, isLoading, isError } = useQuery(projectPostsQuery(projectId))
+  const { data, isLoading, isError } = useQuery(
+    projectPostsQuery(projectId ?? "")
+  )
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (postId === undefined && !isLoading) {
+    if (postId === undefined && data) {
       console.log("here")
 
       if (data.length === 0) return
@@ -478,16 +493,16 @@ export function ProjectPostsLayout() {
 
   return (
     <div className="flex justify-between gap-8 w-full overflow-hidden max-h-[800px]">
-      <div className="flex w-fit gap-4 flex-col overflow-y-auto">
+      <div className="flex w-full max-w-sm gap flex-col overflow-y-auto">
         {data.map((post) => (
           <NavLink
             key={post.id}
             className={({ isActive, isPending }) =>
               isActive
-                ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-blue-500 max-w-xs rounded-lg"
+                ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-2 gap-16 justify-between items-center p-4 border-blue-500 bg-zinc-300 max-w-xs transition-all"
                 : isPending
-                ? "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-500 animate-pulse max-w-xs rounded-lg"
-                : "flex w-full gap-16 justify-between items-center p-4 border-2 border-zinc-400 max-w-xs rounded-lg hover:border-zinc-500 transition-all"
+                ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors"
+                : "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors "
             }
             to={`${post.id}`}
           >
@@ -507,16 +522,16 @@ export function ProjectPostsLayout() {
 
 export function ProjectPost() {
   const params = useParams()
-  const { data, isLoading, isError } = useQuery(
-    projectPostQuery(params.projectId, params.postId)
+  const { data, isLoading } = useQuery(
+    projectPostQuery(params.projectId ?? "", params.postId ?? "")
   )
 
   if (isLoading) return <div>loading..</div>
 
-  if (isError) return <div>something went wrong</div>
+  if (!data) return <div>something went wrong</div>
 
   return (
-    <div className="flex-1 border-2 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
+    <div className="flex-1 border-1 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
       <article className="prose prose-base prose-slate">
         <Markdown>{data.comment}</Markdown>
       </article>

@@ -5,15 +5,24 @@ import { toast } from "react-hot-toast"
 import { redirect, useFetcher } from "react-router-dom"
 import { useUser } from "@clerk/clerk-react"
 import { StyledInput, Input, TextArea } from "../components/inputs"
-import PropType from "prop-types"
+import { QueryClient } from "@tanstack/react-query"
+import { z } from "zod"
 
 export const createProjectAction =
-  (queryClient) =>
-  async ({ request }) => {
+  (queryClient: QueryClient) =>
+  async ({ request }: { request: Request }) => {
     const formData = await request.formData()
-    console.log(formData.forEach((e) => console.log(e)))
-    const inputs = Object.fromEntries(formData)
-    console.log(inputs)
+    const inputsScheme = z.object({
+      title: z.string(),
+      description: z.string(),
+      meetLocation: z.string(),
+      imageUrl: z.instanceof(Blob),
+      maxMembers: z.string(),
+      ownerId: z.string(),
+      meetType: z.string(),
+      startDate: z.string(),
+    })
+    const inputs = inputsScheme.parse(Object.fromEntries(formData))
 
     await createProject({
       title: inputs.title,
@@ -35,13 +44,20 @@ export const createProjectAction =
     return redirect("/")
   }
 
+type FormState = {
+  title: string
+  description: string
+  location: string
+  maxMems: string
+  image: Blob | null
+}
 export default function CreateProj() {
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<FormState>({
     title: "",
     description: "",
     location: "",
     maxMems: "",
-    images: [],
+    image: null,
   }) // state form the inputs
   // const [loading, setLoading] = useState(false)
   const fetcher = useFetcher()
@@ -53,29 +69,27 @@ export default function CreateProj() {
   // handles deletetion of picture
   // params:
   //  index -> index of picture to be deleted
-  function handleDelPictre(index) {
-    const newArr = formState.images.filter((_, i) => i !== index)
-    setFormState({ ...formState, images: newArr })
-  }
+  // fuVjjnction handleDelPictre(index: number) {
+  //   const newArr = formState.images?.filter((_, i) => i !== index)
+  //   setFormState({ ...formState, images: newArr })
+  // }
 
-  function handleAddPicture(file) {
-    if (formState.images.includes(file)) {
-      throw Error("this already exists")
-    }
-    setFormState((prev) => ({
-      ...prev,
-      images: [...prev.images, file],
-    }))
-  }
+  // function handleAddPicture(file: Blob) {
+  //   if (formState.images.includes(file)) {
+  //     throw Error("this already exists")
+  //   }
+  //   setFormState((prev) => ({
+  //     ...prev,
+  //     images: [...prev.images, file],
+  //   }))
+  // }
 
   // return true if form fields are not empty
   // false otherwiise
   function isFormValid() {
-    for (let prop in formState) {
-      if (formState[prop] === "" && prop !== "images") {
-        return false
-      }
-    }
+    Object.values(formState).forEach((val) => {
+      if (val === "" || val === null) return false
+    })
     return true
   }
 
@@ -85,11 +99,7 @@ export default function CreateProj() {
       className="flex justify-between w-full"
       encType="multipart/form-data"
     >
-      <FilesView
-        formState={formState}
-        handleAddPicture={handleAddPicture}
-        handleDelPicture={handleDelPictre}
-      />
+      <FilesView formState={formState} setFormState={setFormState} />
       <InputsView
         formState={formState}
         setFormState={setFormState}
@@ -100,19 +110,25 @@ export default function CreateProj() {
       {/* Submit button for mobile view */}
       <SubmitBtnView
         isFormValid={isFormValid}
+        desktop={true}
         loading={fetcher.state === "submitting"}
       />
     </fetcher.Form>
   )
 }
 
-InputsView.propTypes = {
-  formState: PropType.object.isRequired,
-  setFormState: PropType.func.isRequired,
-  isFormValid: PropType.func.isRequired,
-  loading: PropType.bool.isRequired,
+type InputsViewProps = {
+  formState: FormState
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+  isFormValid: () => boolean
+  loading: boolean
 }
-function InputsView({ formState, setFormState, isFormValid, loading }) {
+function InputsView({
+  formState,
+  setFormState,
+  isFormValid,
+  loading,
+}: InputsViewProps) {
   return (
     <InputsWrapper>
       {/* Title Input */}
@@ -138,8 +154,8 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
         <TextArea
           name="description"
           id="description"
-          cols="20"
-          rows="5"
+          cols={20}
+          rows={5}
           placeholder="description of your project"
           onChange={(e) =>
             setFormState({ ...formState, description: e.target.value })
@@ -220,14 +236,14 @@ function InputsView({ formState, setFormState, isFormValid, loading }) {
   )
 }
 
-FilesView.propTypes = {
-  formState: PropType.object.isRequired,
-  handleAddPicture: PropType.func.isRequired,
-  handleDelPicture: PropType.func.isRequired,
-}
-
-function FilesView({ formState, handleAddPicture, handleDelPicture }) {
-  const [error, setError] = useState(null)
+function FilesView({
+  formState,
+  setFormState,
+}: {
+  formState: FormState
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+}) {
+  const [error, setError] = useState<string | null>(null)
   return (
     <FilesWrapper className="h-fit">
       <div>
@@ -243,55 +259,50 @@ function FilesView({ formState, handleAddPicture, handleDelPicture }) {
           onChange={(e) => {
             setError(null)
             const maxFileSize = 1024 * 1024 // one mb
-            if (e.target.files[0].size > maxFileSize) {
+            if (!e.target.files) return
+            const file = e.target.files[0]
+
+            if (file.size > maxFileSize) {
               setError("File size is too large")
               e.target.value = ""
               return
             }
-
-            if (formState.images.length >= 3) {
-              setError("Too many files")
-              e.target.value = ""
-              return
-            }
-
-            handleAddPicture(e.target.files[0])
+            setFormState((prev) => ({ ...prev, image: file }))
           }}
         />
         {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
 
-      {/* images for project */}
-      <Images className="h-full">
-        {formState.images.map((file, i) => (
-          <Image key={file.name}>
-            <button
-              onClick={() => handleDelPicture(i)}
-              type="button"
-              className="hover:bg-zinc-300 bg-slate-100  "
-            >
-              <span className="material-symbols-outlined">close</span>
-            </button>
-            <img
-              src={URL.createObjectURL(file)}
-              alt={file.name}
-              key={file.name}
-              width={300}
-            />
-          </Image>
-        ))}
-      </Images>
+      {formState.image && (
+        <Image key={formState.image.name}>
+          <button
+            onClick={() => setFormState((prev) => ({ ...prev, image: null }))}
+            type="button"
+            className="hover:bg-zinc-300 bg-slate-100  "
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+          <img
+            src={URL.createObjectURL(formState.image)}
+            alt={formState.image.name}
+            key={formState.image.name}
+            width={300}
+          />
+        </Image>
+      )}
     </FilesWrapper>
   )
 }
 
-SubmitBtnView.propTypes = {
-  isFormValid: PropType.func.isRequired,
-  desktop: PropType.bool,
-  loading: PropType.bool.isRequired,
-}
-
-function SubmitBtnView({ isFormValid, desktop, loading }) {
+function SubmitBtnView({
+  isFormValid,
+  desktop,
+  loading,
+}: {
+  isFormValid: () => boolean
+  desktop: boolean
+  loading: boolean
+}) {
   return (
     <SubmitWrapper desktop={desktop}>
       <button
@@ -316,11 +327,7 @@ function SubmitBtnView({ isFormValid, desktop, loading }) {
   )
 }
 
-LoadingSpinner.propTypes = {
-  size: PropType.number,
-}
-
-function LoadingSpinner({ size }) {
+function LoadingSpinner({ size }: { size: number }) {
   return (
     <div role="status">
       <svg
@@ -346,7 +353,10 @@ function LoadingSpinner({ size }) {
   )
 }
 
-const SubmitWrapper = styled.div`
+interface SubmitWrapperProps {
+  readonly desktop?: boolean
+}
+const SubmitWrapper = styled.div<SubmitWrapperProps>`
   width: 100%;
   display: flex;
   align-items: flex-end;
@@ -383,19 +393,6 @@ const FilesWrapper = styled.div`
       color: ${({ theme }) => theme.colors.subText};
     }
   }
-`
-
-const Images = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  overflow-y: scroll;
-  @media (min-width: 62rem) {
-    flex-direction: column;
-    overflow-y: visible;
-  }
-
-  /* width: 100vw; */
 `
 
 const Image = styled.div`
