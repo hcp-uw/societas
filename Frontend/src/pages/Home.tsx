@@ -3,13 +3,14 @@ import { useUser } from "@clerk/clerk-react"
 import { useQuery, type QueryClient } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
 import ProjectsView from "../components/ProjectsView"
+import { LoaderFunction } from "react-router-dom"
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
   queryFn: () => getAllProjects(),
 })
 
-export const loader = (queryClient: QueryClient) => async () => {
+export const loader = (queryClient: QueryClient):LoaderFunction => async () => {
   if (!queryClient.getQueryData(projectsQuery().queryKey)) {
     return await queryClient.fetchQuery(projectsQuery())
   }

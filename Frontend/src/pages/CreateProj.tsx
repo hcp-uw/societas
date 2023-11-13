@@ -108,11 +108,11 @@ export default function CreateProj() {
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
-      <SubmitBtnView
+      {/* <SubmitBtnView
         isFormValid={isFormValid}
         desktop={true}
         loading={fetcher.state === "submitting"}
-      />
+      /> */}
     </fetcher.Form>
   )
 }
@@ -256,6 +256,7 @@ function FilesView({
           className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
           name="imageUrl"
           id="image"
+          required
           onChange={(e) => {
             setError(null)
             const maxFileSize = 1024 * 1024 // one mb

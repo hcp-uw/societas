@@ -50,7 +50,6 @@ const GlobalStyles = createGlobalStyle`
   *,
   *::before,
   *::after {
-    margin: 0;
     font-family: ${({ theme }) => theme.fonts.default}, sans-serif, ;
   }
 `

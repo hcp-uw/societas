@@ -389,7 +389,6 @@ export function CreatePost() {
             </Input>
             <div>
               <TextArea
-                name="comment"
                 id="comment"
                 cols={30}
                 rows={10}
