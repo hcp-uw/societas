@@ -2,13 +2,13 @@ import { useUser } from "@clerk/clerk-react"
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Input, StyledInput } from "../components/inputs"
-import { useForm } from "react-hook-form"
+import { useForm, SubmitHandler } from "react-hook-form"
 import toast from "react-hot-toast"
 import { getProjectsByUserId } from "../firebase"
 import { useQuery } from "@tanstack/react-query"
 import ProjectsView from "../components/ProjectsView"
 
-const myProjsQuery = (userId) => ({
+const myProjsQuery = (userId: string) => ({
   queryKey: ["projects", "my"],
   queryFn: () => getProjectsByUserId(userId),
 })
@@ -16,11 +16,12 @@ const myProjsQuery = (userId) => ({
 export default function Profile() {
   const { user } = useUser()
   const { data, isError, isLoading } = useQuery(
-    myProjsQuery(user ? user.id : null)
+    myProjsQuery(user ? user.id : "")
   )
 
   const breakpointColumnsObj = {
     default: 3,
+    1826: 2,
     1347: 2,
     900: 1,
   }
@@ -30,8 +31,9 @@ export default function Profile() {
 
   if (!user) return <div>loading</div>
 
-  console.log(data)
+  if (isLoading) return <div>loading</div>
 
+  if (!data) return <div>There was an issue fetching your projects</div>
   return (
     <div className="flex w-full gap-6 flex-col">
       <div className="flex gap-6 items-center">
@@ -44,7 +46,7 @@ export default function Profile() {
         />
         <div className="flex flex-col">
           <h1 className="text-3xl font-medium">{user.fullName}</h1>
-          <p>{user.unsafeMetadata.bio ?? "No bio"}</p>
+          <p>{(user.unsafeMetadata.bio as string) ?? "No bio"}</p>
         </div>
 
         <Link
@@ -66,6 +68,13 @@ export default function Profile() {
   )
 }
 
+type EditProfileFormVals = {
+  firstName: string
+  lastName: string
+  bio: string
+  image: FileList
+}
+
 export function EditProfile() {
   const { user, isLoaded, isSignedIn } = useUser()
   const [image, setImage] = useState("")
@@ -74,10 +83,10 @@ export function EditProfile() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm()
+  } = useForm<EditProfileFormVals>()
 
-  async function onSubmit(data) {
-    console.log(data.image[0])
+  const onSubmit: SubmitHandler<EditProfileFormVals> = async (data) => {
+    if (!user) return
     await user.update({
       firstName: data.firstName,
       lastName: data.lastName,
@@ -111,7 +120,7 @@ export function EditProfile() {
       <div className="relative w-fit">
         <img
           src={typeof image === "string" ? image : URL.createObjectURL(image)}
-          alt=""
+          alt="Your profile image"
           className="rounded-full object-cover h-20 w-20"
           width={100}
           // height={50}
@@ -128,9 +137,8 @@ export function EditProfile() {
           <label htmlFor="firstName">First Name</label>
           <StyledInput
             type="text"
-            name="firstName"
             id="firstName"
-            defaultValue={user.firstName}
+            defaultValue={user.firstName ?? ""}
             {...register("firstName")}
           />
         </Input>
@@ -139,8 +147,7 @@ export function EditProfile() {
           <StyledInput
             type="text"
             id="lastName"
-            name="lastName"
-            defaultValue={user.lastName}
+            defaultValue={user.lastName ?? ""}
             {...register("lastName")}
           />
         </Input>
@@ -149,9 +156,10 @@ export function EditProfile() {
         <label htmlFor="bio">Biography</label>
         <StyledInput
           type="text"
-          name="bio"
           id="bio"
-          defaultValue={user.unsafeMetadata ? user.unsafeMetadata.bio : ""}
+          defaultValue={
+            user.unsafeMetadata ? (user.unsafeMetadata.bio as string) : ""
+          }
           placeholder="Biography"
           {...register("bio")}
         />

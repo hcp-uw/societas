@@ -5,8 +5,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ClerkProvider } from "@clerk/clerk-react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-import { loader as projectsLoader } from "./pages/Home"
-import {
+import Home, { loader as projectsLoader } from "./pages/Home.tsx"
+import Project, {
   createPostAction,
   postsLoader as projectPostsLoader,
   ProjectInfo,
@@ -16,17 +16,15 @@ import {
   CreatePost,
   ProjectPost,
   postLoader,
-} from "./pages/Project"
-import Project from "./pages/Project"
-import ProfileLayout from "./pages/ProfileLayout.jsx"
-import CreateProj, { createProjectAction } from "./pages/CreateProj.jsx"
-import Home from "./pages/Home"
-import Requests, { resquestAcceptAction } from "./pages/Requests.jsx"
+} from "./pages/Project.jsx"
+import ProfileLayout from "./pages/ProfileLayout.tsx"
+import CreateProj, { createProjectAction } from "./pages/CreateProj.tsx"
+import Requests, { resquestAcceptAction } from "./pages/Requests.tsx"
 import Intro from "./pages/Intro.jsx"
-import PreferencePage from "./pages/PreferencePage.jsx"
-import WhoopsPage from "./pages/WhoopsPage.jsx"
-import ReportPage from "./pages/ReportPage.jsx"
-import Profile, { EditProfile } from "./pages/Profile.jsx"
+import PreferencePage from "./pages/PreferencePage.tsx"
+import WhoopsPage from "./pages/WhoopsPage.tsx"
+import ReportPage from "./pages/ReportPage.tsx"
+import Profile, { EditProfile } from "./pages/Profile.tsx"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,7 +44,7 @@ if (
   localStorage.getItem("firstTimeUser") == null &&
   localStorage.getItem("firstTimeUser") !== "false"
 ) {
-  localStorage.setItem("firstTimeUser", true)
+  localStorage.setItem("firstTimeUser", "true")
 }
 
 const router = createBrowserRouter([
@@ -137,7 +135,7 @@ const router = createBrowserRouter([
   },
 ])
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ClerkProvider publishableKey={clerkPubKey}>

@@ -1,23 +1,29 @@
-import { useQuery } from "@tanstack/react-query"
+import { QueryClient, useQuery } from "@tanstack/react-query"
 import { getAllPendingRequests } from "../firebase"
 import { useUser } from "@clerk/clerk-react"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { Form, redirect } from "react-router-dom"
+import { ActionFunctionArgs, Form, redirect } from "react-router-dom"
 import { acceptRequest } from "../firebase"
 import toast from "react-hot-toast"
+import { z } from "zod"
 dayjjs.extend(relativeTime)
 
-const requestsQuery = (currentUserId) => ({
+const requestsQuery = (currentUserId: string) => ({
   queryKey: ["requests"],
   queryFn: () => getAllPendingRequests(currentUserId),
 })
 
 export const resquestAcceptAction =
-  (queryClient) =>
-  async ({ request }) => {
+  (queryClient: QueryClient) =>
+  async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
-    const inputs = Object.fromEntries(formData)
+    const inputsSchema = z.object({
+      requestId: z.string(),
+      projectId: z.string(),
+      requestantId: z.string(),
+    })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData))
     await acceptRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
     queryClient.invalidateQueries({
       queryKey: ["requests"],

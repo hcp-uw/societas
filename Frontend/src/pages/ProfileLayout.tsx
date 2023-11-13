@@ -42,7 +42,15 @@ export default function ProfileLayout() {
   )
 }
 
-function ProfileLink({ to, children, end }) {
+function ProfileLink({
+  to,
+  children,
+  end,
+}: {
+  to: string
+  children: React.ReactNode
+  end?: boolean
+}) {
   return (
     <NavLink
       to={to}
