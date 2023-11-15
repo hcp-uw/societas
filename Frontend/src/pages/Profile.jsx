@@ -13,6 +13,10 @@ const myProjsQuery = (userId) => ({
   queryFn: () => getProjectsByUserId(userId),
 })
 
+/**
+ * 
+ * @returns the profile layout
+ */
 export default function Profile() {
   const { user } = useUser()
   const { data, isError, isLoading } = useQuery(
@@ -66,6 +70,10 @@ export default function Profile() {
   )
 }
 
+/**
+ * 
+ * @returns the edited profile
+ */
 export function EditProfile() {
   const { user, isLoaded, isSignedIn } = useUser()
   const [image, setImage] = useState("")

@@ -3,6 +3,10 @@ import LogoRoute from "../assets/logo.svg"
 import SurferRoute from "../assets/surfer.png"
 import TelescopeRoute from "../assets/Telescope.png"
 import TeamWork from "../assets/Teamwork.svg"
+
+/**
+ * @returns the introduction page, with the introduction of the sociatas
+ */
 export default function Intro() {
   // if (localStorage.getItem("firstTimeUser") === "false") {
   //   console.log("here")
@@ -16,7 +20,6 @@ export default function Intro() {
           Welcome to <span className="font-extrabold">Societas</span>
         </p>
       </h1>
-
       <div className="flex justify-center items-center relative after:bg-intro-gradient-orange after:w-full after:-left-12 after:-translate-y-[100px] after:-z-10 after:max-w-xl after:h-36 after:rotate-12 content-[''] after:absolute md:after:translate-y-[40px] md:after:h-52 xl:after:-translate-y-[10px] xl:after:max-w-3xl">
         <div className="max-w-7xl w-full flex justify-center items-center flex-col gap-6 md:flex-row md:items-center md:justify-between md:py-12">
           <img

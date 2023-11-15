@@ -104,6 +104,11 @@ export const createPostAction =
 
     return redirect(`/${inputs.projectId}/posts`)
   }
+
+/**
+ * 
+ * @returns the project page when getting into a specific project
+ */
 export default function Project() {
   const { projectId } = useParams()
 
@@ -412,6 +417,10 @@ export function CreatePost() {
   )
 }
 
+/**
+ * 
+ * @returns project information view
+ */
 export function ProjectInfo() {
   const { data, isLoading, isError } = useGetProjectData()
 
@@ -451,6 +460,10 @@ export function ProjectInfo() {
   )
 }
 
+/**
+ * 
+ * @returns projects post layout
+ */
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams()
   const { data, isLoading, isError } = useQuery(projectPostsQuery(projectId))

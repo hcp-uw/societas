@@ -49,6 +49,7 @@ if (
   localStorage.setItem("firstTimeUser", true)
 }
 
+//** define the structure of each page */
 const router = createBrowserRouter([
   {
     path: "/intro",

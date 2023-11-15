@@ -4,6 +4,10 @@ import styled from "styled-components"
 import { NavLink } from "react-router-dom"
 import toast from "react-hot-toast"
 
+/**
+ * * includes the left options and the right profile layout
+ * @returns the profile layout
+ */
 export default function ProfileLayout() {
   const navigate = useNavigate()
 

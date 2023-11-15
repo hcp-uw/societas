@@ -17,6 +17,10 @@ export const loader = (queryClient) => async () => {
   return null
 }
 
+/**
+ * * home page includes the projects created
+ * @returns the home page 
+ */
 export default function Home() {
   const { user } = useUser()
 

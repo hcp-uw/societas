@@ -7,6 +7,7 @@ import { useUser } from "@clerk/clerk-react"
 import { StyledInput, Input, TextArea } from "../components/inputs"
 import PropType from "prop-types"
 
+//* Create a project based on the info
 export const createProjectAction =
   (queryClient) =>
   async ({ request }) => {
@@ -35,6 +36,10 @@ export const createProjectAction =
     return redirect("/")
   }
 
+/**
+ * * create the project by selecing the picture, filling the inputs, and submit
+ * @returns the creating project view
+ */
 export default function CreateProj() {
   const [formState, setFormState] = useState({
     title: "",
@@ -112,6 +117,8 @@ InputsView.propTypes = {
   isFormValid: PropType.func.isRequired,
   loading: PropType.bool.isRequired,
 }
+
+// * returns input views(right) of the project
 function InputsView({ formState, setFormState, isFormValid, loading }) {
   return (
     <InputsWrapper>
@@ -226,6 +233,7 @@ FilesView.propTypes = {
   handleDelPicture: PropType.func.isRequired,
 }
 
+//* returns files view(left) for the project, where you can select the picture for the project
 function FilesView({ formState, handleAddPicture, handleDelPicture }) {
   const [error, setError] = useState(null)
   return (
@@ -291,6 +299,7 @@ SubmitBtnView.propTypes = {
   loading: PropType.bool.isRequired,
 }
 
+//* returns submit button view for the project
 function SubmitBtnView({ isFormValid, desktop, loading }) {
   return (
     <SubmitWrapper desktop={desktop}>
@@ -320,6 +329,7 @@ LoadingSpinner.propTypes = {
   size: PropType.number,
 }
 
+//* returns the loading spinner return 
 function LoadingSpinner({ size }) {
   return (
     <div role="status">

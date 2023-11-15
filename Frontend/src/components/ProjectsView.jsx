@@ -4,6 +4,12 @@ import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjjs.extend(relativeTime)
 
+/**
+ * 
+ * @param projects - the projects loaded from projectsQuery()
+ * @param breakPoints - the number of columns in one row ?
+ * @returns the projects view 
+ */
 export default function ProjectsView({ projects, breakPoints }) {
   return (
     <Masonry

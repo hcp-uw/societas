@@ -1,3 +1,7 @@
+/**
+ * * handle redundant project
+ * @returns the error views when the redundant project is created 
+ */
 export default function WhoopsPage() {
   return (
     <div>

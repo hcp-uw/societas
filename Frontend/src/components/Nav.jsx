@@ -4,6 +4,10 @@ import { SignInButton, SignUpButton } from "@clerk/clerk-react"
 import { useUser } from "@clerk/clerk-react"
 import { NavLink } from "react-router-dom"
 
+/**
+ * * includes auth and profile/account 
+ * @returns navigation bar of the app
+ */
 export default function Nav() {
   const { user } = useUser()
 

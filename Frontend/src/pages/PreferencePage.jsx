@@ -1,3 +1,7 @@
+/**
+ * * users can choose their interested fields
+ * @returns preference views for users to choose 
+ */
 export default function PreferencePage() {
   return (
     <div>

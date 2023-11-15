@@ -1,3 +1,7 @@
+/**
+ * * handle report issues
+ * @returns report page view
+ */
 export default function ReportPage() {
   return (
     <div>

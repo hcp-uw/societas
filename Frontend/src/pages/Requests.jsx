@@ -26,6 +26,10 @@ export const resquestAcceptAction =
     return redirect("/account/requests")
   }
 
+/**
+ * ? where we can see others'request to join our project?
+ * @returns returns the request views
+ */
 export default function Requests() {
   const { user } = useUser()
   const { data, isLoading, isError } = useQuery(
