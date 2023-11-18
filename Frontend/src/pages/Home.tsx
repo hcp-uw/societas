@@ -10,13 +10,15 @@ const projectsQuery = () => ({
   queryFn: () => getAllProjects(),
 })
 
-export const loader = (queryClient: QueryClient):LoaderFunction => async () => {
-  if (!queryClient.getQueryData(projectsQuery().queryKey)) {
-    return await queryClient.fetchQuery(projectsQuery())
-  }
+export const loader =
+  (queryClient: QueryClient): LoaderFunction =>
+  async () => {
+    if (!queryClient.getQueryData(projectsQuery().queryKey)) {
+      return await queryClient.fetchQuery(projectsQuery())
+    }
 
-  return null
-}
+    return null
+  }
 
 export default function Home() {
   const { user } = useUser()
@@ -41,16 +43,7 @@ function Projects() {
 
   if (isLoading)
     return (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          margin: "auto",
-        }}
-      >
+      <div className="w-full h-full flex justify-center items-center m-auto">
         <Spinner size="4rem" />
       </div>
     )

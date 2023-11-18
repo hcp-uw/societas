@@ -25,9 +25,6 @@ export default function Profile() {
     1347: 2,
     900: 1,
   }
-  // user.setProfileImage({
-  //   file:
-  // })
 
   if (!user) return <div>loading</div>
 

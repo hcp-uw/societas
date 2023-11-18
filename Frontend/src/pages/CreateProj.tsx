@@ -59,30 +59,11 @@ export default function CreateProj() {
     maxMems: "",
     image: null,
   }) // state form the inputs
-  // const [loading, setLoading] = useState(false)
   const fetcher = useFetcher()
 
   const { user } = useUser()
 
   if (!user) return <div>Must Be signed in to create project</div>
-
-  // handles deletetion of picture
-  // params:
-  //  index -> index of picture to be deleted
-  // fuVjjnction handleDelPictre(index: number) {
-  //   const newArr = formState.images?.filter((_, i) => i !== index)
-  //   setFormState({ ...formState, images: newArr })
-  // }
-
-  // function handleAddPicture(file: Blob) {
-  //   if (formState.images.includes(file)) {
-  //     throw Error("this already exists")
-  //   }
-  //   setFormState((prev) => ({
-  //     ...prev,
-  //     images: [...prev.images, file],
-  //   }))
-  // }
 
   // return true if form fields are not empty
   // false otherwiise
@@ -107,12 +88,6 @@ export default function CreateProj() {
         loading={fetcher.state === "submitting"}
       />
       <input type="hidden" name="ownerId" value={user.id} />
-      {/* Submit button for mobile view */}
-      {/* <SubmitBtnView
-        isFormValid={isFormValid}
-        desktop={true}
-        loading={fetcher.state === "submitting"}
-      /> */}
     </fetcher.Form>
   )
 }
@@ -399,7 +374,6 @@ const FilesWrapper = styled.div`
 const Image = styled.div`
   position: relative;
   width: fit-content;
-  /* height: fit-content; */
   img {
     object-fit: cover;
   }

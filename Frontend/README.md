@@ -10,9 +10,11 @@ Our demo is using [**Firebase**](https://firebase.google.com/) client calls do h
 
 Lastly, for our markdown renderer, we use [**react-markdown**](https://github.com/remarkjs/react-markdown), and to actually style it we use tailwind's plugin for typography to style all of the elements. We decided to use react-markdown because it actually renders elements within the react ecosystem and does not use `.dangerouslySetInnerHTML`, which vulnerable to code injection.
 
-P.S we plan to migrate to TypeScript!!
+## Setup
+
 
 ## Fonts
+
 
 Inter: href="https://fonts.googleapis.com/css?family=Inter"
 

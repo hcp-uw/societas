@@ -111,6 +111,7 @@ export const createPostAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
+    console.log(Object.fromEntries(formData))
     const inputsSchema = z.object({
       title: z.string(),
       comment: z.string(),
@@ -140,7 +141,7 @@ export default function Project() {
   const [showModal, setShowModal] = useState(false)
   const role = useMemo(() => getRole(), [data, user])
 
-  if (!data) return <div>User not found</div>
+  if (!data) return <div>Project not found</div>
 
   function getRole() {
     if (!data || !user) return
@@ -165,16 +166,7 @@ export default function Project() {
 
   if (isLoading)
     return (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          margin: "auto",
-        }}
-      >
+      <div className="w-full h-full flex justify-center items-center m-auto pt-4">
         <Spinner size="4rem" />
       </div>
     )
@@ -208,8 +200,8 @@ export default function Project() {
               <TextArea
                 id="textAreaProj"
                 className="w-full"
-                cols={70}
-                rows={70}
+                cols={20}
+                rows={5}
                 name="message"
               />
               <input type="hidden" value={projectId} name="projectId" />
@@ -315,13 +307,15 @@ function SubmitFetcherBtn({
   return (
     <button
       type="submit"
-      className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400 ${className}`}
+      className={`bg-blue-500 py-2 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400 ${
+        fetcher.state === "submitting" && "pointer-events-none bg-blue-500"
+      } ${className}`}
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
-        <Spinner color="white" />
+        <Spinner color="white" size="1.5rem" />
       ) : (
-        <p className="py-2">{message}</p>
+        <p>{message}</p>
       )}
     </button>
   )
@@ -390,9 +384,8 @@ export function CreatePost() {
             <div>
               <TextArea
                 id="comment"
-                cols={30}
+                className="resize-none w-full"
                 rows={10}
-                className="w-full resize-none"
                 placeholder="Comment"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -410,6 +403,7 @@ export function CreatePost() {
             </div>
           </>
         )}
+        <input type="hidden" name="title" value={title} />
         <input type="hidden" name="comment" value={comment} />
         <input type="hidden" name="projectId" value={projectId} />
         <SubmitFetcherBtn
