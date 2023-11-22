@@ -14,6 +14,8 @@ const requestsQuery = (currentUserId: string) => ({
   queryFn: () => getAllPendingRequests(currentUserId),
 })
 
+//gets request form data and parses it.
+//then invalidates the request query if the data is valid. 
 export const resquestAcceptAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -32,6 +34,8 @@ export const resquestAcceptAction =
     return redirect("/account/requests")
   }
 
+
+//request page to be shown. 
 export default function Requests() {
   const { user } = useUser()
   const { data, isLoading, isError } = useQuery(

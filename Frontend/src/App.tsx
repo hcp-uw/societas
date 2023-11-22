@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom"
 function App() {
   const { getToken } = useAuth()
   const navigate = useNavigate()
-
+  
   useEffect(() => {
     if (localStorage.getItem("firstTimeUser") === "true") {
       navigate("/intro")

@@ -3,6 +3,9 @@ import LogoRoute from "../assets/logo.svg"
 import SurferRoute from "../assets/surfer.png"
 import TelescopeRoute from "../assets/Telescope.png"
 import TeamWork from "../assets/Teamwork.svg"
+
+//weclome page. Once "lets go" is clicked, brings you to home page
+
 export default function Intro() {
   // if (localStorage.getItem("firstTimeUser") === "false") {
   //   console.log("here")

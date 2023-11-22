@@ -4,8 +4,10 @@ import styled from "styled-components"
 import { NavLink } from "react-router-dom"
 import toast from "react-hot-toast"
 
+//shows/handles layout for lefthand navigation in profile page 
 export default function ProfileLayout() {
   const navigate = useNavigate()
+
 
   function handleSignout() {
     navigate("/")
