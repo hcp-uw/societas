@@ -247,6 +247,16 @@ export async function rejectRequest(
   console.log("success")
 }
 
+export async function removeUser(
+  userId: string,
+  projectId: string,
+) {
+  await updateDoc(doc(db, "projects", projectId), {
+    members: arrayRemove(userId),
+  })
+  console.log("success")
+}
+
 // project posts
 
 type ProjPost = {

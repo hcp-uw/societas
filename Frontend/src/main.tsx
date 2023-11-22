@@ -16,6 +16,7 @@ import Project, {
   CreatePost,
   ProjectPost,
   postLoader,
+  leaveProjectAction,
 } from "./pages/Project.jsx"
 import ProfileLayout from "./pages/ProfileLayout.tsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.tsx"
@@ -71,6 +72,11 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <ProjectInfo />,
+          },
+          {
+            path: "leaveProject",
+            element: <ProjectInfo />, 
+            action: leaveProjectAction(queryClient)
           },
           {
             path: "posts",

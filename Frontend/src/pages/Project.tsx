@@ -14,6 +14,7 @@ import {
   getAllProjectPosts,
   getProjectById,
   getProjectPostById,
+  removeUser,
 } from "../firebase"
 import Spinner from "../components/Spinner"
 import dayjjs from "dayjs"
@@ -23,7 +24,7 @@ import { TextArea, Input, StyledInput } from "../components/inputs"
 import { useState } from "react"
 import { useEffect } from "react"
 import toast from "react-hot-toast"
-import { NavLink, Outlet } from "react-router-dom"
+import { NavLink, Outlet, Form } from "react-router-dom"
 import Markdown from "react-markdown"
 import { useMemo } from "react"
 import { z } from "zod"
@@ -142,6 +143,24 @@ export const createPostAction =
     })
 
     return redirect(`/${inputs.projectId}/posts`)
+  }
+
+
+export const leaveProjectAction =
+  (queryClient: QueryClient) =>
+  async ({ request }: ActionFunctionArgs) => {
+    const formData = await request.formData()
+    const inputsSchema = z.object({   
+      projectId: z.string(),
+      userId: z.string(),
+    })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData))
+    await removeUser(inputs.userId, inputs.projectId)
+    queryClient.invalidateQueries({
+      queryKey: ["projects", inputs.projectId],
+    })
+    toast.success("Left Project")
+    return redirect(`/${inputs.projectId}`);
   }
 
 export default function Project() {
@@ -300,9 +319,20 @@ export default function Project() {
                   Requested
                 </div>
               ) : role === "member" ? (
-                <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
-                  Member
-                </div>
+                <>
+                  <Form method = "post" action = "leaveProject">
+                    <input type = "hidden" value = {user ? user.id : ""} name = "userId"/> 
+                    <input type = "hidden" value = {projectId} name = "projectId"/>
+                    <button 
+                      className = "text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors"
+                      >
+                      Leave Project
+                    </button>
+                  </Form>
+                  <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
+                    Member
+                  </div>
+                </>
               ) : (
                 <div>Log in to join!</div>
               )}
