@@ -231,6 +231,22 @@ export async function acceptRequest(
   console.log("success")
 }
 
+export async function rejectRequest(
+  requestId: string,
+  projectId: string,
+  requestantId: string
+) {
+  await updateDoc(doc(db, "requests", requestId), {
+    status: "rejected",
+  })
+
+  await updateDoc(doc(db, "projects", projectId), {
+    requestants: arrayRemove(requestantId),
+  })
+
+  console.log("success")
+}
+
 // project posts
 
 type ProjPost = {
