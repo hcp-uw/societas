@@ -16,10 +16,11 @@ import Project, {
   CreatePost,
   ProjectPost,
   postLoader,
+  leaveProjectAction,
 } from "./pages/Project.jsx"
 import ProfileLayout from "./pages/ProfileLayout.tsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.tsx"
-import Requests, { resquestAcceptAction } from "./pages/Requests.tsx"
+import Requests, { resquestAcceptAction, requestRejectAction} from "./pages/Requests.tsx"
 import Intro from "./pages/Intro.jsx"
 import PreferencePage from "./pages/PreferencePage.tsx"
 import WhoopsPage from "./pages/WhoopsPage.tsx"
@@ -47,6 +48,7 @@ if (
   localStorage.setItem("firstTimeUser", "true")
 }
 
+
 const router = createBrowserRouter([
   {
     path: "/intro",
@@ -70,6 +72,11 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <ProjectInfo />,
+          },
+          {
+            path: "leaveProject",
+            element: <ProjectInfo />, 
+            action: leaveProjectAction(queryClient)
           },
           {
             path: "posts",
@@ -117,6 +124,11 @@ const router = createBrowserRouter([
             element: <Requests />,
             action: resquestAcceptAction(queryClient),
           },
+          {
+            path: "requests/rejectReq",
+            element: <Requests />,
+            action: requestRejectAction(queryClient),
+          }
         ],
       },
       {

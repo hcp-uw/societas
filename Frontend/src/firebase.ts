@@ -45,9 +45,14 @@ export const storage = getStorage(app)
 export const db = getFirestore(app)
 export const auth = getAuth(app)
 
+
 export async function uploadProjectImage(projId: string, image: Blob) {
+  //creates a referance/link for the image.
   const imageRef = ref(storage, `projects/${projId}`)
+  //uploads image to reference
   await uploadBytes(imageRef, image)
+
+  //downloads image url and returns it. 
   const url = await getDownloadURL(imageRef)
   return url
 }
@@ -63,6 +68,8 @@ type CreateProjParams = {
   meetType: string
   startDate: string
 }
+
+//takes project params above and creates a new project. 
 export async function createProject({
   title,
   description,
@@ -107,12 +114,16 @@ export type Project = {
   startDate: string
   imageUrl: string
 }
+
+//gets all projects from projects collection 
+//returns as array of Projects with IDs.  
 export async function getAllProjects() {
   const snapshot = await getDocs(collection(db, "projects"))
   console.log("getting projects")
 
   return addIdsToSnapShot(snapshot) as Project[]
 }
+
 
 export async function getProjectById(id: string) {
   if (id === "") return
@@ -124,6 +135,7 @@ export async function getProjectById(id: string) {
 
   return data
 }
+
 
 export async function getProjectsByUserId(userId: string) {
   if (userId.length < 1) return
@@ -144,6 +156,8 @@ type JoinReqParams = {
   projectTitle: string
   imageUrl: string
 }
+
+//
 export async function createProjectJoinRequest({
   projectId,
   requestantId,
@@ -152,11 +166,14 @@ export async function createProjectJoinRequest({
   projectTitle,
   imageUrl,
 }: JoinReqParams) {
+  //gets project reference and updates requestants field of project
+  //by doing a union so that the same person isn't shown requesting multiple times. 
   const projectRef = doc(db, "projects", projectId)
   await updateDoc(projectRef, {
     requestants: arrayUnion(requestantId),
   })
 
+  //adds the request to the request document.
   const requestRef = await addDoc(collection(db, "requests"), {
     requestantId: requestantId,
     projectId: projectId,
@@ -168,6 +185,7 @@ export async function createProjectJoinRequest({
     imageUrl: imageUrl,
   })
 
+  //returns reference to the new request. 
   return requestRef
 }
 
@@ -182,6 +200,8 @@ type Request = {
   projectTitle: string
   imageUrl: string
 }
+
+//gets user's current requests. 
 export async function getAllPendingRequests(currentUserId: string) {
   const requestsRef = collection(db, "requests")
   const q = query(
@@ -211,6 +231,32 @@ export async function acceptRequest(
   console.log("success")
 }
 
+export async function rejectRequest(
+  requestId: string,
+  projectId: string,
+  requestantId: string
+) {
+  await updateDoc(doc(db, "requests", requestId), {
+    status: "rejected",
+  })
+
+  await updateDoc(doc(db, "projects", projectId), {
+    requestants: arrayRemove(requestantId),
+  })
+
+  console.log("success")
+}
+
+export async function removeUser(
+  userId: string,
+  projectId: string,
+) {
+  await updateDoc(doc(db, "projects", projectId), {
+    members: arrayRemove(userId),
+  })
+  console.log("success")
+}
+
 // project posts
 
 type ProjPost = {
@@ -220,6 +266,7 @@ type ProjPost = {
   likes: number
   createdAt: Timestamp
 }
+//get docs/data from firebase and then return as array with IDs. 
 export async function getAllProjectPosts(projectId: string) {
   const projPostsSnap = await getDocs(
     collection(db, `projects/${projectId}/posts`)
@@ -272,6 +319,7 @@ export async function getProjectPostById(
 // }
 
 //helper function to add id of documents into array
+//takes in a snapshot of a doc from firebase and then reads the data into the doc array. 
 type Doc = ProjPost | Project | Request
 function addIdsToSnapShot(snapshot: QuerySnapshot<DocumentData, DocumentData>) {
   let queryData: Doc[] = []

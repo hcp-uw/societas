@@ -1,5 +1,5 @@
 import { QueryClient, useQuery } from "@tanstack/react-query"
-import { getAllPendingRequests } from "../firebase"
+import { getAllPendingRequests, rejectRequest } from "../firebase"
 import { useUser } from "@clerk/clerk-react"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -14,6 +14,8 @@ const requestsQuery = (currentUserId: string) => ({
   queryFn: () => getAllPendingRequests(currentUserId),
 })
 
+//gets request form data and parses it.
+//then invalidates the request query if the data is valid. 
 export const resquestAcceptAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -32,6 +34,26 @@ export const resquestAcceptAction =
     return redirect("/account/requests")
   }
 
+  export const requestRejectAction =
+  (queryClient: QueryClient) =>
+  async ({ request }: ActionFunctionArgs) => {
+    const formData = await request.formData()
+    const inputsSchema = z.object({
+      requestId: z.string(),
+      projectId: z.string(),
+      requestantId: z.string(),
+    })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData))
+    await rejectRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
+    queryClient.invalidateQueries({
+      queryKey: ["requests"],
+    })
+    toast.success("Rejected from project")
+    return redirect("/account/requests")
+  }
+
+
+//request page to be shown. 
 export default function Requests() {
   const { user } = useUser()
   const { data, isLoading, isError } = useQuery(
@@ -83,7 +105,14 @@ export default function Requests() {
               </button>
             </Form>
 
-            <Form method="post" action="declineReq">
+            <Form method="post" action="rejectReq">
+              <input type="hidden" name="requestId" value={request.id} />
+              <input type="hidden" name="projectId" value={request.projectId} />
+              <input
+                type="hidden"
+                name="requestantId"
+                value={request.requestantId}
+              />
               <button className="bg-zinc-600 p-2 h-fit text-zinc-100 rounded-xl">
                 Decline
               </button>

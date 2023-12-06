@@ -13,6 +13,10 @@ const myProjsQuery = (userId: string) => ({
   queryFn: () => getProjectsByUserId(userId),
 })
 
+/*
+* shows profile page. Gets data from userId. 
+* Also shows all your projects. 
+*/
 export default function Profile() {
   const { user } = useUser()
   const { data, isError, isLoading } = useQuery(
@@ -75,6 +79,7 @@ type EditProfileFormVals = {
   image: FileList
 }
 
+//edit profile page and functionality 
 export function EditProfile() {
   const { user, isLoaded, isSignedIn } = useUser()
   const [image, setImage] = useState("")
@@ -85,6 +90,7 @@ export function EditProfile() {
     formState: { errors, isSubmitting },
   } = useForm<EditProfileFormVals>()
 
+  //handles update of data using the form. 
   const onSubmit: SubmitHandler<EditProfileFormVals> = async (data) => {
     if (!user) return
     await user.update({
@@ -116,6 +122,7 @@ export function EditProfile() {
   if (!user) return <div>loading</div>
 
   return (
+    //form to submit. 
     <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 flex-col">
       <div className="relative w-fit">
         <img
@@ -132,6 +139,7 @@ export function EditProfile() {
           <span className="material-symbols-outlined">edit</span>
         </label>
       </div>
+      {/*Inputs for name and bio and image*/}
       <div className="flex gap-4">
         <Input>
           <label htmlFor="firstName">First Name</label>

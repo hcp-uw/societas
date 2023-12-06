@@ -5,8 +5,10 @@ import { useUser } from "@clerk/clerk-react"
 import { NavLink } from "react-router-dom"
 
 export default function Nav() {
+  //get user.
   const { user } = useUser()
 
+  //returns header of logo and profile button or "sign in/sign up" if user is not registered. 
   return (
     <header className="border-b-2 py-2">
       <StyledNav>

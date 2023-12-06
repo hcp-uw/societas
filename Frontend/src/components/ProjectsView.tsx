@@ -7,6 +7,7 @@ import type { Project } from "../firebase"
 
 type BreakPoints = "default" | "1826" | "1347" | "900"
 
+//shows projects with breakpoints listed above. 
 export default function ProjectsView(props: {
   projects: Project[]
   breakPoints: Record<BreakPoints, number>
