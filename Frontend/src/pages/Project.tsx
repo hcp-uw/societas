@@ -150,16 +150,18 @@ export const leaveProjectAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
-    const inputsSchema = z.object({   
-      projectId: z.string(),
-      userId: z.string(),
-    })
+      const inputsSchema = z.object({   
+        projectId: z.string(),
+        userId: z.string(),
+      })
     const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    await removeUser(inputs.userId, inputs.projectId)
-    queryClient.invalidateQueries({
-      queryKey: ["projects", inputs.projectId],
-    })
-    toast.success("Left Project")
+    if(confirm("Are you sure you want to leave this project?")){
+      await removeUser(inputs.userId, inputs.projectId)
+      queryClient.invalidateQueries({
+        queryKey: ["projects", inputs.projectId],
+      })
+      toast.success("Left Project")
+    }
     return redirect(`/${inputs.projectId}`);
   }
 
