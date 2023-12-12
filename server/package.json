@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/index.ts"
+  },
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.1",
+    "@prisma/client": "^5.7.0",
+    "@trpc/client": "^10.44.1",
+    "@trpc/server": "^10.44.1",
+    "cors": "^2.8.5",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "nodemon": "^3.0.2",
+    "prisma": "^5.7.0",
+    "ts-node": "^10.9.2"
+  }
+}
