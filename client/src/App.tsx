@@ -14,30 +14,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { httpBatchLink } from "@trpc/client"
 import { queryClient } from "./main"
 function App() {
-  // const { getToken } = useAuth()
-  // const navigate = useNavigate()
-
-  // // const { data } = trpc.projects.getAll.useQuery()
-
-  // // console.log(data)
-
-  // useEffect(() => {
-  //   if (localStorage.getItem("firstTimeUser") === "true") {
-  //     navigate("/intro")
-  //   }
-  //   // const signInWithFirebase = async () => {
-  //   //   const token = await getToken({ template: "integration_firebase" })
-
-  //   //   if (!token) {
-  //   //     signOutFromFirebase()
-  //   //     return
-  //   //   }
-  //   // }
-
-  //   // signInWithFirebase()
-  // }, [])
-
-  const { isLoaded, session, isSignedIn } = useSession()
+  const { getToken } = useAuth()
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
@@ -51,11 +28,11 @@ function App() {
             //     userLoading: 'true',
             //   }
             // }
-            const token = (await session?.getToken()) ?? undefined
+            const token = await getToken()
             return {
-              authorization: session?.id,
-              token: token,
-              isLoaded: isLoaded.toString(),
+              authorization: token ?? undefined,
+              // token: token,
+              // isLoaded: isLoaded.toString(),
             }
           },
         }),

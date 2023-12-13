@@ -1,14 +1,13 @@
 import { initTRPC } from "@trpc/server"
 import { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone"
 import { prisma } from "./db"
-import { sessions, clerkClient } from "@clerk/clerk-sdk-node"
-import type { TRPCClientIncomingMessage } from "@trpc/server/rpc"
+import { sessions, clerkClient, verifyToken } from "@clerk/clerk-sdk-node"
 
-type AuthenticateRequestOptions {
-  apiUrl: string
-  apiVersion: string
-  req: TRPCClientIncomingMessage
-}
+// type AuthenticateRequestOptions {
+//   apiUrl: string
+//   apiVersion: string
+//   req: TRPCClientIncomingMessage
+// }
 //inner context
 function createContextInner(opts: CreateHTTPContextOptions) {
   //   const sessionId = opts.req.headers.authorization
@@ -18,8 +17,8 @@ function createContextInner(opts: CreateHTTPContextOptions) {
   return {
     db: prisma,
     auth: {
-      session: opts.req.headers.authorization,
-      token: opts.req.headers.token,
+      // session: opts.req.headers.authorization,
+      token: opts.req.headers.token as string,
     },
   }
 }
@@ -43,25 +42,29 @@ const t = initTRPC.context<typeof createTRPCContext>().create()
  */
 
 const enforeceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+  // const { isSignedIn } = await clerkClient.authenticateRequest({ request: ctx.req});
 
-  const { isSignedIn } = await clerkClient.authenticateRequest({ req: ctx.req });
-
-  if (ctx.auth.session === undefined || ctx.auth.token === undefined) {
-    throw new Error("Not authorized");
+  if (ctx.auth.token === undefined) {
+    throw new Error("Not authorized")
   }
 
-  const session = await sessions.verifySession(
-    ctx.auth.session,
-    ctx.auth.token.toString()
-  );
-  if (session === null) {
-    throw new Error("Not authorized");
+  // const session = await sessions.verifySession(
+  //   ctx.auth.session,
+  //   ctx.auth.token.toString()
+  // );
+
+  try {
+    await clerkClient.verifyToken(ctx.auth.token)
+  } catch (err) {
+    throw new Error("Not authorized")
   }
+  // if (session === null) {
+  //   throw new Error("Not authorized");
+  // }
 
   return next({
     ctx: {
       auth: {
-        session: ctx.auth.session,
         token: ctx.auth.token,
       },
     },
