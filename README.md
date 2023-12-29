@@ -64,15 +64,25 @@ git pull origin main (make sure you have the latest version of the main branch b
 
 ## Credits
 
-Vincent: PM Github:VincentLiu777
+Vincent Liu: PM Github:VincentLiu777
 
-Santiago: Frontend Github:SantiagoG14
+Santiago Gracias: Frontend Github:SantiagoG14
 
-Angela: Frontend Github:Ajyang5
+Angela Yang: Frontend Github:Ajyang5
 
-Arjun: Backend Github:Aleph-Null-123
+Ben Epstein: Frontend 
 
-Sid: Backend GitHub :Szzzz234
+Aaron Honjaya: Frontend
+
+Jasmine Zhang: Frontend
+
+Arjun Naik: Backend Github:Aleph-Null-123
+
+Hansel: Backend
+
+Hrudhai: Backend
+
+Oscar: UX/UI
 
 ## Contact
 
