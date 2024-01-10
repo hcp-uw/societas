@@ -28,7 +28,7 @@ export const createProjectAction =
     const inputs = inputsScheme.parse(Object.fromEntries(formData))
 
     //wait until data is parsed
-    await createProject({
+    const newProjectId = await createProject({
       title: inputs.title,
       description: inputs.description,
       meetLocation: inputs.meetLocation,
@@ -46,7 +46,7 @@ export const createProjectAction =
       queryKey: ["projects"],
     })
 
-    return redirect("/")
+    return redirect(`/${newProjectId}`)
   }
 
 type FormState = {

@@ -8,6 +8,7 @@ import {
   addDoc,
   serverTimestamp,
   updateDoc,
+  deleteDoc,
   getDocs,
   doc,
   getDoc,
@@ -97,6 +98,7 @@ export async function createProject({
   await updateDoc(docRef, {
     imageUrl: url,
   })
+  return docRef.id
 }
 
 type MeetType = "in-person" | "hybrid" | "remote"
@@ -254,6 +256,13 @@ export async function removeUser(
   await updateDoc(doc(db, "projects", projectId), {
     members: arrayRemove(userId),
   })
+  console.log("success")
+}
+
+export async function deleteProject(
+  projectId: string
+) {
+  await deleteDoc(doc(db, "projects", projectId))
   console.log("success")
 }
 

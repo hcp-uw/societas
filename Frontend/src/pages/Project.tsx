@@ -11,6 +11,7 @@ import {
 import {
   createProjectJoinRequest,
   createProjectPost,
+  deleteProject,
   getAllProjectPosts,
   getProjectById,
   getProjectPostById,
@@ -141,8 +142,9 @@ export const createPostAction =
     queryClient.invalidateQueries({
       queryKey: ["projects", inputs.projectId, "posts"],
     })
+    
 
-    return redirect(`/${inputs.projectId}/posts`)
+    return redirect(`/${inputs.projectId}`)
   }
 
 
@@ -163,6 +165,24 @@ export const leaveProjectAction =
       toast.success("Left Project")
     }
     return redirect(`/${inputs.projectId}`);
+  }
+
+export const deleteProjectAction = 
+  (queryClient: QueryClient) => 
+  async({ request } : ActionFunctionArgs) => {
+    const formData = await request.formData()
+      const inputsSchema = z.object({   
+        projectId: z.string(),
+      })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData))
+    if(confirm("Are you sure you want to delete this project?")){
+      await deleteProject(inputs.projectId)
+      queryClient.invalidateQueries({
+        queryKey: ["projects"],
+      })
+      toast.success("Left Project")
+    }
+    return redirect(`/`);
   }
 
 export default function Project() {
@@ -301,14 +321,24 @@ export default function Project() {
 
             <div className="flex gap-4 flex-row-reverse">
               {role === "owner" ? (
-                <div className="flex gap-4 items-center">
-                  <NavLink
-                    to="posts/new"
-                    className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
-                  >
-                    New Post
-                  </NavLink>
-                </div>
+                <>
+                  <Form method = "post" action = "deleteProject">
+                    <input type = "hidden" value = {projectId} name = "projectId"/>
+                    <button 
+                      className = "text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors"
+                      >
+                      Delete Project
+                    </button>
+                  </Form>
+                  <div className="flex gap-4 items-center">
+                    <NavLink
+                      to="posts/new"
+                      className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
+                    >
+                      New Post
+                    </NavLink>
+                  </div>
+                </>
               ) : role === "none" ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
