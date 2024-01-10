@@ -8,6 +8,7 @@ import { StyledInput, Input, TextArea } from "../components/inputs"
 import { QueryClient } from "@tanstack/react-query"
 import { z } from "zod"
 
+// creates project and sets the types for each form entry type
 export const createProjectAction =
   (queryClient: QueryClient) =>
   async ({ request }: { request: Request }) => {
@@ -43,7 +44,7 @@ export const createProjectAction =
 
     return redirect("/")
   }
-
+// sets state types
 type FormState = {
   title: string
   description: string
@@ -51,6 +52,7 @@ type FormState = {
   maxMems: string
   image: Blob | null
 }
+// sets initial form state
 export default function CreateProj() {
   const [formState, setFormState] = useState<FormState>({
     title: "",
@@ -92,7 +94,7 @@ export default function CreateProj() {
     })
     return true
   }
-
+// the actual form being returned and its styling and properties
   return (
     <fetcher.Form
       method="post"
@@ -116,19 +118,21 @@ export default function CreateProj() {
     </fetcher.Form>
   )
 }
-
+// the type for each input prop
 type InputsViewProps = {
   formState: FormState
   setFormState: React.Dispatch<React.SetStateAction<FormState>>
   isFormValid: () => boolean
   loading: boolean
 }
+// the props
 function InputsView({
   formState,
   setFormState,
   isFormValid,
   loading,
 }: InputsViewProps) {
+  //the different inputs (title description for the create project app)
   return (
     <InputsWrapper>
       {/* Title Input */}
@@ -235,7 +239,7 @@ function InputsView({
     </InputsWrapper>
   )
 }
-
+//the file feature, errors for certain parameters
 function FilesView({
   formState,
   setFormState,
@@ -294,7 +298,7 @@ function FilesView({
     </FilesWrapper>
   )
 }
-
+// submit button
 function SubmitBtnView({
   isFormValid,
   desktop,
@@ -327,7 +331,7 @@ function SubmitBtnView({
     </SubmitWrapper>
   )
 }
-
+// when things need to load
 function LoadingSpinner({ size }: { size: number }) {
   return (
     <div role="status">
@@ -353,7 +357,7 @@ function LoadingSpinner({ size }: { size: number }) {
     </div>
   )
 }
-
+// styling for the various components
 interface SubmitWrapperProps {
   readonly desktop?: boolean
 }

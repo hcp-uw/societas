@@ -29,7 +29,7 @@ import { useMemo } from "react"
 import { z } from "zod"
 
 dayjjs.extend(relativeTime)
-
+//
 const projectInfoQuery = (id: string) => ({
   queryKey: ["projects", id, "info"],
   queryFn: () => getProjectById(id),
@@ -44,7 +44,7 @@ const projectPostQuery = (projectId: string, postId: string) => ({
   queryKey: ["projects", projectId, "posts", postId],
   queryFn: () => getProjectPostById(projectId, postId),
 })
-
+// uses queryclient to load data that will be used in main when a url is accessed (applies to all the loaders). preloads data in main.
 export const infoLoader =
   (queryClient: QueryClient) =>
   async ({ params }: LoaderFunctionArgs) => {
@@ -78,7 +78,7 @@ export const postLoader =
       (await queryClient.fetchQuery(query))
     )
   }
-// send request
+// send request, parses data when asking to join a project
 export const action =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -106,7 +106,7 @@ export const action =
     })
     return null
   }
-
+// sends request, parses data when creatin a post
 export const createPostAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -129,6 +129,7 @@ export const createPostAction =
 
     return redirect(`/${inputs.projectId}/posts`)
   }
+  // all the information and styling for a specific project
 export default function Project() {
   const { projectId } = useParams()
 
@@ -291,7 +292,7 @@ export default function Project() {
     </>
   )
 }
-
+// returns the data for a specific project that has been requested
 function useGetProjectData() {
   const { projectId } = useParams()
   const query = useQuery(projectInfoQuery(projectId ?? ""))
@@ -307,6 +308,7 @@ type SubmitFetcherBtnProps = {
   message: string
   className?: string
 }
+// the submit button and what to do if its in a loading state
 function SubmitFetcherBtn({
   fetcher,
   message,
@@ -326,7 +328,7 @@ function SubmitFetcherBtn({
     </button>
   )
 }
-
+// provides the layout, styling, and data to create a post
 export function CreatePost() {
   const { user } = useUser()
   const { data, isLoading, projectId } = useGetProjectData()
@@ -421,7 +423,7 @@ export function CreatePost() {
     </div>
   )
 }
-
+// Project info tab data and layout
 export function ProjectInfo() {
   const { data, isLoading } = useGetProjectData()
 
@@ -441,7 +443,7 @@ export function ProjectInfo() {
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
-            Star Date:
+            Start Date:
           </span>
           {data.startDate}
         </p>
@@ -462,7 +464,7 @@ export function ProjectInfo() {
     </div>
   )
 }
-
+// Blog post tab layout and data
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams()
   const { data, isLoading, isError } = useQuery(
@@ -518,7 +520,7 @@ export function ProjectPostsLayout() {
     </div>
   )
 }
-
+// layout and data for a specific project post
 export function ProjectPost() {
   const params = useParams()
   const { data, isLoading } = useQuery(

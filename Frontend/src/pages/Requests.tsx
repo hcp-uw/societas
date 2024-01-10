@@ -8,12 +8,12 @@ import { acceptRequest } from "../firebase"
 import toast from "react-hot-toast"
 import { z } from "zod"
 dayjjs.extend(relativeTime)
-
+// Gets all the requests for people trying to join your project. Query fetches these locally
 const requestsQuery = (currentUserId: string) => ({
   queryKey: ["requests"],
   queryFn: () => getAllPendingRequests(currentUserId),
 })
-
+// Allows for you to accept a user. Parses data and returns a toast when someone is accepted
 export const resquestAcceptAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -31,7 +31,7 @@ export const resquestAcceptAction =
     toast.success("Accepted into project")
     return redirect("/account/requests")
   }
-
+// The data and styling for the requests page
 export default function Requests() {
   const { user } = useUser()
   const { data, isLoading, isError } = useQuery(

@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { NavLink } from "react-router-dom"
 import toast from "react-hot-toast"
-
+// allows you to route to different features and functionalities from the navigation bar on the left side
 export default function ProfileLayout() {
   const navigate = useNavigate()
 
@@ -41,7 +41,7 @@ export default function ProfileLayout() {
     </Layout>
   )
 }
-
+// Allows for us to set a link as active vs pending, which allows for the ui change. Appears when other pages are loaded, as long as that page is accessible from the profile layout.
 function ProfileLink({
   to,
   children,

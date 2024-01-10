@@ -8,6 +8,7 @@ export default function Intro() {
   //   console.log("here")
   //   return redirect("/")
   // }
+  // first time you login, only shows up once, has the functionality to prove that you're a first time user after you click out
   return (
     <div className=" w-full m-auto pt-8 flex flex-col gap-4 overflow-hidden">
       <h1 className="flex flex-col items-center text-4xl relative">

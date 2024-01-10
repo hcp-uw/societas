@@ -19,7 +19,7 @@ import {
   QuerySnapshot,
   DocumentData,
 } from "firebase/firestore"
-
+// interacts with firebase to get (GET) the actual data and update (POST) it
 import {
   getAuth,
   createUserWithEmailAndPassword,

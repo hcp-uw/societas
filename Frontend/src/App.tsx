@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom"
 function App() {
   const { getToken } = useAuth()
   const navigate = useNavigate()
-
+// If a user is logging in for the first time it will navigate to the intro page
   useEffect(() => {
     if (localStorage.getItem("firstTimeUser") === "true") {
       navigate("/intro")
@@ -29,7 +29,7 @@ function App() {
 
     // signInWithFirebase()
   }, [])
-
+// how the page layout gets organized
   return (
     <div className="h-screen overflow-hidden">
       <ThemeProvider theme={theme}>

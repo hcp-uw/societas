@@ -7,11 +7,13 @@ import toast from "react-hot-toast"
 import { getProjectsByUserId } from "../firebase"
 import { useQuery } from "@tanstack/react-query"
 import ProjectsView from "../components/ProjectsView"
-
+// retrieve projects by user id
 const myProjsQuery = (userId: string) => ({
   queryKey: ["projects", "my"],
   queryFn: () => getProjectsByUserId(userId),
 })
+// get the user, shows their projects
+// if no projects, projects not displayed
 
 export default function Profile() {
   const { user } = useUser()
@@ -74,6 +76,7 @@ type EditProfileFormVals = {
   bio: string
   image: FileList
 }
+// edit profiile feature
 
 export function EditProfile() {
   const { user, isLoaded, isSignedIn } = useUser()

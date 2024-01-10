@@ -1,3 +1,4 @@
+// when a redundant post has been made this is swhat will show up
 export default function WhoopsPage() {
   return (
     <div>

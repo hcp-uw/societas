@@ -1,3 +1,4 @@
+// report page and its styling
 export default function ReportPage() {
   return (
     <div>

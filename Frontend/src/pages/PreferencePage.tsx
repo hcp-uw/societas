@@ -1,3 +1,4 @@
+// UI for preferences page
 export default function PreferencePage() {
   return (
     <div>

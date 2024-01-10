@@ -4,12 +4,13 @@ import { useQuery, type QueryClient } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
 import ProjectsView from "../components/ProjectsView"
 import { LoaderFunction } from "react-router-dom"
-
+// how data is fetched
 const projectsQuery = () => ({
   queryKey: ["projects"],
   queryFn: () => getAllProjects(),
 })
-
+// It checks if the local storage has data and if it's not null then it fetches the data.
+// Allows for consistent updates when you load pages. 
 export const loader = (queryClient: QueryClient):LoaderFunction => async () => {
   if (!queryClient.getQueryData(projectsQuery().queryKey)) {
     return await queryClient.fetchQuery(projectsQuery())
@@ -17,7 +18,7 @@ export const loader = (queryClient: QueryClient):LoaderFunction => async () => {
 
   return null
 }
-
+// styling and layout for the home page
 export default function Home() {
   const { user } = useUser()
 
@@ -35,7 +36,7 @@ export default function Home() {
     </div>
   )
 }
-
+// The UI for the projects
 function Projects() {
   const { data, isLoading } = useQuery(projectsQuery())
 
