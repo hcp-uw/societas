@@ -1,1 +1,7 @@
-Backend/res/key.json
+# Backend/res/key.json
+*.env
+*.env.local
+
+**node_modules
+
+# server/node_modules

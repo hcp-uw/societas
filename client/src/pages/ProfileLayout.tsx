@@ -1,21 +1,19 @@
 import { SignOutButton } from "@clerk/clerk-react"
 import { Outlet, useNavigate } from "react-router-dom"
-import styled from "styled-components"
 import { NavLink } from "react-router-dom"
 import toast from "react-hot-toast"
 
-//shows/handles layout for lefthand navigation in profile page 
+//shows/handles layout for lefthand navigation in profile page
 export default function ProfileLayout() {
   const navigate = useNavigate()
-
 
   function handleSignout() {
     navigate("/")
     toast.success("Successfully Signout")
   }
   return (
-    <Layout className="mt-6 gap-32">
-      <StyledAside>
+    <div className="flex mt-6 gap-32">
+      <div className="flex flex-col py-4 gap-4 w-fit min-w-fit sticky top-8 h-full justify-start">
         <ProfileLink to="/account" end={true}>
           <span className="material-symbols-outlined">person</span>
           My profile
@@ -37,10 +35,10 @@ export default function ProfileLayout() {
             Sign out
           </div>
         </SignOutButton>
-      </StyledAside>
+      </div>
 
       <Outlet />
-    </Layout>
+    </div>
   )
 }
 
@@ -69,18 +67,3 @@ function ProfileLink({
     </NavLink>
   )
 }
-const Layout = styled.div`
-  display: flex;
-`
-const StyledAside = styled.aside`
-  display: flex;
-  flex-direction: column;
-  padding: 1rem 0;
-  gap: 1rem;
-  width: fit-content;
-  min-width: fit-content;
-  position: sticky;
-  top: 2rem;
-  height: 100%;
-  justify-items: flex-start;
-`

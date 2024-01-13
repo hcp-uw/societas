@@ -3,8 +3,7 @@ import ReactDOM from "react-dom/client"
 import App from "./App.jsx"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ClerkProvider } from "@clerk/clerk-react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { QueryClient } from "@tanstack/react-query"
 import Home, { loader as projectsLoader } from "./pages/Home.tsx"
 import Project, {
   createPostAction,
@@ -20,7 +19,10 @@ import Project, {
 } from "./pages/Project.jsx"
 import ProfileLayout from "./pages/ProfileLayout.tsx"
 import CreateProj, { createProjectAction } from "./pages/CreateProj.tsx"
-import Requests, { resquestAcceptAction, requestRejectAction} from "./pages/Requests.tsx"
+import Requests, {
+  resquestAcceptAction,
+  requestRejectAction,
+} from "./pages/Requests.tsx"
 import Intro from "./pages/Intro.jsx"
 import PreferencePage from "./pages/PreferencePage.tsx"
 import WhoopsPage from "./pages/WhoopsPage.tsx"
@@ -34,7 +36,6 @@ const queryClient = new QueryClient({
     },
   },
 })
-
 if (!import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY) {
   throw "Missing Publishable Key"
 }
@@ -48,7 +49,6 @@ if (
   localStorage.setItem("firstTimeUser", "true")
 }
 
-
 const router = createBrowserRouter([
   {
     path: "/intro",
@@ -56,7 +56,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <App />,
+    element: <App queryClient={queryClient} />,
     loader: projectsLoader(queryClient),
     children: [
       {
@@ -75,8 +75,8 @@ const router = createBrowserRouter([
           },
           {
             path: "leaveProject",
-            element: <ProjectInfo />, 
-            action: leaveProjectAction(queryClient)
+            element: <ProjectInfo />,
+            action: leaveProjectAction(queryClient),
           },
           {
             path: "posts",
@@ -128,7 +128,7 @@ const router = createBrowserRouter([
             path: "requests/rejectReq",
             element: <Requests />,
             action: requestRejectAction(queryClient),
-          }
+          },
         ],
       },
       {
@@ -149,11 +149,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={clerkPubKey}>
-        <RouterProvider router={router} />
-        <ReactQueryDevtools initialIsOpen position="bottom-right" />
-      </ClerkProvider>
-    </QueryClientProvider>
+    <ClerkProvider publishableKey={clerkPubKey}>
+      <RouterProvider router={router} />
+    </ClerkProvider>
   </React.StrictMode>
 )

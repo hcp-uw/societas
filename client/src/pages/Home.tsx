@@ -10,40 +10,39 @@ const projectsQuery = () => ({
   queryFn: () => getAllProjects(),
 })
 
-
-//loader - checks if query data is null or not and if it is it fetches it. 
-export const loader = (queryClient: QueryClient):LoaderFunction => async () => {
-  if (!queryClient.getQueryData(projectsQuery().queryKey)) {
-    return await queryClient.fetchQuery(projectsQuery())
+//loader - checks if query data is null or not and if it is it fetches it.
+export const loader =
+  (queryClient: QueryClient): LoaderFunction =>
+  async () => {
+    if (!queryClient.getQueryData(projectsQuery().queryKey)) {
+      return await queryClient.fetchQuery(projectsQuery())
+    }
+    return null
   }
-  return null
-}
 
 export default function Home() {
   const { user } = useUser()
-
-  //home page with "welcome" and projects shown. 
+  //home page with "welcome" and projects shown.
   return (
-    <div className="pb-24">
-      {user ? ( 
-        
+    <div>
+      {user ? (
         <h1 className="py-6 text-4xl font-bold text-zinc-800">
           Welcome {user.firstName}
         </h1>
       ) : (
         <h1 className="py-6 text-4xl font-bold text-zinc-800">Welcome</h1>
       )}
-    
+
       <Projects />
     </div>
   )
 }
 
 /*
-*Get project data. If loading, then show buffering image. 
-*If data is null return error message
-*else return project view. 
-*/
+ *Get project data. If loading, then show buffering image.
+ *If data is null return error message
+ *else return project view.
+ */
 function Projects() {
   const { data, isLoading } = useQuery(projectsQuery())
 

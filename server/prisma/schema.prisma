@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Project {
+  id           String    @id @default(uuid())
+  name         String
+  createdAt    DateTime  @default(now())
+  updateAt     DateTime  @updatedAt
+  ownerId      String
+  description  String    @db.VarChar(1500)
+  meetLocation String
+  meetType     String
+  posts        Post[]
+  requests     Request[]
+  members      User[]    @relation("Member")
+}
+
+model User {
+  id       String    @id @default(uuid())
+  requests Request[]
+  member   Project[] @relation("Member")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  createAt  DateTime @default(now())
+  updateAt  DateTime @updatedAt
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+model Request {
+  id        String   @id @default(uuid())
+  createAt  DateTime @default(now())
+  updateAt  DateTime @updatedAt
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([projectId])
+  @@index([userId])
+}
