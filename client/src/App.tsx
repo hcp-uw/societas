@@ -1,19 +1,17 @@
-import styled, { createGlobalStyle } from "styled-components"
+import { createGlobalStyle } from "styled-components"
 import { ThemeProvider } from "styled-components"
 import { theme } from "./contexts/theme"
 import Nav from "./components/Nav"
 import { Toaster } from "react-hot-toast"
 import "./index.css"
-import { Outlet, redirect } from "react-router-dom"
-import { useAuth, useUser, useSession } from "@clerk/clerk-react"
-import { useEffect, useState } from "react"
-// import { signInWithClerkToken, signOutFromFirebase } from "./firebase"
-import { useNavigate } from "react-router-dom"
+import { Outlet } from "react-router-dom"
+import { useAuth } from "@clerk/clerk-react"
+import { useState } from "react"
 import { trpc } from "./utils/trpc"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { httpBatchLink } from "@trpc/client"
-import { queryClient } from "./main"
-function App() {
+
+export default function App({ queryClient }: { queryClient: QueryClient }) {
   const { getToken } = useAuth()
   const [trpcClient] = useState(() =>
     trpc.createClient({
@@ -22,17 +20,9 @@ function App() {
           url: "http://localhost:3001",
           // You can pass any HTTP headers you wish here
           async headers() {
-            // if (!isLoaded) {
-            //   return {
-            //     authorization: undefined,
-            //     userLoading: 'true',
-            //   }
-            // }
             const token = await getToken()
             return {
               authorization: token ?? undefined,
-              // token: token,
-              // isLoaded: isLoaded.toString(),
             }
           },
         }),
@@ -40,21 +30,18 @@ function App() {
     })
   )
 
-  // async function headers() {
-
-  // }
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <div className="h-screen overflow-hidden">
+        <div className="flex flex-col h-screen">
           <ThemeProvider theme={theme}>
             <GlobalStyles />
             <Nav />
             <Toaster position="bottom-center" />
-            <main className="h-full overflow-auto overscroll-y-contain">
-              <StyledAppLayout>
+            <main className="flex-grow-1 overflow-auto overscroll-y-contain">
+              <div className="m-auto max-w-[80%]">
                 <Outlet />
-              </StyledAppLayout>
+              </div>
             </main>
           </ThemeProvider>
         </div>
@@ -70,10 +57,3 @@ const GlobalStyles = createGlobalStyle`
     font-family: ${({ theme }) => theme.fonts.default}, sans-serif, ;
   }
 `
-
-const StyledAppLayout = styled.div`
-  margin: auto;
-  max-width: 80%;
-`
-
-export default App

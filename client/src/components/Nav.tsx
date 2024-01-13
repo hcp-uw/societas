@@ -1,4 +1,3 @@
-import styled from "styled-components"
 import LogoRoute from "../assets/logo.png"
 import { SignInButton, SignUpButton } from "@clerk/clerk-react"
 import { useUser } from "@clerk/clerk-react"
@@ -8,10 +7,10 @@ export default function Nav() {
   //get user.
   const { user } = useUser()
 
-  //returns header of logo and profile button or "sign in/sign up" if user is not registered. 
+  //returns header of logo and profile button or "sign in/sign up" if user is not registered.
   return (
     <header className="border-b-2 py-2">
-      <StyledNav>
+      <nav className="flex max-w-[80%] justify-between items-center m-auto">
         <NavLink to="/">
           <img
             src={LogoRoute}
@@ -24,73 +23,30 @@ export default function Nav() {
 
         {user ? (
           <div>
-            <AccountBtn to="/account">
+            <NavLink to="/account">
               <img
                 src={user.imageUrl}
                 alt={`${user.fullName} profile image`}
                 width={70}
                 className="rounded-full object-cover w-14 h-14"
               />
-            </AccountBtn>
+            </NavLink>
           </div>
         ) : (
-          <AuthPrompts>
-            <SignInButton mode="modal">Login</SignInButton>
-            <SignUpButton mode="modal">Sign up</SignUpButton>
-          </AuthPrompts>
+          <div className="flex gap-4">
+            <SignInButton mode="modal">
+              <div className="bg-blue-400 hover:bg-blue-500 transition-colors cursor-pointer py-2 px-6 text-zinc-100 rounded-lg">
+                Login
+              </div>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <div className="border border-zinc-900 py-2 cursor-pointer px-6 rounded-lg hover:bg-zinc-200 transition-colors">
+                Sign up
+              </div>
+            </SignUpButton>
+          </div>
         )}
-      </StyledNav>
+      </nav>
     </header>
   )
 }
-
-const AccountBtn = styled(NavLink)`
-  /* width: 3rem;
-  height: 3rem;
-  background-color: #e9e9e9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  text-decoration: none;
-  color: #717171; */
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-`
-
-const StyledNav = styled.nav`
-  display: flex;
-  max-width: 80%;
-  justify-content: space-between;
-  align-items: center;
-  margin: auto;
-`
-
-const AuthPrompts = styled.div`
-  button {
-    border: none;
-    padding: 0.75rem 1rem;
-    margin-left: 0.5rem;
-    border-radius: 16px;
-    cursor: pointer;
-    color: ${({ theme }) => theme.colors.mainText};
-    background: none;
-    /* background-color: ${({ theme }) => theme.colors.disabled}; */
-    font-size: 1rem;
-    border: solid 2px ${({ theme }) => theme.colors.mainText};
-    transition: background 150ms ease-out;
-  }
-
-  & button:last-child {
-    background-color: ${({ theme }) => theme.colors.primary};
-    color: ${({ theme }) => theme.colors.whiteText};
-    border: none;
-  }
-
-  & button:hover {
-    background-color: ${({ theme }) => theme.colors.whiteText};
-  }
-
-  & button:last-child:hover {
-    background-color: ${({ theme }) => theme.colors.primary_600};
-  }
-`

@@ -4,7 +4,6 @@ import { useQuery, type QueryClient } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
 import ProjectsView from "../components/ProjectsView"
 import { LoaderFunction } from "react-router-dom"
-import { trpc } from "../utils/trpc"
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
@@ -23,13 +22,9 @@ export const loader =
 
 export default function Home() {
   const { user } = useUser()
-  const { data } = trpc.projects.getAll.useQuery()
-
-  console.log(data)
-
   //home page with "welcome" and projects shown.
   return (
-    <div className="pb-24">
+    <div>
       {user ? (
         <h1 className="py-6 text-4xl font-bold text-zinc-800">
           Welcome {user.firstName}

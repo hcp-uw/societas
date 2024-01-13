@@ -1,10 +1,9 @@
-import React, { useState } from "react"
+import React from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App.jsx"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { ClerkProvider, useUser } from "@clerk/clerk-react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { ClerkProvider } from "@clerk/clerk-react"
+import { QueryClient } from "@tanstack/react-query"
 import Home, { loader as projectsLoader } from "./pages/Home.tsx"
 import Project, {
   createPostAction,
@@ -29,32 +28,14 @@ import PreferencePage from "./pages/PreferencePage.tsx"
 import WhoopsPage from "./pages/WhoopsPage.tsx"
 import ReportPage from "./pages/ReportPage.tsx"
 import Profile, { EditProfile } from "./pages/Profile.tsx"
-import { trpc } from "./utils/trpc"
-import { httpBatchLink } from "@trpc/client"
-// import Wrappers from "./Wrappers.tsx"
 
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60,
     },
   },
 })
-
-// const trpcClient = trpc.createClient({
-//   links: [
-//     httpBatchLink({
-//       url: "http://localhost:3001",
-//       // You can pass any HTTP headers you wish here
-//       async headers() {
-//         return {
-//           // authorization: ,
-//         }
-//       },
-//     }),
-//   ],
-// })
-
 if (!import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY) {
   throw "Missing Publishable Key"
 }
@@ -68,14 +49,14 @@ if (
   localStorage.setItem("firstTimeUser", "true")
 }
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/intro",
     element: <Intro />,
   },
   {
     path: "/",
-    element: <App />,
+    element: <App queryClient={queryClient} />,
     loader: projectsLoader(queryClient),
     children: [
       {
@@ -170,7 +151,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={clerkPubKey}>
       <RouterProvider router={router} />
-      {/* <ReactQueryDevtools initialIsOpen position="bottom-right" /> */}
     </ClerkProvider>
   </React.StrictMode>
 )

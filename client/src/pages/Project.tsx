@@ -49,11 +49,10 @@ const projectPostQuery = (projectId: string, postId: string) => ({
   queryFn: () => getProjectPostById(projectId, postId),
 })
 
-
-//Loaders for Info, allPosts, and posts. 
+//Loaders for Info, allPosts, and posts.
 
 //Maybe combine info and allPosts into one function as their code seems identical
-//Change name of Postloader and Postsloader. A bit confusing. 
+//Change name of Postloader and Postsloader. A bit confusing.
 export const infoLoader =
   (queryClient: QueryClient) =>
   async ({ params }: LoaderFunctionArgs) => {
@@ -68,7 +67,7 @@ export const infoLoader =
 export const postsLoader =
   (queryClient: QueryClient) =>
   async ({ params }: LoaderFunctionArgs) => {
-    if (!params.projectId)throw new Error("no project Id found in url params")
+    if (!params.projectId) throw new Error("no project Id found in url params")
 
     const query = projectPostsQuery(params.projectId)
     return (
@@ -92,8 +91,7 @@ export const postLoader =
 export const action =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
-
-    //get form data and parse it thorugh to inputsSchema. 
+    //get form data and parse it thorugh to inputsSchema.
     const formData = await request.formData()
     const inputsSchema = z.object({
       projectId: z.string(),
@@ -113,15 +111,15 @@ export const action =
       requestantId: inputs.requestantId,
     })
 
-    //when done invalidate queries and update them. 
+    //when done invalidate queries and update them.
     queryClient.invalidateQueries({
       queryKey: ["projects", inputs.projectId, "info"],
     })
     return null
   }
 
-//same process as above just creating a post in this case and 
-//updating a different query. 
+//same process as above just creating a post in this case and
+//updating a different query.
 export const createPostAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
@@ -145,24 +143,23 @@ export const createPostAction =
     return redirect(`/${inputs.projectId}/posts`)
   }
 
-
 export const leaveProjectAction =
   (queryClient: QueryClient) =>
   async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData()
-      const inputsSchema = z.object({   
-        projectId: z.string(),
-        userId: z.string(),
-      })
+    const inputsSchema = z.object({
+      projectId: z.string(),
+      userId: z.string(),
+    })
     const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    if(confirm("Are you sure you want to leave this project?")){
+    if (confirm("Are you sure you want to leave this project?")) {
       await removeUser(inputs.userId, inputs.projectId)
       queryClient.invalidateQueries({
         queryKey: ["projects", inputs.projectId],
       })
       toast.success("Left Project")
     }
-    return redirect(`/${inputs.projectId}`);
+    return redirect(`/${inputs.projectId}`)
   }
 
 export default function Project() {
@@ -172,13 +169,13 @@ export default function Project() {
     projectInfoQuery(projectId ?? "")
   )
   */
-  const {projectId, data, isLoading, isError} = useGetProjectData()
+  const { projectId, data, isLoading, isError } = useGetProjectData()
   const { user } = useUser()
   const fetcher = useFetcher()
-  
+
   const [showModal, setShowModal] = useState(false)
-  
-  //get and store role whenever data or user changes. 
+
+  //get and store role whenever data or user changes.
   const role = useMemo(() => getRole(), [data, user])
 
   if (!data) return <div>User not found</div>
@@ -222,9 +219,8 @@ export default function Project() {
 
   if (isError) return <div>Project was not found</div>
 
-
-  //shows the user the view of the project and ability/options to join. 
-  //TO FIX: join button is not working. 
+  //shows the user the view of the project and ability/options to join.
+  //TO FIX: join button is not working.
   return (
     <>
       <div className="flex justify-between mt-6">
@@ -322,12 +318,14 @@ export default function Project() {
                 </div>
               ) : role === "member" ? (
                 <>
-                  <Form method = "post" action = "leaveProject">
-                    <input type = "hidden" value = {user ? user.id : ""} name = "userId"/> 
-                    <input type = "hidden" value = {projectId} name = "projectId"/>
-                    <button 
-                      className = "text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors"
-                      >
+                  <Form method="post" action="leaveProject">
+                    <input
+                      type="hidden"
+                      value={user ? user.id : ""}
+                      name="userId"
+                    />
+                    <input type="hidden" value={projectId} name="projectId" />
+                    <button className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors">
                       Leave Project
                     </button>
                   </Form>

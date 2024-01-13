@@ -10,7 +10,6 @@ import { z } from "zod"
 
 export const createProjectAction =
   (queryClient: QueryClient) =>
-
   async ({ request }: { request: Request }) => {
     //wait for data
     const formData = await request.formData()
@@ -24,7 +23,7 @@ export const createProjectAction =
       meetType: z.string(),
       startDate: z.string(),
     })
-    //parse data into above values. 
+    //parse data into above values.
     const inputs = inputsScheme.parse(Object.fromEntries(formData))
 
     //wait until data is parsed
@@ -41,7 +40,7 @@ export const createProjectAction =
 
     toast.success("Project Created")
 
-    //update project queries. 
+    //update project queries.
     queryClient.invalidateQueries({
       queryKey: ["projects"],
     })
@@ -58,8 +57,7 @@ type FormState = {
 }
 
 export default function CreateProj() {
-
-  //elements to fill when creating a project. 
+  //elements to fill when creating a project.
   const [formState, setFormState] = useState<FormState>({
     title: "",
     description: "",
@@ -95,7 +93,6 @@ export default function CreateProj() {
   // return true if form fields are not empty
   // false otherwiise
 
-
   //function to check if values are null or empty
   function isFormValid() {
     Object.values(formState).forEach((val) => {
@@ -104,7 +101,7 @@ export default function CreateProj() {
     return true
   }
 
-  //gets files view and inputs view from formstate. 
+  //gets files view and inputs view from formstate.
   return (
     <fetcher.Form
       method="post"
@@ -120,11 +117,6 @@ export default function CreateProj() {
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
-      {/* <SubmitBtnView
-        isFormValid={isFormValid}
-        desktop={true}
-        loading={fetcher.state === "submitting"}
-      /> */}
     </fetcher.Form>
   )
 }
@@ -136,8 +128,8 @@ type InputsViewProps = {
   loading: boolean
 }
 
-//shows the view for inputs to create a new project. 
-//updates fiewlds of formState when inputs are made. 
+//shows the view for inputs to create a new project.
+//updates fiewlds of formState when inputs are made.
 function InputsView({
   formState,
   setFormState,
@@ -172,7 +164,6 @@ function InputsView({
           cols={20}
           rows={5}
           placeholder="description of your project"
-
           onChange={(e) =>
             setFormState({ ...formState, description: e.target.value })
           }
@@ -252,8 +243,7 @@ function InputsView({
   )
 }
 
-
-//shows view for selecting a picture for a project. 
+//shows view for selecting a picture for a project.
 function FilesView({
   formState,
   setFormState,
@@ -275,8 +265,7 @@ function FilesView({
           name="imageUrl"
           id="image"
           required
-
-          //checks file size and for null returns. 
+          //checks file size and for null returns.
           onChange={(e) => {
             setError(null)
             const maxFileSize = 1024 * 1024 // one mb
@@ -294,7 +283,7 @@ function FilesView({
         {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
       {formState.image && (
-        //loads the image and shows it on screen. Allows you to close it and not show it. 
+        //loads the image and shows it on screen. Allows you to close it and not show it.
         <Image key={formState.image.name}>
           <button
             onClick={() => setFormState((prev) => ({ ...prev, image: null }))}
@@ -312,11 +301,10 @@ function FilesView({
         </Image>
       )}
     </FilesWrapper>
-  
   )
 }
 
-//submit button view. 
+//submit button view.
 function SubmitBtnView({
   isFormValid,
   desktop,
@@ -329,7 +317,7 @@ function SubmitBtnView({
   return (
     <SubmitWrapper desktop={desktop}>
       <button
-        //disabled while form is invalid. Changes to loading spinnner when pressed. 
+        //disabled while form is invalid. Changes to loading spinnner when pressed.
         type="submit"
         disabled={!isFormValid()}
         aria-busy={loading}
@@ -351,7 +339,7 @@ function SubmitBtnView({
   )
 }
 
-//to fix maybe? 
+//to fix maybe?
 function LoadingSpinner({ size }: { size: number }) {
   return (
     <div role="status">

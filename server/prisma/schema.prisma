@@ -12,24 +12,23 @@ datasource db {
 }
 
 model Project {
-  id           String     @id @default(uuid())
+  id           String    @id @default(uuid())
   name         String
-  createAt     DateTime   @default(now())
-  updateAt     DateTime   @updatedAt
+  createdAt    DateTime  @default(now())
+  updateAt     DateTime  @updatedAt
   ownerId      String
-  description  String
+  description  String    @db.VarChar(1500)
   meetLocation String
   meetType     String
   posts        Post[]
-  requests     Requests[]
-  members      User[]     @relation("Member")
-  requestants  User[]     @relation("Requestant")
+  requests     Request[]
+  members      User[]    @relation("Member")
 }
 
 model User {
-  id        String    @id @default(uuid())
-  requested Project[] @relation("Requestant")
-  member    Project[] @relation("Member")
+  id       String    @id @default(uuid())
+  requests Request[]
+  member   Project[] @relation("Member")
 }
 
 model Post {
@@ -44,13 +43,15 @@ model Post {
   @@index([projectId])
 }
 
-model Requests {
+model Request {
   id        String   @id @default(uuid())
   createAt  DateTime @default(now())
   updateAt  DateTime @updatedAt
   projectId String
   project   Project  @relation(fields: [projectId], references: [id])
   userId    String
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([projectId])
+  @@index([userId])
 }
