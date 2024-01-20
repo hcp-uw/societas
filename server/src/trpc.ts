@@ -1,73 +1,56 @@
-import { initTRPC } from "@trpc/server"
-import { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone"
-import { prisma } from "./db"
-import { sessions, clerkClient } from "@clerk/clerk-sdk-node"
-import type { TRPCClientIncomingMessage } from "@trpc/server/rpc"
+import { TRPCError, initTRPC } from "@trpc/server";
+import { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
+import { prisma } from "./db";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
-type AuthenticateRequestOptions {
-  apiUrl: string
-  apiVersion: string
-  req: TRPCClientIncomingMessage
-}
 //inner context
 function createContextInner(opts: CreateHTTPContextOptions) {
-  //   const sessionId = opts.req.headers.authorization
-  //   console.log(sessionId)
-  // const clientToken = "adsfadf"
-
   return {
     db: prisma,
     auth: {
-      session: opts.req.headers.authorization,
-      token: opts.req.headers.token,
+      // session: opts.req.headers.authorization,
+      authorization: opts.req.headers.authorization as string,
     },
-  }
+  };
 }
 // context
 export function createTRPCContext(opts: CreateHTTPContextOptions) {
-  const contextInner = createContextInner(opts)
+  const contextInner = createContextInner(opts);
   return {
     ...contextInner,
     req: opts.req,
     res: opts.res,
-  }
+  };
 }
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
  */
-const t = initTRPC.context<typeof createTRPCContext>().create()
-/**
- * Export reusable router and procedure helpers
- * that can be used throughout the router
- */
+const t = initTRPC.context<typeof createTRPCContext>().create();
 
 const enforeceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-
-  const { isSignedIn } = await clerkClient.authenticateRequest({ req: ctx.req });
-
-  if (ctx.auth.session === undefined || ctx.auth.token === undefined) {
-    throw new Error("Not authorized");
-  }
-
-  const session = await sessions.verifySession(
-    ctx.auth.session,
-    ctx.auth.token.toString()
-  );
-  if (session === null) {
-    throw new Error("Not authorized");
+  try {
+    await clerkClient.verifyToken(ctx.auth.authorization);
+  } catch (err) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "user is not logged in",
+    });
   }
 
   return next({
     ctx: {
       auth: {
-        session: ctx.auth.session,
-        token: ctx.auth.token,
+        authorization: ctx.auth.authorization,
       },
     },
-  })
-})
+  });
+});
 
-export const router = t.router
-export const publicProcedure = t.procedure
-export const authedProcedure = publicProcedure.use(enforeceUserIsAuthed)
+/*
+ * Export reusable router and procedure helpers
+ * that can be used throughout the router
+ */
+export const router = t.router;
+export const publicProcedure = t.procedure;
+export const authedProcedure = publicProcedure.use(enforeceUserIsAuthed);

@@ -12,24 +12,23 @@ datasource db {
 }
 
 model Project {
-  id           String     @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
-  createAt     DateTime   @default(now())
-  updateAt     DateTime   @updatedAt
+  createAt     DateTime      @default(now())
+  updateAt     DateTime      @updatedAt
   ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   description  String
   meetLocation String
   meetType     String
   posts        Post[]
-  requests     Requests[]
-  members      User[]     @relation("Member")
-  requestants  User[]     @relation("Requestant")
+  memberships  Memberships[]
 }
 
 model User {
-  id        String    @id @default(uuid())
-  requested Project[] @relation("Requestant")
-  member    Project[] @relation("Member")
+  id          String        @id @default(uuid())
+  memberships Memberships[]
+  projects    Project[]
 }
 
 model Post {
@@ -39,18 +38,27 @@ model Post {
   createAt  DateTime @default(now())
   updateAt  DateTime @updatedAt
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
 }
 
-model Requests {
-  id        String   @id @default(uuid())
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt
+model Memberships {
+  id        String           @id @default(uuid())
+  createAt  DateTime         @default(now())
+  updateAt  DateTime         @updatedAt
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id])
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    MembershipStatus @default(PENDING)
 
   @@index([projectId])
+  @@unique([projectId, userId])
+}
+
+enum MembershipStatus {
+  ACCEPTED
+  PENDING
+  REJECTED
 }
