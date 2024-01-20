@@ -24,7 +24,10 @@ export const loader =
 export default function Home() {
   const { user } = useUser()
   const { data } = trpc.projects.getAll.useQuery()
-  const { mutate } = trpc.projects.create.useMutation()
+
+  if (data) {
+    console.log(data)
+  }
 
   //home page with "welcome" and projects shown.
   return (

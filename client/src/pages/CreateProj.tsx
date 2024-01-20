@@ -7,6 +7,7 @@ import { useUser } from "@clerk/clerk-react"
 import { StyledInput, Input, TextArea } from "../components/inputs"
 import { QueryClient } from "@tanstack/react-query"
 import { z } from "zod"
+import { trpc } from "../utils/trpc"
 
 export const createProjectAction =
   (queryClient: QueryClient) =>
@@ -67,7 +68,13 @@ export default function CreateProj() {
   }) // state form the inputs
   // const [loading, setLoading] = useState(false)
   const fetcher = useFetcher()
-
+  const utils = trpc.useUtils()
+  const mutation = trpc.projects.create.useMutation({
+    onSuccess() {
+      console.log("here")
+      utils.projects.getAll.invalidate()
+    },
+  })
   const { user } = useUser()
 
   if (!user) return <div>Must Be signed in to create project</div>
@@ -101,12 +108,25 @@ export default function CreateProj() {
     return true
   }
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!user) return
+    mutation.mutate({
+      name: formState.title,
+      description: formState.description,
+      meetLocation: formState.location,
+      meetType: "",
+      ownerId: user?.id,
+    })
+  }
+
   //gets files view and inputs view from formstate.
   return (
     <fetcher.Form
       method="post"
       className="flex justify-between w-full"
       encType="multipart/form-data"
+      onSubmit={handleSubmit}
     >
       <FilesView formState={formState} setFormState={setFormState} />
       <InputsView
