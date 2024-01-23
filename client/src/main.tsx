@@ -18,7 +18,7 @@ import Project, {
   leaveProjectAction,
 } from "./pages/Project.jsx"
 import ProfileLayout from "./pages/ProfileLayout.tsx"
-import CreateProj, { createProjectAction } from "./pages/CreateProj.tsx"
+import CreateProj from "./pages/CreateProj.tsx"
 import Requests, {
   resquestAcceptAction,
   requestRejectAction,
@@ -105,7 +105,6 @@ const router = createBrowserRouter([
           {
             path: "create",
             element: <CreateProj />,
-            action: createProjectAction(queryClient),
           },
           {
             index: true,

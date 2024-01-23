@@ -14,10 +14,10 @@ datasource db {
 model Project {
   id           String        @id @default(uuid())
   name         String
-  createAt     DateTime      @default(now())
+  createdAt     DateTime      @default(now())
   updateAt     DateTime      @updatedAt
   ownerId      String
-  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+ // owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   description  String
   meetLocation String
   meetType     String
@@ -28,7 +28,7 @@ model Project {
 model User {
   id          String        @id @default(uuid())
   memberships Memberships[]
-  projects    Project[]
+  //projects    Project[]
 }
 
 model Post {
