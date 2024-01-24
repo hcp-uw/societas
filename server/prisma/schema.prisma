@@ -14,10 +14,10 @@ datasource db {
 model Project {
   id           String        @id @default(uuid())
   name         String
-  createAt     DateTime      @default(now())
-  updateAt     DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   ownerId      String
-  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  // owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   description  String
   meetLocation String
   meetType     String
@@ -26,9 +26,9 @@ model Project {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  memberships Memberships[]
-  projects    Project[]
+  id String @id @default(uuid())
+  // memberships Memberships[]
+  // projects    Project[]
 }
 
 model Post {
@@ -50,11 +50,13 @@ model Memberships {
   projectId String
   project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   status    MembershipStatus @default(PENDING)
+  // User      User             @relation(fields: [userId], references: [id])
+  // User      User             @relation(fields: [userId], references: [id])
 
-  @@index([projectId])
   @@unique([projectId, userId])
+  @@index([projectId])
 }
 
 enum MembershipStatus {
