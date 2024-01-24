@@ -50,8 +50,12 @@ export default function Home() {
  *If data is null return error message
  *else return project view.
  */
+
+ 
 function Projects() {
-  const { data, isLoading } = useQuery(projectsQuery())
+  //const { data, isLoading } = useQuery(projectsQuery())
+
+  const {data, isLoading} = trpc.projects.getAll.useQuery();
 
   if (isLoading)
     return (

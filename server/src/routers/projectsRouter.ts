@@ -10,7 +10,7 @@ export const projectsRouter = router({
     return projects
   }),
 
-  getById: authedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.project.findFirst({
       where: {
         id: input,

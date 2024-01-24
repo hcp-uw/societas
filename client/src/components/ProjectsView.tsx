@@ -3,10 +3,19 @@ import { Link } from "react-router-dom"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 dayjjs.extend(relativeTime)
-import type { Project } from "../firebase"
 
 type BreakPoints = "default" | "1826" | "1347" | "900"
 
+type Project = {
+  name: string;
+  id: string;
+  description: string;
+  meetType: string;
+  ownerId: string;
+  meetLocation: string;
+  createdAt: string;
+  updatedAt: string;
+}
 //shows projects with breakpoints listed above. 
 export default function ProjectsView(props: {
   projects: Project[]
@@ -24,8 +33,10 @@ export default function ProjectsView(props: {
           to={`/${proj.id}`}
           className="bg-zinc-200 flex flex-col p-6 rounded-2xl gap-3 mb-8 hover:scale-[1.009] hover:shadow-lg hover:shadow-zinc400/50 transition-all"
         >
+          {
+          
           <img
-            src={proj.imageUrl}
+            src={""}
             width={350}
             height={400}
             loading="lazy"
@@ -34,15 +45,15 @@ export default function ProjectsView(props: {
               e.currentTarget.classList.remove("opacity-0")
               e.currentTarget.classList.add("opacity-1")
             }}
-          />
-          <h2 className="text-2xl font-bold text-zinc-950">{proj.title}</h2>
+          /> }
+          <h2 className="text-2xl font-bold text-zinc-950">{proj.name}</h2>
           <p className="text-zinc-800 leading-loose line-clamp-4">
             {proj.description}
           </p>
           <div className="flex gap-2 flex-wrap">
             <Blob>
               <span className="material-symbols-outlined">schedule</span>
-              {dayjjs(proj.createdAt.toDate()).fromNow()}
+              {dayjjs(proj.createdAt).fromNow()}
             </Blob>
             <Blob>
               {proj.meetType === "in-person" ? (

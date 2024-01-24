@@ -165,12 +165,16 @@ export const leaveProjectAction =
 
 export default function Project() {
   /*
-  const { projectId } = useParams()
   const { data, isLoading, isError } = useQuery(
     projectInfoQuery(projectId ?? "")
   )
   */
-  const { projectId, data, isLoading, isError } = useGetProjectData()
+  //const { projectId } = useParams()
+
+ const { projectId, data, isLoading, isError } = useGetProjectData()
+
+  //const {data, isLoading, isError} = trpc.projects.getById.useQuery(projectId ?? "");
+
   const { user } = useUser()
   const fetcher = useFetcher()
 
