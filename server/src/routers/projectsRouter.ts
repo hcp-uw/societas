@@ -28,7 +28,7 @@ export const projectsRouter = router({
       })
     }),
 
-  createProjectJoinRequest: authedProcedure
+  createProjectJoinRequest: publicProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -47,7 +47,7 @@ export const projectsRouter = router({
       }
     }),
 
-  getAllPendingRequests: authedProcedure
+  getAllPendingRequests: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.memberships.findMany({
