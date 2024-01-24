@@ -196,13 +196,13 @@ export default function Project() {
     if(!projectId) return;
     console.log("mutating");
     mutation.mutate({
-      projectId: "c8ab9aff-5f09-45bb-bf22-7a6eea51eb65",
-      userId: user?.id
+      projectId: "66800fed-e1ab-4566-af05-e913616ee903",
+      userId: "aron1234"
     })
   }
 
 
-  const requestData = trpc.projects.getAllPendingRequests.useQuery("c8ab9aff-5f09-45bb-bf22-7a6eea51eb65");
+  const requestData = trpc.projects.getAllPendingRequests.useQuery("66800fed-e1ab-4566-af05-e913616ee903");
 
   if(requestData.data != undefined) {
     console.log(requestData.data);

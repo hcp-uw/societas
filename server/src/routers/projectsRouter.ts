@@ -40,11 +40,8 @@ export const projectsRouter = router({
         where: input,
       })
 
-      if (existing == null) {
-        ctx.db.memberships.create({ data: input })
-      } else {
-        // throw error code
-      }
+      await ctx.db.memberships.create({ data: input })
+      
     }),
 
   getAllPendingRequests: publicProcedure
