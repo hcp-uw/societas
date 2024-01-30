@@ -16,7 +16,6 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "nodemon": "^3.0.2",
-    "prisma": "^5.7.0",
     "ts-node": "^10.9.2"
   }
 }

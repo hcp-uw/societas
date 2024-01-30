@@ -9,7 +9,7 @@ export const projectsRouter = router({
     return projects;
   }),
 
-  getById: authedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.project.findFirst({
       where: {
         id: input,
@@ -27,7 +27,7 @@ export const projectsRouter = router({
       });
     }),
 
-  createProjectJoinRequest: authedProcedure
+  createProjectJoinRequest: publicProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -39,7 +39,7 @@ export const projectsRouter = router({
       await ctx.db.memberships.create({ data: input });
     }),
 
-  getAllPendingRequests: authedProcedure
+  getAllPendingRequests: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.memberships.findMany({
