@@ -46,19 +46,7 @@ export const projectsRouter = router({
       }
     }),
 
-  getAllPendingRequests: authedProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      return await ctx.db.memberships.findMany({
-        where: {
-          userId: input,
-          status: "PENDING",
-        },
-        select: {
-          projectId: true,
-        },
-      });
-    }),
+
 
   // must be owner
   acceptRequest: authedProcedure
