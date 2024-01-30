@@ -9,7 +9,6 @@ import {
   useParams,
 } from "react-router-dom"
 import {
-  createProjectJoinRequest,
   createProjectPost,
   getAllProjectPosts,
   getProjectById,
@@ -200,13 +199,13 @@ export default function Project() {
     if(!projectId) return;
     console.log("mutating");
     mutation.mutate({
-      projectId: "66800fed-e1ab-4566-af05-e913616ee903",
-      userId: "aron1234"
+      projectId: projectId,
+      userId: user.id
     })
   }
 
 
-  const requestData = trpc.projects.getAllPendingRequests.useQuery("66800fed-e1ab-4566-af05-e913616ee903");
+  const requestData = trpc.projects.getAllPendingRequests.useQuery(projectId);
 
   if(requestData.data != undefined) {
     console.log(requestData.data);
