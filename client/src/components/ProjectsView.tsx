@@ -2,23 +2,15 @@ import Masonry from "react-masonry-css"
 import { Link } from "react-router-dom"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
+import { ReactQueryOptions, RouterOutputs } from "../utils/trpc"
 dayjjs.extend(relativeTime)
 
 type BreakPoints = "default" | "1826" | "1347" | "900"
 
-type Project = {
-  name: string;
-  id: string;
-  description: string;
-  meetType: string;
-  ownerId: string;
-  meetLocation: string;
-  createdAt: string;
-  updatedAt: string;
-}
-//shows projects with breakpoints listed above. 
+type Projects = RouterOutputs["projects"]["getAll"]
+
 export default function ProjectsView(props: {
-  projects: Project[]
+  projects: Projects
   breakPoints: Record<BreakPoints, number>
 }) {
   return (
@@ -34,18 +26,18 @@ export default function ProjectsView(props: {
           className="bg-zinc-200 flex flex-col p-6 rounded-2xl gap-3 mb-8 hover:scale-[1.009] hover:shadow-lg hover:shadow-zinc400/50 transition-all"
         >
           {
-          
-          <img
-            src={""}
-            width={350}
-            height={400}
-            loading="lazy"
-            className="object-cover rounded-lg max-h-[400px] opacity-0 transition-opacity m-auto"
-            onLoad={(e) => {
-              e.currentTarget.classList.remove("opacity-0")
-              e.currentTarget.classList.add("opacity-1")
-            }}
-          /> }
+            <img
+              src={""}
+              width={350}
+              height={400}
+              loading="lazy"
+              className="object-cover rounded-lg max-h-[400px] opacity-0 transition-opacity m-auto"
+              onLoad={(e) => {
+                e.currentTarget.classList.remove("opacity-0")
+                e.currentTarget.classList.add("opacity-1")
+              }}
+            />
+          }
           <h2 className="text-2xl font-bold text-zinc-950">{proj.name}</h2>
           <p className="text-zinc-800 leading-loose line-clamp-4">
             {proj.description}

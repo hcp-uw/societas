@@ -9,8 +9,6 @@ import { QueryClient } from "@tanstack/react-query"
 import { z } from "zod"
 import { trpc } from "../utils/trpc"
 
-
-
 // export const createProjectAction =
 //   (queryClient: QueryClient) =>
 //   async ({ request }: { request: Request }) => {
@@ -70,49 +68,22 @@ export default function CreateProj() {
   }) // state form the inputs
   // const [loading, setLoading] = useState(false)
   //const fetcher = useFetcher()
-  const utils = trpc.useUtils();
+  const utils = trpc.useUtils()
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const mutation = trpc.projects.create.useMutation({
-    onSuccess(){
-      console.log("I'm here");
-      utils.projects.getAll.invalidate();
-      navigate("/");
-      toast.success("Project Created!");
-    }
-  });
-  
-
-  
-  
+    onSuccess() {
+      utils.projects.getAll.invalidate()
+      toast.success("Project Created!")
+      navigate("/")
+    },
+  })
 
   const { user } = useUser()
 
   if (!user) return <div>Must Be signed in to create project</div>
 
-  // handles deletetion of picture
-  // params:
-  //  index -> index of picture to be deleted
-  // fuVjjnction handleDelPictre(index: number) {
-  //   const newArr = formState.images?.filter((_, i) => i !== index)
-  //   setFormState({ ...formState, images: newArr })
-  // }
-
-  // function handleAddPicture(file: Blob) {
-  //   if (formState.images.includes(file)) {
-  //     throw Error("this already exists")
-  //   }
-  //   setFormState((prev) => ({
-  //     ...prev,
-  //     images: [...prev.images, file],
-  //   }))
-  // }
-
-  // return true if form fields are not empty
-  // false otherwiise
-
-  //function to check if values are null or empty
   function isFormValid() {
     Object.values(formState).forEach((val) => {
       if (val === "" || val === null) return false
@@ -120,15 +91,15 @@ export default function CreateProj() {
     return true
   }
 
-  function handleSubmit(e : React.FormEvent<HTMLFormElement>){
-    e.preventDefault();
-    if(!user) return;
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!user) return
     mutation.mutate({
       name: formState.title,
       description: formState.description,
       meetLocation: formState.location,
       meetType: "",
-      ownerId: user?.id
+      ownerId: user?.id,
     })
   }
   //gets files view and inputs view from formstate.
@@ -137,14 +108,14 @@ export default function CreateProj() {
       method="post"
       className="flex justify-between w-full"
       encType="multipart/form-data"
-      onSubmit = {handleSubmit}
+      onSubmit={handleSubmit}
     >
       <FilesView formState={formState} setFormState={setFormState} />
       <InputsView
         formState={formState}
         setFormState={setFormState}
         isFormValid={isFormValid}
-        loading={mutation.isLoading}
+        loading={mutation.isPending}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}

@@ -53,16 +53,6 @@ const projectPostQuery = (projectId: string, postId: string) => ({
 
 //Maybe combine info and allPosts into one function as their code seems identical
 //Change name of Postloader and Postsloader. A bit confusing.
-export const infoLoader =
-  (queryClient: QueryClient) =>
-  async ({ params }: LoaderFunctionArgs) => {
-    if (!params.projectId) throw Error("No Project Id found in url params")
-    const query = projectInfoQuery(params.projectId)
-    return (
-      queryClient.getQueryData(query.queryKey) ??
-      (await queryClient.fetchQuery(query))
-    )
-  }
 
 export const postsLoader =
   (queryClient: QueryClient) =>
@@ -162,78 +152,76 @@ export const leaveProjectAction =
     return redirect(`/${inputs.projectId}`)
   }
 
+function useGetProjectData() {
+  const { projectId } = useParams()
+  const query = trpc.projects.getById.useQuery(projectId ?? "")
+
+  return {
+    projectId,
+    ...query,
+  }
+}
+
 export default function Project() {
-  /*
-  const { data, isLoading, isError } = useQuery(
-    projectInfoQuery(projectId ?? "")
-  )
-  */
-  //const { projectId } = useParams()
-
- const { projectId, data, isLoading, isError } = useGetProjectData()
-
-  //const {data, isLoading, isError} = trpc.projects.getById.useQuery(projectId ?? "");
-
+  const { data, isLoading, isError, projectId } = useGetProjectData()
   const { user } = useUser()
-  const fetcher = useFetcher()
+  // const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false)
-  
+
   //get and store role whenever data or user changes.
-  const role = useMemo(() => getRole(), [data, user])
-  
+  // const role = useMemo(() => getRole(), [data, user])
 
+  const utils = trpc.useUtils()
+  const createJoinReqMutation =
+    trpc.projects.createProjectJoinRequest.useMutation({
+      onSuccess() {
+        console.log("Request Created")
+        setShowModal(false)
+        utils.projects.getAllPendingRequests.invalidate()
+        toast.success("Requested!")
+      },
+    })
 
-  const utils = trpc.useUtils();
-  const mutation = trpc.projects.createProjectJoinRequest.useMutation({
-    onSuccess(){
-      console.log("Request Created");
-      utils.projects.getAllPendingRequests.invalidate();
-      toast.success("Requested!");
-    }
-  })
-
-  function handleJoinReqSubmit(e : React.FormEvent<HTMLFormElement>){
-    e.preventDefault();
-    if(!user) return;
-    if(!projectId) return;
-    console.log("mutating");
-    mutation.mutate({
+  function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!user) return
+    if (!projectId) return
+    console.log("mutating")
+    createJoinReqMutation.mutate({
       projectId: projectId,
-      userId: user.id
+      userId: user.id,
     })
   }
 
+  const requestData = trpc.projects.getAllPendingRequests.useQuery(
+    projectId ?? ""
+  )
 
-  const requestData = trpc.projects.getAllPendingRequests.useQuery(projectId);
-
-  if(requestData.data != undefined) {
-    console.log(requestData.data);
-  }
-  
-
-  if (!data) return <div>User not found</div>
-
-  function getRole() {
-    if (!data || !user) return
-    if (data.ownerId === user.id) {
-      return "owner"
-    } else if (data.members.find((member) => member === user.id)) {
-      return "member"
-    } else if (data.requestants.find((requestant) => requestant === user.id)) {
-      return "requestant"
-    } else {
-      return "none"
-    }
+  if (requestData.data != undefined) {
+    console.log(requestData.data)
   }
 
-  useEffect(() => {
-    return () => {
-      if (fetcher.state === "submitting") {
-        setShowModal(false)
-      }
-    }
-  }, [fetcher.state])
+  // function getRole() {
+  //   if (!data || !user) return
+  //   if (data.ownerId === user.id) {
+  //     return "owner"
+  //   } else if (data.members.find((member) => member === user.id)) {
+  //     return "member"
+  //   } else if (data.requestants.find((requestant) => requestant === user.id)) {
+  //     return "requestant"
+  //   } else {
+  //     return "none"
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (fetcher.state === "submitting") {
+  //       setShowModal(false)
+  //     }
+  //   }
+  // }, [fetcher.state])
 
   if (isLoading)
     return (
@@ -251,7 +239,7 @@ export default function Project() {
       </div>
     )
 
-  if (isError) return <div>Project was not found</div>
+  if (!data) return <div>Project was not found</div>
 
   //shows the user the view of the project and ability/options to join.
   //TO FIX: join button is not working.
@@ -260,10 +248,7 @@ export default function Project() {
       <div className="flex justify-between mt-6">
         {showModal && (
           <div className="absolute w-screen h-screen bg-zinc-200 bg-opacity-75 top-0 left-0 flex items-center justify-center">
-            <Form 
-              method="POST"
-              onSubmit={handleJoinReqSubmit}
-            >
+            <Form method="POST" onSubmit={handleJoinReqSubmit}>
               <label
                 htmlFor="textAreaProj"
                 className="text-2xl font-semibold mb-2 w-full flex justify-between"
@@ -296,14 +281,14 @@ export default function Project() {
                 name="requestantId"
               />
               <input type="hidden" value={data.ownerId} name="ownerId" />
-              <input type="hidden" value={data.title} name="projectTitle" />
-              <input type="hidden" value={data.imageUrl} name="imageUrl" />
+              <input type="hidden" value={data.name} name="projectTitle" />
+              {/* <input type="hidden" value={data.imageUrl} name="imageUrl" /> */}
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={fetcher.state === "submitting"}
+                disabled={createJoinReqMutation.isPending}
               >
-                {mutation.isLoading ? (
+                {createJoinReqMutation.isPending ? (
                   <Spinner color="white" />
                 ) : (
                   <p className="py-2">Join</p>
@@ -315,7 +300,7 @@ export default function Project() {
 
         <div className="w-full max-w-6xl m-auto flex flex-col gap-4">
           <h2 className="text-3xl font-bold text-zinc-800 flex items-center">
-            {data.title}
+            {data.name}
           </h2>
           <nav className="w-full flex gap-4 border-b-2 justify-between items-center">
             <div className="flex gap-4">
@@ -343,7 +328,13 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              {role === "owner" ? (
+              <button
+                className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
+                onClick={() => setShowModal(true)}
+              >
+                Join
+              </button>
+              {/* {role === "owner" ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
@@ -382,24 +373,14 @@ export default function Project() {
                 </>
               ) : (
                 <div>Log in to join!</div>
-              )}
+              )} */}
             </div>
           </nav>
-          <Outlet />
+          {/* <Outlet /> */}
         </div>
       </div>
     </>
   )
-}
-
-function useGetProjectData() {
-  const { projectId } = useParams()
-  const query = useQuery(projectInfoQuery(projectId ?? ""))
-
-  return {
-    projectId,
-    ...query,
-  }
 }
 
 type SubmitFetcherBtnProps = {
