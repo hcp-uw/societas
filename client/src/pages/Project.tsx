@@ -9,7 +9,6 @@ import {
   useParams,
 } from "react-router-dom"
 import {
-  createProjectJoinRequest,
   createProjectPost,
   getAllProjectPosts,
   getProjectById,
@@ -28,6 +27,7 @@ import { NavLink, Outlet, Form } from "react-router-dom"
 import Markdown from "react-markdown"
 import { useMemo } from "react"
 import { z } from "zod"
+import { trpc } from "../utils/trpc"
 
 dayjjs.extend(relativeTime)
 
@@ -102,14 +102,14 @@ export const action =
       requestantId: z.string(),
     })
     const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    await createProjectJoinRequest({
-      projectId: inputs.projectId,
-      imageUrl: inputs.imageUrl,
-      message: inputs.message,
-      ownerId: inputs.ownerId,
-      projectTitle: inputs.projectTitle,
-      requestantId: inputs.requestantId,
-    })
+    // await createProjectJoinRequest({
+    //   projectId: inputs.projectId,
+    //   imageUrl: inputs.imageUrl,
+    //   message: inputs.message,
+    //   ownerId: inputs.ownerId,
+    //   projectTitle: inputs.projectTitle,
+    //   requestantId: inputs.requestantId,
+    // })
 
     //when done invalidate queries and update them.
     queryClient.invalidateQueries({
@@ -164,19 +164,53 @@ export const leaveProjectAction =
 
 export default function Project() {
   /*
-  const { projectId } = useParams()
   const { data, isLoading, isError } = useQuery(
     projectInfoQuery(projectId ?? "")
   )
   */
-  const { projectId, data, isLoading, isError } = useGetProjectData()
+  //const { projectId } = useParams()
+
+ const { projectId, data, isLoading, isError } = useGetProjectData()
+
+  //const {data, isLoading, isError} = trpc.projects.getById.useQuery(projectId ?? "");
+
   const { user } = useUser()
   const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false)
-
+  
   //get and store role whenever data or user changes.
   const role = useMemo(() => getRole(), [data, user])
+  
+
+
+  const utils = trpc.useUtils();
+  const mutation = trpc.projects.createProjectJoinRequest.useMutation({
+    onSuccess(){
+      console.log("Request Created");
+      utils.projects.getAllPendingRequests.invalidate();
+      toast.success("Requested!");
+    }
+  })
+
+  function handleJoinReqSubmit(e : React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    if(!user) return;
+    if(!projectId) return;
+    console.log("mutating");
+    mutation.mutate({
+      projectId: projectId,
+      userId: user.id
+    })
+  }
+
+
+  const requestData = trpc.projects.getAllPendingRequests.useQuery(projectId);
+
+  if(requestData.data != undefined) {
+    console.log(requestData.data);
+  }
+  
 
   if (!data) return <div>User not found</div>
 
@@ -226,7 +260,10 @@ export default function Project() {
       <div className="flex justify-between mt-6">
         {showModal && (
           <div className="absolute w-screen h-screen bg-zinc-200 bg-opacity-75 top-0 left-0 flex items-center justify-center">
-            <fetcher.Form method="POST">
+            <Form 
+              method="POST"
+              onSubmit={handleJoinReqSubmit}
+            >
               <label
                 htmlFor="textAreaProj"
                 className="text-2xl font-semibold mb-2 w-full flex justify-between"
@@ -261,8 +298,18 @@ export default function Project() {
               <input type="hidden" value={data.ownerId} name="ownerId" />
               <input type="hidden" value={data.title} name="projectTitle" />
               <input type="hidden" value={data.imageUrl} name="imageUrl" />
-              <SubmitFetcherBtn fetcher={fetcher} message="Send join request" />
-            </fetcher.Form>
+              <button
+                type="submit"
+                className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
+                disabled={fetcher.state === "submitting"}
+              >
+                {mutation.isLoading ? (
+                  <Spinner color="white" />
+                ) : (
+                  <p className="py-2">Join</p>
+                )}
+              </button>
+            </Form>
           </div>
         )}
 

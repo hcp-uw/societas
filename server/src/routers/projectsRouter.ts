@@ -1,21 +1,20 @@
-import { z } from "zod"
-import { authedProcedure, publicProcedure, router } from "../trpc"
-import { TRPCError } from "@trpc/server"
+import { z } from "zod";
+import { authedProcedure, publicProcedure, router } from "../trpc";
 
 export const projectsRouter = router({
-  getAll: publicProcedure.query(async ({ ctx }) => {
+  getAll: authedProcedure.query(async ({ ctx }) => {
     const projects = await ctx.db.project.findMany({
       take: 5,
-    })
-    return projects
+    });
+    return projects;
   }),
 
-  getById: authedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.project.findFirst({
       where: {
         id: input,
       },
-    })
+    });
   }),
 
   getByUserId: authedProcedure
@@ -25,10 +24,10 @@ export const projectsRouter = router({
         where: {
           ownerId: input,
         },
-      })
+      });
     }),
 
-  createProjectJoinRequest: authedProcedure
+  createProjectJoinRequest: publicProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -36,18 +35,11 @@ export const projectsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const existing = ctx.db.memberships.findFirst({
-        where: input,
-      })
-
-      if (existing == null) {
-        ctx.db.memberships.create({ data: input })
-      } else {
-        // throw error code
-      }
+      // if already exists, will throw invalid invocation error
+      await ctx.db.memberships.create({ data: input });
     }),
 
-  getAllPendingRequests: authedProcedure
+  getAllPendingRequests: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.memberships.findMany({
@@ -58,7 +50,7 @@ export const projectsRouter = router({
         select: {
           projectId: true,
         },
-      })
+      });
     }),
 
   // must be owner
@@ -72,7 +64,7 @@ export const projectsRouter = router({
         data: {
           status: "ACCEPTED",
         },
-      })
+      });
     }),
 
   // must be owner
@@ -92,7 +84,7 @@ export const projectsRouter = router({
         data: {
           status: "REJECTED",
         },
-      })
+      });
     }),
 
   // must be owner
@@ -108,7 +100,7 @@ export const projectsRouter = router({
         where: {
           projectId_userId: input,
         },
-      })
+      });
     }),
 
   getPosts: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -116,7 +108,7 @@ export const projectsRouter = router({
       where: {
         projectId: input,
       },
-    })
+    });
   }),
 
   // must be owner
@@ -129,7 +121,7 @@ export const projectsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.post.create({ data: input })
+      await ctx.db.post.create({ data: input });
     }),
 
   create: publicProcedure
@@ -144,9 +136,9 @@ export const projectsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        await ctx.db.project.create({ data: input })
+        await ctx.db.project.create({ data: input });
       } catch (e) {
-        console.log("here")
+        console.log("here");
       }
     }),
-})
+});
