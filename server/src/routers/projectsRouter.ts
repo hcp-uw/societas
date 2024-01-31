@@ -1,20 +1,57 @@
-import { z } from "zod";
-import { authedProcedure, publicProcedure, router } from "../trpc";
+import { z } from "zod"
+import { authedProcedure, publicProcedure, router } from "../trpc"
+import { TRPCError } from "@trpc/server"
+import { MembershipStatus } from "@prisma/client"
 
 export const projectsRouter = router({
-  getAll: authedProcedure.query(async ({ ctx }) => {
+  getAll: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.db.project.findMany({
       take: 5,
-    });
-    return projects;
+    })
+    return projects
   }),
 
-  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    return await ctx.db.project.findFirst({
+  getById: authedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const userId = ""
+    const data = await ctx.db.project.findFirst({
       where: {
         id: input,
       },
-    });
+      include: {
+        memberships: true,
+      },
+    })
+
+    const membershipts  = await ctx.db.memberships
+
+    if(!data) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "No project has corresponding id"
+      })
+    }
+
+    let role = "none"
+    const memberShipStatus = data?.memberships.find(
+      (mem) => mem.userId === userId
+    )
+    if (data?.ownerId == userId) {
+      role = "owner"
+    } else if (memberShipStatus && memberShipStatus.status == "ACCEPTED") {
+      role = "participant"
+    } else if (memberShipStatus && memberShipStatus.status == "PENDING") {
+      role = "requestant"
+    }
+
+    if (data && data.memberships) {
+      delete data.memberships;
+    }
+
+    return {
+      createdAt: data?.createdAt
+
+      ...data.
+    }
   }),
 
   getByUserId: authedProcedure
@@ -24,10 +61,10 @@ export const projectsRouter = router({
         where: {
           ownerId: input,
         },
-      });
+      })
     }),
 
-  createProjectJoinRequest: publicProcedure
+  createProjectJoinRequest: authedProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -35,22 +72,15 @@ export const projectsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // if already exists, will throw invalid invocation error
-      await ctx.db.memberships.create({ data: input });
-    }),
+      const existing = ctx.db.memberships.findFirst({
+        where: input,
+      })
 
-  getAllPendingRequests: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      return await ctx.db.memberships.findMany({
-        where: {
-          userId: input,
-          status: "PENDING",
-        },
-        select: {
-          projectId: true,
-        },
-      });
+      if (existing == null) {
+        ctx.db.memberships.create({ data: input })
+      } else {
+        // throw error code
+      }
     }),
 
   // must be owner
@@ -64,7 +94,7 @@ export const projectsRouter = router({
         data: {
           status: "ACCEPTED",
         },
-      });
+      })
     }),
 
   // must be owner
@@ -84,7 +114,7 @@ export const projectsRouter = router({
         data: {
           status: "REJECTED",
         },
-      });
+      })
     }),
 
   // must be owner
@@ -100,7 +130,7 @@ export const projectsRouter = router({
         where: {
           projectId_userId: input,
         },
-      });
+      })
     }),
 
   getPosts: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -108,7 +138,7 @@ export const projectsRouter = router({
       where: {
         projectId: input,
       },
-    });
+    })
   }),
 
   // must be owner
@@ -121,7 +151,7 @@ export const projectsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.post.create({ data: input });
+      await ctx.db.post.create({ data: input })
     }),
 
   create: publicProcedure
@@ -136,9 +166,9 @@ export const projectsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        await ctx.db.project.create({ data: input });
+        await ctx.db.project.create({ data: input })
       } catch (e) {
-        console.log("here");
+        console.log("here")
       }
     }),
-});
+})
