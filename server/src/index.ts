@@ -2,9 +2,11 @@ import { createTRPCContext, publicProcedure, router } from "./trpc"
 import { createHTTPServer } from "@trpc/server/adapters/standalone"
 import cors from "cors"
 import { projectsRouter } from "./routers/projectsRouter"
+import { membershipsRouter } from "./routers/membershipsRouter"
 
 const appRouter = router({
   projects: projectsRouter,
+  memberships: membershipsRouter,
 })
 // Export type router type signature,
 // NOT the router itself.

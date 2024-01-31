@@ -163,7 +163,12 @@ function useGetProjectData() {
 }
 
 export default function Project() {
+  // const { projectId } = useParams()
   const { data, isLoading, isError, projectId } = useGetProjectData()
+  const { data: role, isLoading: isRoleLoading } =
+    trpc.memberships.getRole.useQuery({
+      projectId: projectId ?? "",
+    })
   const { user } = useUser()
   // const fetcher = useFetcher()
 
@@ -178,7 +183,7 @@ export default function Project() {
       onSuccess() {
         console.log("Request Created")
         setShowModal(false)
-        utils.projects.getAllPendingRequests.invalidate()
+        utils.memberships.getAllPendingRequests.invalidate()
         toast.success("Requested!")
       },
     })
@@ -194,7 +199,7 @@ export default function Project() {
     })
   }
 
-  const requestData = trpc.projects.getAllPendingRequests.useQuery(
+  const requestData = trpc.memberships.getAllPendingRequests.useQuery(
     projectId ?? ""
   )
 
@@ -286,9 +291,9 @@ export default function Project() {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={createJoinReqMutation.isPending}
+                disabled={createJoinReqMutation.isLoading}
               >
-                {createJoinReqMutation.isPending ? (
+                {createJoinReqMutation.isLoading ? (
                   <Spinner color="white" />
                 ) : (
                   <p className="py-2">Join</p>
@@ -328,13 +333,7 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              <button
-                className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
-                onClick={() => setShowModal(true)}
-              >
-                Join
-              </button>
-              {/* {role === "owner" ? (
+              {data.ownerId === user?.id ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
@@ -343,18 +342,18 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : role === "none" ? (
+              ) : !role ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
                 >
                   Join
                 </button>
-              ) : role === "requestant" ? (
+              ) : role.status === "PENDING" ? (
                 <div className="py-1 px-6 bg-zinc-200 rounded-lg cursor-default">
                   Requested
                 </div>
-              ) : role === "member" ? (
+              ) : role.status === "ACCEPTED" ? (
                 <>
                   <Form method="post" action="leaveProject">
                     <input
@@ -373,7 +372,7 @@ export default function Project() {
                 </>
               ) : (
                 <div>Log in to join!</div>
-              )} */}
+              )}
             </div>
           </nav>
           {/* <Outlet /> */}

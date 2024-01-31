@@ -12,46 +12,38 @@ export const projectsRouter = router({
   }),
 
   getById: authedProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const userId = ""
     const data = await ctx.db.project.findFirst({
       where: {
         id: input,
       },
-      include: {
-        memberships: true,
-      },
     })
 
-    const membershipts  = await ctx.db.memberships
+    // const membershipts  = await ctx.db
 
-    if(!data) {
+    if (!data) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "No project has corresponding id"
+        message: "No project has corresponding id",
       })
     }
 
-    let role = "none"
-    const memberShipStatus = data?.memberships.find(
-      (mem) => mem.userId === userId
-    )
-    if (data?.ownerId == userId) {
-      role = "owner"
-    } else if (memberShipStatus && memberShipStatus.status == "ACCEPTED") {
-      role = "participant"
-    } else if (memberShipStatus && memberShipStatus.status == "PENDING") {
-      role = "requestant"
-    }
+    // let role = "none"
+    // const memberShipStatus = data?.memberships.find(
+    //   (mem) => mem.userId === userId
+    // )
+    // if (data?.ownerId == userId) {
+    //   role = "owner"
+    // } else if (memberShipStatus && memberShipStatus.status == "ACCEPTED") {
+    //   role = "participant"
+    // } else if (memberShipStatus && memberShipStatus.status == "PENDING") {
+    //   role = "requestant"
+    // }
 
-    if (data && data.memberships) {
-      delete data.memberships;
-    }
+    // if (data && data.memberships) {
+    //   delete data.memberships;
+    // }
 
-    return {
-      createdAt: data?.createdAt
-
-      ...data.
-    }
+    return data
   }),
 
   getByUserId: authedProcedure
