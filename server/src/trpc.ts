@@ -10,6 +10,7 @@ function createContextInner(opts: CreateHTTPContextOptions) {
     auth: {
       // session: opts.req.headers.authorization,
       authorization: opts.req.headers.authorization as string,
+      userId: opts.req.headers.userId as string,
     },
   };
 }
@@ -42,6 +43,7 @@ const enforeceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
     ctx: {
       auth: {
         authorization: ctx.auth.authorization,
+        userId: ctx.auth.userId,
       },
     },
   });
