@@ -1,4 +1,4 @@
-//import { getAllProjects } from "../firebase"
+import { getAllProjects } from "../firebase"
 import { useUser } from "@clerk/clerk-react"
 import { useQuery, type QueryClient } from "@tanstack/react-query"
 import Spinner from "../components/Spinner"
@@ -7,17 +7,17 @@ import { LoaderFunction } from "react-router-dom"
 import { trpc } from "../utils/trpc"
 
 const projectsQuery = () => ({
-  // queryKey: ["projects"],
-  // queryFn: () => getAllProjects(),
+  queryKey: ["projects"],
+  queryFn: () => getAllProjects(),
 })
 
 //loader - checks if query data is null or not and if it is it fetches it.
 export const loader =
   (queryClient: QueryClient): LoaderFunction =>
   async () => {
-    // if (!queryClient.getQueryData(projectsQuery().queryKey)) {
-    //   return await queryClient.fetchQuery(projectsQuery())
-    // }
+    if (!queryClient.getQueryData(projectsQuery().queryKey)) {
+      return await queryClient.fetchQuery(projectsQuery())
+    }
     return null
   }
 

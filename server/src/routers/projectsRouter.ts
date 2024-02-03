@@ -11,7 +11,7 @@ export const projectsRouter = router({
     return projects
   }),
 
-  getById: authedProcedure.input(z.string()).query(async ({ ctx, input }) => {
+  getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const data = await ctx.db.project.findFirst({
       where: {
         id: input,
@@ -56,24 +56,7 @@ export const projectsRouter = router({
       })
     }),
 
-  createProjectJoinRequest: authedProcedure
-    .input(
-      z.object({
-        projectId: z.string(),
-        userId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const existing = ctx.db.memberships.findFirst({
-        where: input,
-      })
-
-      if (existing == null) {
-        ctx.db.memberships.create({ data: input })
-      } else {
-        // throw error code
-      }
-    }),
+  
 
   // must be owner
   acceptRequest: authedProcedure
@@ -125,6 +108,21 @@ export const projectsRouter = router({
       })
     }),
 
+  
+  leaveProject: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const memberToDelete = {
+        projectId: input, 
+        userId: ctx.auth.userId
+      }
+      await ctx.db.memberships.delete({
+        where: {
+          projectId_userId: memberToDelete
+        },
+      })
+    }),
+
   getPosts: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.post.findMany({
       where: {
@@ -163,4 +161,6 @@ export const projectsRouter = router({
         console.log("here")
       }
     }),
+
+    
 })
