@@ -58,40 +58,7 @@ export const projectsRouter = router({
 
   
 
-  // must be owner
-  acceptRequest: authedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          id: input,
-        },
-        data: {
-          status: "ACCEPTED",
-        },
-      })
-    }),
-
-  // must be owner
-  rejectRequest: authedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        projectId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          projectId_userId: input,
-          status: "PENDING",
-        },
-        data: {
-          status: "REJECTED",
-        },
-      })
-    }),
-
+  
   // must be owner
   kickUser: authedProcedure
     .input(
