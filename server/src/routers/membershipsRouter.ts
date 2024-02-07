@@ -4,16 +4,40 @@ import { MembershipStatus, Memberships } from "@prisma/client"
 
 export const membershipsRouter = router({
 
-  createProjectJoinRequest: publicProcedure
+  sendProjectJoinRequest: publicProcedure
     .input(
       z.object({
         projectId: z.string(),
         ownerId: z.string(),
         userId: z.string(),
+        description: z.optional(z.string()),
+        role: z.optional(z.object({
+          status: z.string(),
+          id: z.string()
+        }))
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.create({ data: input})
+      if(!input.role){
+        await ctx.db.memberships.create({ 
+          data: {
+            projectId: input.projectId,
+            ownerId: input.ownerId,
+            userId: input.userId,
+            description: input.description
+          }
+        })
+      }else if(input.role.status === "REJECTED"){
+        await ctx.db.memberships.update({
+          where: {
+            id: input.role.id
+          },
+          data:{
+            status: "PENDING",
+            description: input.description
+          }
+        })
+      }
     }),
   
   
@@ -89,19 +113,7 @@ export const membershipsRouter = router({
       })
     }),
   
-  updateProjectJoinRequest: publicProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          id: input
-        },
-        data:{
-          status: "PENDING"
-        }
-      })
-    }),
-
+  
   // must be owner
   rejectRequest: publicProcedure
     .input(z.string())

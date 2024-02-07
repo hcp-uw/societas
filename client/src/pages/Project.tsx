@@ -174,8 +174,8 @@ export default function Project() {
   const utils = trpc.useUtils()
 
 
-  const createJoinReqMutation =
-    trpc.memberships.createProjectJoinRequest.useMutation({
+  const sendJoinReqMutation =
+    trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
         console.log("Request Created")
         setShowModal(false)
@@ -184,30 +184,36 @@ export default function Project() {
       },
     })
 
-  const updateJoinReqMutation = trpc.memberships.updateProjectJoinRequest.useMutation({
-    onSuccess() {
-      console.log("Request Created")
-      setShowModal(false)
-      utils.memberships.getRole.invalidate(projectId);
-      toast.success("Requested!")
-    },
-  })
 
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
+
     e.preventDefault()
     if (!projectId) return
     if (!data) return
     if (!user) return
-    console.log(user?.id)
-    console.log("mutating")
+    const formData = new FormData(e.currentTarget)
+    
+    const description = formData.get("description") as string
+
+
     if(!role){
-      createJoinReqMutation.mutate({
+      sendJoinReqMutation.mutate({
         projectId: projectId,
         ownerId: data.ownerId,
         userId: user?.id,
+        description: description,
       })
     }else if(role.status === "REJECTED"){
-      updateJoinReqMutation.mutate(role.id);
+      sendJoinReqMutation.mutate({
+        projectId: projectId,
+        ownerId: data.ownerId,
+        userId: user?.id,
+        description: description,
+        role: {
+          status: role.status,
+          id: role.id
+        }
+      })
     }
   }
 
@@ -310,7 +316,7 @@ export default function Project() {
                 className="w-full"
                 cols={10}
                 rows={10}
-                name="message"
+                name="description"
               />
               <input type="hidden" value={projectId} name="projectId" />
               <input
@@ -324,10 +330,9 @@ export default function Project() {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={ (!role || role.status !== "REJECTED") 
-                              ? createJoinReqMutation.isLoading : updateJoinReqMutation.isLoading}
+                disabled={sendJoinReqMutation.isLoading}
               >
-                {createJoinReqMutation.isLoading ? (
+                {sendJoinReqMutation.isLoading ? (
                   <Spinner color="white" />
                 ) : (
                   <p className="py-2">Join</p>

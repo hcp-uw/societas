@@ -123,7 +123,7 @@ export default function Requests() {
           <img src={""} alt="" width={200} height={200} />
           <div className="">
             <p className="text-sm text-zinc-600">
-              {request.createdAt}
+              {dayjjs(request.createdAt).toDate().toLocaleDateString()}
             </p>
             <h1 className="text-2xl font-bold text-zinc-800 mb-5">
               {request.description}
