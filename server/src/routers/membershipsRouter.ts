@@ -30,19 +30,15 @@ export const membershipsRouter = router({
         },
       })
     }),
-  getRole: authedProcedure
-    .input(
-      z.object({
-        projectId: z.string(),
-      })
-    )
+  getRole: publicProcedure
+    .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.memberships.findFirst({
         where: {
-          projectId: input.projectId,
+          projectId: input,
           userId: ctx.auth.userId,
         },
       })
-      ctx.auth.userId
+
     }),
 })

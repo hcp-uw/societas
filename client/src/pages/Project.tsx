@@ -156,6 +156,7 @@ function useGetProjectData() {
   const { projectId } = useParams()
   const query = trpc.projects.getById.useQuery(projectId ?? "")
 
+
   return {
     projectId,
     ...query,
@@ -165,10 +166,9 @@ function useGetProjectData() {
 export default function Project() {
   // const { projectId } = useParams()
   const { data, isLoading, isError, projectId } = useGetProjectData()
+
   const { data: role, isLoading: isRoleLoading } =
-    trpc.memberships.getRole.useQuery({
-      projectId: projectId ?? "",
-    })
+    trpc.memberships.getRole.useQuery(projectId ?? "")
   const { user } = useUser()
   // const fetcher = useFetcher()
 
@@ -243,6 +243,7 @@ export default function Project() {
         <Spinner size="4rem" />
       </div>
     )
+    
 
   if (!data) return <div>Project was not found</div>
 
@@ -503,9 +504,22 @@ export function CreatePost() {
 }
 
 export function ProjectInfo() {
-  const { data, isLoading } = useGetProjectData()
+  // const { dataImage} = useGetProjectData()
+  // const dataImageURL = dataImage.imageUrl;
+  console.log("hi, project info")
+  const dataImageURL = "null image"
+  // console.log("project info data", data)
+ const { projectId } = useGetProjectData()
+  // const { projectId } = useParams(); 
+  const { data, isLoading, error } = trpc.projects.getById.useQuery(projectId ?? '', {
+  });
+
+
+  console.log("project info: ", data)
 
   if (isLoading) return <div>loading</div>
+
+  if (error) return <div>Error: {error.message}</div>;
 
   if (!data) return <div>something went wrong, Try again!</div>
 
@@ -523,17 +537,17 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Start Date:
           </span>
-          {data.startDate}
+          {data.createdAt}
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>
-          {dayjjs(data.createdAt.toDate()).fromNow()}
+          {dayjjs(data.createdAt).fromNow()}
         </p>
       </div>
       <img
-        src={data.imageUrl}
+        src={dataImageURL}
         alt=""
         width={400}
         height={400}
@@ -548,6 +562,8 @@ export function ProjectPostsLayout() {
   const { data, isLoading, isError } = useQuery(
     projectPostsQuery(projectId ?? "")
   )
+
+  console.log("project info: ", data)
   const navigate = useNavigate()
 
   useEffect(() => {
