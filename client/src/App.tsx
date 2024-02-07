@@ -13,6 +13,7 @@ import { httpBatchLink } from "@trpc/client";
 
 export default function App({ queryClient }: { queryClient: QueryClient }) {
   const { getToken, userId } = useAuth();
+  
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [

@@ -27,22 +27,6 @@ export const projectsRouter = router({
       })
     }
 
-    // let role = "none"
-    // const memberShipStatus = data?.memberships.find(
-    //   (mem) => mem.userId === userId
-    // )
-    // if (data?.ownerId == userId) {
-    //   role = "owner"
-    // } else if (memberShipStatus && memberShipStatus.status == "ACCEPTED") {
-    //   role = "participant"
-    // } else if (memberShipStatus && memberShipStatus.status == "PENDING") {
-    //   role = "requestant"
-    // }
-
-    // if (data && data.memberships) {
-    //   delete data.memberships;
-    // }
-
     return data
   }),
 
@@ -75,20 +59,6 @@ export const projectsRouter = router({
       })
     }),
 
-  
-  leaveProject: publicProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      const memberToDelete = {
-        projectId: input, 
-        userId: ctx.auth.userId
-      }
-      await ctx.db.memberships.delete({
-        where: {
-          projectId_userId: memberToDelete
-        },
-      })
-    }),
 
   getPosts: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.post.findMany({

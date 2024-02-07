@@ -143,11 +143,11 @@ export const leaveProjectAction =
     })
     const inputs = inputsSchema.parse(Object.fromEntries(formData))
     if (confirm("Are you sure you want to leave this project?")) {
-      await removeUser(inputs.userId, inputs.projectId)
-      queryClient.invalidateQueries({
-        queryKey: ["projects", inputs.projectId],
-      })
-      toast.success("Left Project")
+      // await removeUser(inputs.userId, inputs.projectId)
+      // queryClient.invalidateQueries({
+      //   queryKey: ["projects", inputs.projectId],
+      // })
+      // toast.success("Left Project")
     }
     return redirect(`/${inputs.projectId}`)
   }
@@ -184,6 +184,15 @@ export default function Project() {
       },
     })
 
+  const updateJoinReqMutation = trpc.memberships.updateProjectJoinRequest.useMutation({
+    onSuccess() {
+      console.log("Request Created")
+      setShowModal(false)
+      utils.memberships.getRole.invalidate(projectId);
+      toast.success("Requested!")
+    },
+  })
+
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!projectId) return
@@ -191,11 +200,15 @@ export default function Project() {
     if (!user) return
     console.log(user?.id)
     console.log("mutating")
-    createJoinReqMutation.mutate({
-      projectId: projectId,
-      ownerId: data.ownerId,
-      userId: user?.id
-    })
+    if(!role){
+      createJoinReqMutation.mutate({
+        projectId: projectId,
+        ownerId: data.ownerId,
+        userId: user?.id,
+      })
+    }else if(role.status === "REJECTED"){
+      updateJoinReqMutation.mutate(role.id);
+    }
   }
 
   const requestData = trpc.memberships.getAllPendingRequests.useQuery(
@@ -207,10 +220,9 @@ export default function Project() {
   }
 
 
-  const leaveProjectMutation = trpc.projects.leaveProject.useMutation({
+  const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
     onSuccess(){
       console.log("Left Project");
-      utils.memberships.getAllUserMemberships.invalidate();
       utils.memberships.getRole.invalidate();
       toast.success("Left Project")
     }
@@ -219,7 +231,12 @@ export default function Project() {
   function handleLeaveReq(e: React.FormEvent<HTMLFormElement>){
     e.preventDefault();
     if(!user || !projectId) return;
-    leaveProjectMutation.mutate(projectId);    
+    if (confirm("Are you sure you want to leave this project?")){ 
+      leaveProjectMutation.mutate({
+        projectId: projectId,
+        userId: user?.id
+      });    
+    }
   }
 
 
@@ -307,7 +324,7 @@ export default function Project() {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={false}
+                disabled={createJoinReqMutation.isLoading}
               >
                 {createJoinReqMutation.isLoading ? (
                   <Spinner color="white" />
@@ -358,7 +375,7 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : !role ? (
+              ) : !role || role.status === "REJECTED"? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
