@@ -1,0 +1,25 @@
+.slick-dots li button:before {
+    font-size: 12px; 
+    color: blue; 
+}
+
+.my-slider .slick-prev, .my-slider .slick-next {
+    top: 50%; 
+    transform: translateY(-50%); 
+}
+
+.my-slider .slick-prev:before, .my-slider .slick-next:before {
+    font-size: 30px;
+    color: white;
+}
+
+/* Or if you use an id for the slider container */
+#my-slider .slick-prev:before, #my-slider .slick-next:before {
+    font-size: 30px;
+    color: white;
+}
+
+.slick-prev:before, .slick-next:before {
+    font-size: 30px !important; 
+    color: white !important;
+}

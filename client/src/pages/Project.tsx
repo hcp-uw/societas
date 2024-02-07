@@ -28,6 +28,7 @@ import Markdown from "react-markdown"
 import { useMemo } from "react"
 import { z } from "zod"
 import { trpc } from "../utils/trpc"
+import ProjectInfoComponent from '../components/ProjectInfoComponent/ProjectInfoComponent';
 
 dayjjs.extend(relativeTime)
 
@@ -166,6 +167,7 @@ function useGetProjectData() {
 export default function Project() {
   // const { projectId } = useParams()
   const { data, isLoading, isError, projectId } = useGetProjectData()
+  console.log("project: ", data)
 
   const { data: role, isLoading: isRoleLoading } =
     trpc.memberships.getRole.useQuery(projectId ?? "")
@@ -394,7 +396,7 @@ export default function Project() {
               )}
             </div>
           </nav>
-          {/* <Outlet /> */}
+          <Outlet />
         </div>
       </div>
     </>
@@ -522,15 +524,29 @@ export function CreatePost() {
 }
 
 export function ProjectInfo() {
-  // const { dataImage} = useGetProjectData()
-  // const dataImageURL = dataImage.imageUrl;
-  console.log("hi, project info")
-  const dataImageURL = "null image"
-  // console.log("project info data", data)
- const { projectId } = useGetProjectData()
-  // const { projectId } = useParams(); 
-  const { data, isLoading, error } = trpc.projects.getById.useQuery(projectId ?? '', {
-  });
+  const { data, isLoading, isError, projectId, error} = useGetProjectData()
+
+  const imageURLs = ["https://i.natgeofe.com/k/ad9b542e-c4a0-4d0b-9147-da17121b4c98/MOmeow1_square.png", "https://www.southernliving.com/thmb/Rz-dYEhwq_82C5_Y9GLH2ZlEoYw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/gettyimages-837898820-1-4deae142d4d0403dbb6cb542bfc56934.jpg", "https://th-thumbnailer.cdn-si-edu.com/C4MIxDa_YxisZm2EtoTNHweBKZU=/fit-in/1600x0/filters:focal(3126x2084:3127x2085)/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer_public/ec/e6/ece69181-708a-496e-b2b7-eaf7078b99e0/gettyimages-1310156391.jpg"];
+
+
+  const mockLabels = [
+    { text: 'Urgent', color: '#FFA07A' },
+    { text: 'New', color: '#8FFef3' },
+    { text: 'High Priority', color: '#FA8072' }
+  ];
+
+  
+
+  const mockProjectData = {
+    description: 'This is a description of the event...',
+    name: 'Event Title',
+    meetType: 'In-person',
+    ownerId: 'owner123',
+    meetLocation: 'New York',
+    id: 'project123',
+    createdAt: '2021-09-01T12:00:00.000Z',
+    updatedAt: '2021-09-01T12:00:00.000Z',
+  };
 
 
   console.log("project info: ", data)
@@ -542,37 +558,10 @@ export function ProjectInfo() {
   if (!data) return <div>something went wrong, Try again!</div>
 
   return (
-    <div className="flex justify-between w-full gap-16">
-      <div className="flex flex-col gap-4">
-        <p className="text-zinc-800 leading-7">{data.description} </p>
-        <p>
-          <span className="underline font-semibold mr-3 underline-offset-4">
-            Meet Location:
-          </span>
-          {data.meetLocation}
-        </p>
-        <p className="capitalize">
-          <span className="underline font-semibold mr-3 underline-offset-4">
-            Start Date:
-          </span>
-          {data.createdAt}
-        </p>
-        <p className="capitalize">
-          <span className="underline font-semibold mr-3 underline-offset-4">
-            Posted:
-          </span>
-          {dayjjs(data.createdAt).fromNow()}
-        </p>
-      </div>
-      <img
-        src={"" /*to fix later*/}
-        alt=""
-        width={400}
-        height={400}
-        className="rounded-lg"
-      />
+    <div>
+      <ProjectInfoComponent data={mockProjectData} labels={mockLabels} imageUrls={imageURLs}/>
     </div>
-  )
+  );
 }
 
 export function ProjectPostsLayout() {
