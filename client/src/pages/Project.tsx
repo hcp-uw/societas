@@ -568,7 +568,7 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>
-          {"hello how are"}
+          {dayjjs(data.createdAt).fromNow()}
         </p>
       </div>
       <img
