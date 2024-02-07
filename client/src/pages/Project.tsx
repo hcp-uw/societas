@@ -307,7 +307,7 @@ export default function Project() {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={false}
+                disabled={createJoinReqMutation.isLoading}
               >
                 {createJoinReqMutation.isLoading ? (
                   <Spinner color="white" />
