@@ -35,8 +35,8 @@ model Post {
   id        String   @id @default(uuid())
   title     String
   content   String
-  createAt  DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
@@ -44,16 +44,18 @@ model Post {
 }
 
 model Memberships {
-  id        String           @id @default(uuid())
-  createAt  DateTime         @default(now())
-  updateAt  DateTime         @updatedAt
-  projectId String
-  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  userId    String
+  id          String           @id @default(uuid())
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  ownerId     String
   // user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status    MembershipStatus @default(PENDING)
+  status      MembershipStatus @default(PENDING)
   // User      User             @relation(fields: [userId], references: [id])
   // User      User             @relation(fields: [userId], references: [id])
+  description String?
 
   @@unique([projectId, userId])
   @@index([projectId])

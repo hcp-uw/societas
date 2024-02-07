@@ -115,7 +115,7 @@ export default function CreateProj() {
         formState={formState}
         setFormState={setFormState}
         isFormValid={isFormValid}
-        loading={mutation.isPending}
+        loading={mutation.isLoading}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}

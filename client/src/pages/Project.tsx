@@ -78,35 +78,35 @@ export const postLoader =
     )
   }
 // send request
-export const action =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    //get form data and parse it thorugh to inputsSchema.
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      projectId: z.string(),
-      imageUrl: z.string(),
-      message: z.string(),
-      ownerId: z.string(),
-      projectTitle: z.string(),
-      requestantId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    // await createProjectJoinRequest({
-    //   projectId: inputs.projectId,
-    //   imageUrl: inputs.imageUrl,
-    //   message: inputs.message,
-    //   ownerId: inputs.ownerId,
-    //   projectTitle: inputs.projectTitle,
-    //   requestantId: inputs.requestantId,
-    // })
+// export const action =
+//   (queryClient: QueryClient) =>
+//   async ({ request }: ActionFunctionArgs) => {
+//     //get form data and parse it thorugh to inputsSchema.
+//     const formData = await request.formData()
+//     const inputsSchema = z.object({
+//       projectId: z.string(),
+//       imageUrl: z.string(),
+//       message: z.string(),
+//       ownerId: z.string(),
+//       projectTitle: z.string(),
+//       requestantId: z.string(),
+//     })
+//     const inputs = inputsSchema.parse(Object.fromEntries(formData))
+//     // await createProjectJoinRequest({
+//     //   projectId: inputs.projectId,
+//     //   imageUrl: inputs.imageUrl,
+//     //   message: inputs.message,
+//     //   ownerId: inputs.ownerId,
+//     //   projectTitle: inputs.projectTitle,
+//     //   requestantId: inputs.requestantId,
+//     // })
 
-    //when done invalidate queries and update them.
-    queryClient.invalidateQueries({
-      queryKey: ["projects", inputs.projectId, "info"],
-    })
-    return null
-  }
+//     //when done invalidate queries and update them.
+//     queryClient.invalidateQueries({
+//       queryKey: ["projects", inputs.projectId, "info"],
+//     })
+//     return null
+//   }
 
 //same process as above just creating a post in this case and
 //updating a different query.
@@ -166,36 +166,35 @@ export default function Project() {
   // const { projectId } = useParams()
   const { data, isLoading, isError, projectId } = useGetProjectData()
   const { data: role, isLoading: isRoleLoading } =
-    trpc.memberships.getRole.useQuery({
-      projectId: projectId ?? "",
-    })
+    trpc.memberships.getRole.useQuery(projectId ?? "")
   const { user } = useUser()
   // const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false)
-
-  //get and store role whenever data or user changes.
-  // const role = useMemo(() => getRole(), [data, user])
-
   const utils = trpc.useUtils()
+
+
   const createJoinReqMutation =
-    trpc.projects.createProjectJoinRequest.useMutation({
+    trpc.memberships.createProjectJoinRequest.useMutation({
       onSuccess() {
         console.log("Request Created")
         setShowModal(false)
-        utils.memberships.getAllPendingRequests.invalidate()
+        utils.memberships.getRole.invalidate(projectId);
         toast.success("Requested!")
       },
     })
 
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!user) return
     if (!projectId) return
+    if (!data) return
+    if (!user) return
+    console.log(user?.id)
     console.log("mutating")
     createJoinReqMutation.mutate({
       projectId: projectId,
-      userId: user.id,
+      ownerId: data.ownerId,
+      userId: user?.id
     })
   }
 
@@ -206,6 +205,23 @@ export default function Project() {
   if (requestData.data != undefined) {
     console.log(requestData.data)
   }
+
+
+  const leaveProjectMutation = trpc.projects.leaveProject.useMutation({
+    onSuccess(){
+      console.log("Left Project");
+      utils.memberships.getAllUserMemberships.invalidate();
+      utils.memberships.getRole.invalidate();
+      toast.success("Left Project")
+    }
+  });
+
+  function handleLeaveReq(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    if(!user || !projectId) return;
+    leaveProjectMutation.mutate(projectId);    
+  }
+
 
   // function getRole() {
   //   if (!data || !user) return
@@ -355,7 +371,7 @@ export default function Project() {
                 </div>
               ) : role.status === "ACCEPTED" ? (
                 <>
-                  <Form method="post" action="leaveProject">
+                  <Form method="post" onSubmit={handleLeaveReq}>
                     <input
                       type="hidden"
                       value={user ? user.id : ""}
@@ -523,7 +539,7 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Start Date:
           </span>
-          {data.startDate}
+          {data.createdAt}
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
@@ -533,7 +549,7 @@ export function ProjectInfo() {
         </p>
       </div>
       <img
-        src={data.imageUrl}
+        src={"" /*to fix later*/}
         alt=""
         width={400}
         height={400}
