@@ -66,8 +66,8 @@ const router = createBrowserRouter([
       {
         path: ":projectId",
         element: <Project />,
-        loader: projectInfoLoader(queryClient),
-        action: reqAction(queryClient),
+        // loader: projectInfoLoader(queryClient),
+        // action: reqAction(queryClient),
         children: [
           {
             index: true,
@@ -81,7 +81,7 @@ const router = createBrowserRouter([
           {
             path: "posts",
             element: <ProjectPostsLayout />,
-            loader: projectPostsLoader(queryClient),
+            // loader: projectPostsLoader(queryClient),
             children: [
               {
                 path: ":postId",

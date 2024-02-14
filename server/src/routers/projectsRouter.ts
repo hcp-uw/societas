@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { authedProcedure, publicProcedure, router } from "../trpc"
 import { TRPCError } from "@trpc/server"
+import { MembershipStatus } from "@prisma/client"
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -11,11 +12,22 @@ export const projectsRouter = router({
   }),
 
   getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    return await ctx.db.project.findFirst({
+    const data = await ctx.db.project.findFirst({
       where: {
         id: input,
       },
     })
+
+    // const membershipts  = await ctx.db
+
+    if (!data) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "No project has corresponding id",
+      })
+    }
+
+    return data
   }),
 
   getByUserId: authedProcedure
@@ -28,65 +40,9 @@ export const projectsRouter = router({
       })
     }),
 
-  createProjectJoinRequest: publicProcedure
-    .input(
-      z.object({
-        projectId: z.string(),
-        userId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.create({ data: input })
-    }),
+  
 
-  getAllPendingRequests: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      return await ctx.db.memberships.findMany({
-        where: {
-          userId: input,
-          status: "PENDING",
-        },
-        select: {
-          projectId: true,
-        },
-      })
-    }),
-
-  // must be owner
-  acceptRequest: publicProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          id: input,
-        },
-        data: {
-          status: "ACCEPTED",
-        },
-      })
-    }),
-
-  // must be owner
-  rejectRequest: authedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        projectId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          projectId_userId: input,
-          status: "PENDING",
-        },
-        data: {
-          status: "REJECTED",
-        },
-      })
-    }),
-
+  
   // must be owner
   kickUser: authedProcedure
     .input(
@@ -102,6 +58,7 @@ export const projectsRouter = router({
         },
       })
     }),
+
 
   getPosts: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.post.findMany({
@@ -141,4 +98,6 @@ export const projectsRouter = router({
         console.log("here")
       }
     }),
+
+    
 })
