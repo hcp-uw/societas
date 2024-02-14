@@ -13,12 +13,12 @@ import { httpBatchLink } from "@trpc/client";
 
 export default function App({ queryClient }: { queryClient: QueryClient }) {
   const { getToken, userId } = useAuth();
-  
+
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://localhost:3001",
+          url: "https://societas-trpc.onrender.com",
           // You can pass any HTTP headers you wish here
           async headers() {
             const token = await getToken();
