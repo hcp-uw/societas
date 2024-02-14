@@ -1,38 +1,38 @@
-import { getAllProjects } from "../firebase"
-import { useUser } from "@clerk/clerk-react"
-import { useQuery, type QueryClient } from "@tanstack/react-query"
-import Spinner from "../components/Spinner"
-import ProjectsView from "../components/ProjectsView"
-import { LoaderFunction } from "react-router-dom"
-import { trpc } from "../utils/trpc"
+import { getAllProjects } from "../firebase";
+import { useUser } from "@clerk/clerk-react";
+import { useQuery, type QueryClient } from "@tanstack/react-query";
+import Spinner from "../components/Spinner";
+import ProjectsView from "../components/ProjectsView";
+import { LoaderFunction } from "react-router-dom";
+import { trpc } from "../utils/trpc";
 
 const projectsQuery = () => ({
   queryKey: ["projects"],
   queryFn: () => getAllProjects(),
-})
+});
 
 //loader - checks if query data is null or not and if it is it fetches it.
 export const loader =
   (queryClient: QueryClient): LoaderFunction =>
   async () => {
     if (!queryClient.getQueryData(projectsQuery().queryKey)) {
-      return await queryClient.fetchQuery(projectsQuery())
+      return await queryClient.fetchQuery(projectsQuery());
     }
-    return null
-  }
+    return null;
+  };
 
 export default function Home() {
-  const { user } = useUser()
-  const { data } = trpc.projects.getAll.useQuery()
+  const { user } = useUser();
+  const { data } = trpc.projects.getAll.useQuery();
 
   if (data) {
-    console.log(data)
+    console.log(data);
   }
 
   //home page with "welcome" and projects shown.
   return (
     <div className="pb-24">
-      {user ? (
+      {/* {user ? (
         <h1 className="py-6 text-4xl font-bold text-zinc-800">
           Welcome {user.firstName}
         </h1>
@@ -40,9 +40,12 @@ export default function Home() {
         <h1 className="py-6 text-4xl font-bold text-zinc-800">Welcome</h1>
       )}
 
-      <Projects />
+      <Projects /> */}
+      {data?.map((proj) => (
+        <div key={proj.id}>{proj.name}</div>
+      ))}
     </div>
-  )
+  );
 }
 
 /*
@@ -51,7 +54,7 @@ export default function Home() {
  *else return project view.
  */
 function Projects() {
-  const { data, isLoading } = useQuery(projectsQuery())
+  const { data, isLoading } = useQuery(projectsQuery());
 
   if (isLoading)
     return (
@@ -67,16 +70,16 @@ function Projects() {
       >
         <Spinner size="4rem" />
       </div>
-    )
+    );
 
-  if (!data) return <div>Something went wrong!</div>
+  if (!data) return <div>Something went wrong!</div>;
 
   const breakpointColumnsObj = {
     default: 4,
     1826: 3,
     1347: 2,
     900: 1,
-  }
+  };
 
-  return <ProjectsView projects={data} breakPoints={breakpointColumnsObj} />
+  return <ProjectsView projects={data} breakPoints={breakpointColumnsObj} />;
 }

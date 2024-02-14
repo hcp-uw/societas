@@ -28,6 +28,7 @@ import PreferencePage from "./pages/PreferencePage.tsx"
 import WhoopsPage from "./pages/WhoopsPage.tsx"
 import ReportPage from "./pages/ReportPage.tsx"
 import Profile, { EditProfile } from "./pages/Profile.tsx"
+import RateProject from "./pages/RateProject.tsx"
 import { trpc } from "./utils/trpc.ts"
 
 const queryClient = new QueryClient({
@@ -142,6 +143,10 @@ const router = createBrowserRouter([
       {
         path: "report",
         element: <ReportPage />,
+      },
+      {
+        path: "RateProject",
+        element: <RateProject />,
       },
     ],
   },

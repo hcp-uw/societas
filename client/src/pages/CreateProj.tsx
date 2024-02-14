@@ -1,19 +1,19 @@
-import styled from "styled-components"
-import { useState } from "react"
-import { createProject } from "../firebase"
-import { toast } from "react-hot-toast"
-import { redirect, useFetcher } from "react-router-dom"
-import { useUser } from "@clerk/clerk-react"
-import { StyledInput, Input, TextArea } from "../components/inputs"
-import { QueryClient } from "@tanstack/react-query"
-import { z } from "zod"
-import { trpc } from "../utils/trpc"
+import styled from "styled-components";
+import { useState } from "react";
+import { createProject } from "../firebase";
+import { toast } from "react-hot-toast";
+import { redirect, useFetcher, useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { StyledInput, Input, TextArea } from "../components/inputs";
+import { QueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import { trpc } from "../utils/trpc";
 
 export const createProjectAction =
   (queryClient: QueryClient) =>
   async ({ request }: { request: Request }) => {
     //wait for data
-    const formData = await request.formData()
+    const formData = await request.formData();
     const inputsScheme = z.object({
       title: z.string(),
       description: z.string(),
@@ -23,9 +23,9 @@ export const createProjectAction =
       ownerId: z.string(),
       meetType: z.string(),
       startDate: z.string(),
-    })
+    });
     //parse data into above values.
-    const inputs = inputsScheme.parse(Object.fromEntries(formData))
+    const inputs = inputsScheme.parse(Object.fromEntries(formData));
 
     //wait until data is parsed
     await createProject({
@@ -37,25 +37,25 @@ export const createProjectAction =
       ownerId: inputs.ownerId,
       meetType: inputs.meetType,
       startDate: inputs.startDate,
-    })
+    });
 
-    toast.success("Project Created")
+    toast.success("Project Created");
 
     //update project queries.
     queryClient.invalidateQueries({
       queryKey: ["projects"],
-    })
+    });
 
-    return redirect("/")
-  }
+    return redirect("/");
+  };
 
 type FormState = {
-  title: string
-  description: string
-  location: string
-  maxMems: string
-  image: Blob | null
-}
+  title: string;
+  description: string;
+  location: string;
+  maxMems: string;
+  image: Blob | null;
+};
 
 export default function CreateProj() {
   //elements to fill when creating a project.
@@ -65,19 +65,21 @@ export default function CreateProj() {
     location: "",
     maxMems: "",
     image: null,
-  }) // state form the inputs
+  }); // state form the inputs
   // const [loading, setLoading] = useState(false)
-  const fetcher = useFetcher()
-  const utils = trpc.useUtils()
+  const fetcher = useFetcher();
+  const utils = trpc.useUtils();
+  const navigate = useNavigate();
   const mutation = trpc.projects.create.useMutation({
     onSuccess() {
-      console.log("here")
-      utils.projects.getAll.invalidate()
+      console.log("here");
+      utils.projects.getAll.invalidate();
+      navigate("/");
     },
-  })
-  const { user } = useUser()
+  });
+  const { user } = useUser();
 
-  if (!user) return <div>Must Be signed in to create project</div>
+  if (!user) return <div>Must Be signed in to create project</div>;
 
   // handles deletetion of picture
   // params:
@@ -103,21 +105,21 @@ export default function CreateProj() {
   //function to check if values are null or empty
   function isFormValid() {
     Object.values(formState).forEach((val) => {
-      if (val === "" || val === null) return false
-    })
-    return true
+      if (val === "" || val === null) return false;
+    });
+    return true;
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!user) return
+    e.preventDefault();
+    if (!user) return;
     mutation.mutate({
       name: formState.title,
       description: formState.description,
       meetLocation: formState.location,
       meetType: "",
       ownerId: user?.id,
-    })
+    });
   }
 
   //gets files view and inputs view from formstate.
@@ -138,15 +140,15 @@ export default function CreateProj() {
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
     </fetcher.Form>
-  )
+  );
 }
 
 type InputsViewProps = {
-  formState: FormState
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
-  isFormValid: () => boolean
-  loading: boolean
-}
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+  isFormValid: () => boolean;
+  loading: boolean;
+};
 
 //shows the view for inputs to create a new project.
 //updates fiewlds of formState when inputs are made.
@@ -260,7 +262,7 @@ function InputsView({
 
       <SubmitBtnView isFormValid={isFormValid} desktop loading={loading} />
     </InputsWrapper>
-  )
+  );
 }
 
 //shows view for selecting a picture for a project.
@@ -268,10 +270,10 @@ function FilesView({
   formState,
   setFormState,
 }: {
-  formState: FormState
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 }) {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
   return (
     <FilesWrapper className="h-fit">
       <div>
@@ -287,17 +289,17 @@ function FilesView({
           required
           //checks file size and for null returns.
           onChange={(e) => {
-            setError(null)
-            const maxFileSize = 1024 * 1024 // one mb
-            if (!e.target.files) return
-            const file = e.target.files[0]
+            setError(null);
+            const maxFileSize = 1024 * 1024; // one mb
+            if (!e.target.files) return;
+            const file = e.target.files[0];
 
             if (file.size > maxFileSize) {
-              setError("File size is too large")
-              e.target.value = ""
-              return
+              setError("File size is too large");
+              e.target.value = "";
+              return;
             }
-            setFormState((prev) => ({ ...prev, image: file }))
+            setFormState((prev) => ({ ...prev, image: file }));
           }}
         />
         {error && <p className="text-red-500 mt-4">{error}</p>}
@@ -321,7 +323,7 @@ function FilesView({
         </Image>
       )}
     </FilesWrapper>
-  )
+  );
 }
 
 //submit button view.
@@ -330,9 +332,9 @@ function SubmitBtnView({
   desktop,
   loading,
 }: {
-  isFormValid: () => boolean
-  desktop: boolean
-  loading: boolean
+  isFormValid: () => boolean;
+  desktop: boolean;
+  loading: boolean;
 }) {
   return (
     <SubmitWrapper desktop={desktop}>
@@ -356,7 +358,7 @@ function SubmitBtnView({
         </div>
       </button>
     </SubmitWrapper>
-  )
+  );
 }
 
 //to fix maybe?
@@ -383,11 +385,11 @@ function LoadingSpinner({ size }: { size: number }) {
       </svg>
       <span className="sr-only">Loading...</span>
     </div>
-  )
+  );
 }
 
 interface SubmitWrapperProps {
-  readonly desktop?: boolean
+  readonly desktop?: boolean;
 }
 const SubmitWrapper = styled.div<SubmitWrapperProps>`
   width: 100%;
@@ -401,7 +403,7 @@ const SubmitWrapper = styled.div<SubmitWrapperProps>`
     justify-content: flex-end;
     align-items: flex-end;
   }
-`
+`;
 
 const FilesWrapper = styled.div`
   display: flex;
@@ -426,7 +428,7 @@ const FilesWrapper = styled.div`
       color: ${({ theme }) => theme.colors.subText};
     }
   }
-`
+`;
 
 const Image = styled.div`
   position: relative;
@@ -462,7 +464,7 @@ const Image = styled.div`
     }
   }
   margin-bottom: 0.5rem;
-`
+`;
 
 const InputsWrapper = styled.div`
   display: flex;
@@ -475,4 +477,4 @@ const InputsWrapper = styled.div`
     top: 0;
     width: 100%;
   }
-`
+`;

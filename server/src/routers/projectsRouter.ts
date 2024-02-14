@@ -47,6 +47,7 @@ export const projectsRouter = router({
       }
     }),
 
+<<<<<<< HEAD
   getAllPendingRequests: authedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -60,6 +61,9 @@ export const projectsRouter = router({
         },
       })
     }),
+=======
+
+>>>>>>> a4aa307f717c7015694aa684972df546225b3b5e
 
   // must be owner
   acceptRequest: authedProcedure

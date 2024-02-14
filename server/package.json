@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.1",
-    "@prisma/client": "^5.7.0",
+    "@prisma/client": "^5.8.1",
     "@trpc/client": "^10.44.1",
     "@trpc/server": "^10.44.1",
     "cors": "^2.8.5",
@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "nodemon": "^3.0.2",
-    "prisma": "^5.7.0",
+    "prisma": "^5.8.1",
     "ts-node": "^10.9.2"
   }
 }
