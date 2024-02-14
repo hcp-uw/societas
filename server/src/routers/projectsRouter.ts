@@ -2,7 +2,7 @@ import { z } from "zod";
 import { authedProcedure, publicProcedure, router } from "../trpc";
 
 export const projectsRouter = router({
-  getAll: authedProcedure.query(async ({ ctx }) => {
+  getAll: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.db.project.findMany({
       take: 5,
     });
@@ -132,6 +132,7 @@ export const projectsRouter = router({
         meetType: z.string(),
         ownerId: z.string(),
         meetLocation: z.string(),
+        imageUrl: z.string()
       })
     )
     .mutation(async ({ ctx, input }) => {

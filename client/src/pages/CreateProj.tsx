@@ -1,11 +1,11 @@
 import styled from "styled-components"
 import { useState } from "react"
-import { createProject } from "../firebase"
+import { createProject, uploadProjectImage } from "../firebase"
 import { toast } from "react-hot-toast"
 import { Form, useNavigate } from "react-router-dom"
 import { useUser } from "@clerk/clerk-react"
 import { StyledInput, Input, TextArea } from "../components/inputs"
-import { QueryClient } from "@tanstack/react-query"
+import { QueryClient, useMutation } from "@tanstack/react-query"
 import { z } from "zod"
 import { trpc } from "../utils/trpc"
 
@@ -72,8 +72,26 @@ export default function CreateProj() {
 
   const navigate = useNavigate()
 
+  const uploadImageMutation = useMutation({
+    mutationFn: (image: Blob) => uploadProjectImage(image),
+    onSuccess (url) {
+      if (!user) return
+      mutation.mutate({
+      name: formState.title,
+      description: formState.description,
+      meetLocation: formState.location,
+      meetType: "",
+      ownerId: user?.id,
+      imageUrl: url
+
+      })
+
+    },
+
+  })
+
   const mutation = trpc.projects.create.useMutation({
-    onSuccess() {
+    onSuccess(data) {
       utils.projects.getAll.invalidate()
       toast.success("Project Created!")
       navigate("/")
@@ -94,13 +112,8 @@ export default function CreateProj() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!user) return
-    mutation.mutate({
-      name: formState.title,
-      description: formState.description,
-      meetLocation: formState.location,
-      meetType: "",
-      ownerId: user?.id,
-    })
+    if (!formState.image) return
+    uploadImageMutation.mutate(formState.image)
   }
   //gets files view and inputs view from formstate.
   return (
@@ -115,7 +128,7 @@ export default function CreateProj() {
         formState={formState}
         setFormState={setFormState}
         isFormValid={isFormValid}
-        loading={mutation.isPending}
+        loading={mutation.isLoading}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}

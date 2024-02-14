@@ -27,7 +27,7 @@ export default function ProjectsView(props: {
         >
           {
             <img
-              src={""}
+              src={proj.imageUrl}
               width={350}
               height={400}
               loading="lazy"

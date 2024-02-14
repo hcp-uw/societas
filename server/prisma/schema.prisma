@@ -10,7 +10,7 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
-
+// add imageurl string field
 model Project {
   id           String        @id @default(uuid())
   name         String
@@ -23,6 +23,8 @@ model Project {
   meetType     String
   posts        Post[]
   memberships  Memberships[]
+  imageUrl     String
+
 }
 
 model User {
