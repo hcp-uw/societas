@@ -36,12 +36,7 @@ export const projectsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const existing = ctx.db.memberships.findFirst({
-        where: input,
-      })
-
       await ctx.db.memberships.create({ data: input })
-      
     }),
 
   getAllPendingRequests: publicProcedure
@@ -59,7 +54,7 @@ export const projectsRouter = router({
     }),
 
   // must be owner
-  acceptRequest: authedProcedure
+  acceptRequest: publicProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       await ctx.db.memberships.update({

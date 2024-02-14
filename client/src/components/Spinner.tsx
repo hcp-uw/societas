@@ -3,7 +3,7 @@
 
 
 //Buffering animation - the circle that spins when things are loading
-export default function Spinner({ color = "#383838", size = "3rem" }) {
+export default function Spinner({size = "3rem" }) {
   return (
     <div role="status">
       <svg

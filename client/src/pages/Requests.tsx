@@ -7,6 +7,7 @@ import { ActionFunctionArgs, Form, redirect } from "react-router-dom"
 import { acceptRequest } from "../firebase"
 import toast from "react-hot-toast"
 import { z } from "zod"
+import { trpc } from "../utils/trpc"
 dayjjs.extend(relativeTime)
 
 const requestsQuery = (currentUserId: string) => ({
@@ -26,10 +27,10 @@ export const resquestAcceptAction =
       requestantId: z.string(),
     })
     const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    await acceptRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
-    queryClient.invalidateQueries({
-      queryKey: ["requests"],
-    })
+    // await acceptRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
+    // queryClient.invalidateQueries({
+    //   queryKey: ["requests"],
+    // })
     toast.success("Accepted into project")
     return redirect("/account/requests")
   }
@@ -59,6 +60,23 @@ export default function Requests() {
   const { data, isLoading, isError } = useQuery(
     requestsQuery(user ? user.id : "")
   )
+
+  const utils = trpc.useUtils();
+  const acceptMutation = trpc.projects.acceptRequest.useMutation({
+    onSuccess(){
+      console.log("accepted!");
+      utils.projects.getAllPendingRequests.invalidate();
+      toast.success("Accepted");
+    }
+  });
+
+  function handleAccept(e : React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    acceptMutation.mutate( 
+      "hello"
+    )
+  } 
+
 
   if (isLoading) return <div>loading</div>
 
