@@ -126,6 +126,7 @@ export const projectsRouter = router({
         await ctx.db.project.create({ data: input })
       } catch (e) {
         console.log("here")
+
       }
     }),
 

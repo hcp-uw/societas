@@ -55,6 +55,7 @@ type FormState = {
   location: string
   maxMems: string
   image: Blob | null
+  meetType: string
 }
 
 export default function CreateProj() {
@@ -65,6 +66,7 @@ export default function CreateProj() {
     location: "",
     maxMems: "",
     image: null,
+    meetType: "",
   }) // state form the inputs
   // const [loading, setLoading] = useState(false)
   //const fetcher = useFetcher()
@@ -98,7 +100,7 @@ export default function CreateProj() {
       name: formState.title,
       description: formState.description,
       meetLocation: formState.location,
-      meetType: "",
+      meetType: formState.meetType,
       ownerId: user?.id,
     })
   }
@@ -202,16 +204,36 @@ function InputsView({
               type="radio"
               name="meetType"
               id="in-person"
-              value="in-person"
+              value="In Person"
+              checked={formState.meetType === "in-person"}
+              onChange={(e) =>
+                setFormState({ ...formState, meetType: e.target.value })
+              }
             />
             <label htmlFor="in-person">In Person</label>
           </div>
           <div className="gap-4 flex">
-            <input type="radio" name="meetType" id="hybrid" value="hybrid" />
+            <input 
+            type="radio" 
+            name="meetType" 
+            id="hybrid" 
+            value="Hybrid" 
+            checked={formState.meetType === "hybrid"}
+            onChange={(e) =>
+              setFormState({ ...formState, meetType: e.target.value })
+            }/>
             <label htmlFor="hybrid">Hybrid</label>
           </div>
           <div className="gap-4 flex">
-            <input type="radio" name="meetType" id="remote" value="remote" />
+            <input 
+            type="radio" 
+            name="meetType" 
+            id="remote" 
+            value="Remote" 
+            checked={formState.meetType === "remote"}
+            onChange={(e) =>
+              setFormState({ ...formState, meetType: e.target.value })
+            }/>
             <label htmlFor="remote">Remote</label>
           </div>
         </div>

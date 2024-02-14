@@ -525,6 +525,7 @@ export function CreatePost() {
 
 export function ProjectInfo() {
   const { data, isLoading, isError, projectId, error} = useGetProjectData()
+  const { user } = useUser()
 
   const imageURLs = ["https://i.natgeofe.com/k/ad9b542e-c4a0-4d0b-9147-da17121b4c98/MOmeow1_square.png", "https://www.southernliving.com/thmb/Rz-dYEhwq_82C5_Y9GLH2ZlEoYw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/gettyimages-837898820-1-4deae142d4d0403dbb6cb542bfc56934.jpg", "https://th-thumbnailer.cdn-si-edu.com/C4MIxDa_YxisZm2EtoTNHweBKZU=/fit-in/1600x0/filters:focal(3126x2084:3127x2085)/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer_public/ec/e6/ece69181-708a-496e-b2b7-eaf7078b99e0/gettyimages-1310156391.jpg"];
 
@@ -559,7 +560,7 @@ export function ProjectInfo() {
 
   return (
     <div>
-      <ProjectInfoComponent data={mockProjectData} labels={mockLabels} imageUrls={imageURLs}/>
+      <ProjectInfoComponent user={user}  data={data} labels={mockLabels} imageUrls={imageURLs}/>
     </div>
   );
 }

@@ -24,6 +24,27 @@
     color: white !important;
 }
 
+.user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+  
+  .user-image {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+  }
+  
+  .user-details {
+    margin-left: 1rem;
+  }
+  
+  .user-username {
+    font-weight: bold;
+  }
+
 
 @media screen and (min-width: 769px) {
     .project-container {

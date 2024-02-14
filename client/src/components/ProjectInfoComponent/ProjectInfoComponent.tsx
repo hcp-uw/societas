@@ -8,7 +8,7 @@ import './ProjectInfoComponent.css';
 
 dayjs.extend(relativeTime);
 
-const ProjectInfoComponent = ({ data, labels, imageUrls}) => {
+const ProjectInfoComponent = ({ data, labels, imageUrls, user}) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }} className="project-container">
@@ -19,10 +19,15 @@ const ProjectInfoComponent = ({ data, labels, imageUrls}) => {
 
         {/* Right side with Title, Format, Time, etc. */}
         <div style={{ flexBasis: '50%', marginLeft: '30px'}} className='right-side'>
+            <h1 style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '30px'}}>{data.name}</h1>
+            <p style={{marginBottom: '24px' }}>{data.description}</p>
             <h2 style={{ fontWeight: 'bold', marginBottom: '5px' }}>Format</h2>
-            <p style={{ marginBottom: '20px' }}>{data.meetType}</p>
+            <p style={{ marginBottom: '12px' }}>{data.meetType}</p>
+            <h2 style={{ fontWeight: 'bold', marginBottom: '5px' }}>Location</h2>
+            <p style={{ marginBottom: '12px' }}>{data.meetLocation}</p>
             <h2 style={{ fontWeight: 'bold', marginBottom: '5px' }}>Time</h2>
-            <p style={{ marginBottom: '20px' }}>{dayjs(data.createdAt).format('h:mm A')}</p>
+            <p style={{ marginBottom: '12px' }}>{dayjs(data.createdAt).format('h:mm A')}</p>
+            
           
           {/* Tags */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
@@ -42,7 +47,36 @@ const ProjectInfoComponent = ({ data, labels, imageUrls}) => {
         </div>
       </div>
 
-      {/* Description Box */}
+      <h1 style={{ fontWeight: 'bold', marginBottom: '20px', fontSize: '20px'}}>Organizer</h1>
+
+
+      <div className="user-profile">
+        <img
+            src={user.imageUrl}
+            alt={`${user.fullName} profile image`}
+            className="rounded-full object-cover w-14 h-14"
+        />
+        <div className="user-details">
+          <div className="user-username">{user.username}</div>
+          <p>{user.fullName}</p>
+        </div>
+      </div>
+
+      <h1 style={{ fontWeight: 'bold', marginBottom: '20px', fontSize: '20px'}}>Project Blogs</h1>
+
+      {/* <div className="user-profile">
+        <img
+          src={user.imageUrl}
+          alt={`${user.fullName} profile image`}
+          className="user-image"
+        />
+        <div className="user-details">
+          <div className="user-username">{user.username}</div>
+          <div>{user.fullName}</div>
+        </div>
+      </div> */}
+
+      {/* <h1 style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '20px'}}>Project Blog</h1>
       <div style={{
         border: '1px solid #ccc',
         borderRadius: '8px',
@@ -50,8 +84,10 @@ const ProjectInfoComponent = ({ data, labels, imageUrls}) => {
         minHeight: '100px',
         marginTop: '15px',
       }}>
-        <p>{data.description}</p>
-      </div>
+        <p>Post your thoughts here...</p>
+      </div> */}
+
+     
     </div>
   );
 };
