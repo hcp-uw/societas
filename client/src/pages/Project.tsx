@@ -1,19 +1,13 @@
-import { QueryClient, useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import {
-  ActionFunctionArgs,
   FetcherWithComponents,
-  LoaderFunctionArgs,
-  redirect,
   useFetcher,
   useNavigate,
   useParams,
 } from "react-router-dom"
 import {
-  createProjectPost,
   getAllProjectPosts,
-  getProjectById,
   getProjectPostById,
-  removeUser,
 } from "../firebase"
 import Spinner from "../components/Spinner"
 import dayjjs from "dayjs"
@@ -25,17 +19,12 @@ import { useEffect } from "react"
 import toast from "react-hot-toast"
 import { NavLink, Outlet, Form } from "react-router-dom"
 import Markdown from "react-markdown"
-import { useMemo } from "react"
-import { z } from "zod"
 import { trpc } from "../utils/trpc"
 
 dayjjs.extend(relativeTime)
 
 //get project info
-const projectInfoQuery = (id: string) => ({
-  queryKey: ["projects", id, "info"],
-  queryFn: () => getProjectById(id),
-})
+
 
 //get all posts related to project
 const projectPostsQuery = (id: string) => ({
@@ -49,109 +38,6 @@ const projectPostQuery = (projectId: string, postId: string) => ({
   queryFn: () => getProjectPostById(projectId, postId),
 })
 
-//Loaders for Info, allPosts, and posts.
-
-//Maybe combine info and allPosts into one function as their code seems identical
-//Change name of Postloader and Postsloader. A bit confusing.
-
-export const postsLoader =
-  (queryClient: QueryClient) =>
-  async ({ params }: LoaderFunctionArgs) => {
-    if (!params.projectId) throw new Error("no project Id found in url params")
-
-    const query = projectPostsQuery(params.projectId)
-    return (
-      queryClient.getQueryData(query.queryKey) ??
-      (await queryClient.fetchQuery(query))
-    )
-  }
-
-export const postLoader =
-  (queryClient: QueryClient) =>
-  async ({ params }: LoaderFunctionArgs) => {
-    if (!params.projectId) throw new Error("no project Id found in url params")
-    if (!params.postId) throw new Error("no post Id found in url params")
-    const query = projectPostQuery(params.projectId, params.postId)
-    return (
-      queryClient.getQueryData(query.queryKey) ??
-      (await queryClient.fetchQuery(query))
-    )
-  }
-// send request
-// export const action =
-//   (queryClient: QueryClient) =>
-//   async ({ request }: ActionFunctionArgs) => {
-//     //get form data and parse it thorugh to inputsSchema.
-//     const formData = await request.formData()
-//     const inputsSchema = z.object({
-//       projectId: z.string(),
-//       imageUrl: z.string(),
-//       message: z.string(),
-//       ownerId: z.string(),
-//       projectTitle: z.string(),
-//       requestantId: z.string(),
-//     })
-//     const inputs = inputsSchema.parse(Object.fromEntries(formData))
-//     // await createProjectJoinRequest({
-//     //   projectId: inputs.projectId,
-//     //   imageUrl: inputs.imageUrl,
-//     //   message: inputs.message,
-//     //   ownerId: inputs.ownerId,
-//     //   projectTitle: inputs.projectTitle,
-//     //   requestantId: inputs.requestantId,
-//     // })
-
-//     //when done invalidate queries and update them.
-//     queryClient.invalidateQueries({
-//       queryKey: ["projects", inputs.projectId, "info"],
-//     })
-//     return null
-//   }
-
-//same process as above just creating a post in this case and
-//updating a different query.
-export const createPostAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      title: z.string(),
-      comment: z.string(),
-      projectId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-
-    await createProjectPost(inputs.projectId, {
-      title: inputs.title,
-      comment: inputs.comment,
-    })
-
-    queryClient.invalidateQueries({
-      queryKey: ["projects", inputs.projectId, "posts"],
-    })
-
-    return redirect(`/${inputs.projectId}/posts`)
-  }
-
-export const leaveProjectAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      projectId: z.string(),
-      userId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    if (confirm("Are you sure you want to leave this project?")) {
-      // await removeUser(inputs.userId, inputs.projectId)
-      // queryClient.invalidateQueries({
-      //   queryKey: ["projects", inputs.projectId],
-      // })
-      // toast.success("Left Project")
-    }
-    return redirect(`/${inputs.projectId}`)
-  }
-
 function useGetProjectData() {
   const { projectId } = useParams()
   const query = trpc.projects.getById.useQuery(projectId ?? "")
@@ -164,8 +50,8 @@ function useGetProjectData() {
 
 export default function Project() {
   // const { projectId } = useParams()
-  const { data, isLoading, isError, projectId } = useGetProjectData()
-  const { data: role, isLoading: isRoleLoading } =
+  const { data, isLoading, projectId } = useGetProjectData()
+  const { data: role} =
     trpc.memberships.getRole.useQuery(projectId ?? "")
   const { user } = useUser()
   // const fetcher = useFetcher()
@@ -246,27 +132,6 @@ export default function Project() {
   }
 
 
-  // function getRole() {
-  //   if (!data || !user) return
-  //   if (data.ownerId === user.id) {
-  //     return "owner"
-  //   } else if (data.members.find((member) => member === user.id)) {
-  //     return "member"
-  //   } else if (data.requestants.find((requestant) => requestant === user.id)) {
-  //     return "requestant"
-  //   } else {
-  //     return "none"
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (fetcher.state === "submitting") {
-  //       setShowModal(false)
-  //     }
-  //   }
-  // }, [fetcher.state])
-
   if (isLoading)
     return (
       <div
@@ -333,7 +198,7 @@ export default function Project() {
                 disabled={sendJoinReqMutation.isLoading}
               >
                 {sendJoinReqMutation.isLoading ? (
-                  <Spinner color="white" />
+                  <Spinner/>
                 ) : (
                   <p className="py-2">Join</p>
                 )}
@@ -438,7 +303,7 @@ function SubmitFetcherBtn({
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
-        <Spinner color="white" />
+        <Spinner/>
       ) : (
         <p className="py-2">{message}</p>
       )}

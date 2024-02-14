@@ -1,59 +1,11 @@
-import { QueryClient, useQuery } from "@tanstack/react-query"
-import { getAllPendingRequests, rejectRequest } from "../firebase"
 import { useUser } from "@clerk/clerk-react"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { ActionFunctionArgs, Form, redirect } from "react-router-dom"
-import { acceptRequest } from "../firebase"
 import toast from "react-hot-toast"
 import { z } from "zod"
 import { trpc } from "../utils/trpc"
 import React from "react"
 dayjjs.extend(relativeTime)
-
-// const requestsQuery = (currentUserId: string) => ({
-//   queryKey: ["requests"],
-//   queryFn: () => getAllPendingRequests(currentUserId),
-// })
-
-//gets request form data and parses it.
-//then invalidates the request query if the data is valid. 
-export const resquestAcceptAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      requestId: z.string(),
-      projectId: z.string(),
-      requestantId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    // await acceptRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
-    // queryClient.invalidateQueries({
-    //   queryKey: ["requests"],
-    // })
-    toast.success("Accepted into project")
-    return redirect("/account/requests")
-  }
-
-  export const requestRejectAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      requestId: z.string(),
-      projectId: z.string(),
-      requestantId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    // await rejectRequest(inputs.requestId, inputs.projectId, inputs.requestantId)
-    // queryClient.invalidateQueries({
-    //   queryKey: ["requests"],
-    // })
-    toast.success("Rejected from project")
-    return redirect("/account/requests")
-  }
-
 
 //request page to be shown. 
 export default function Requests() {

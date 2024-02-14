@@ -1,10 +1,9 @@
 import { z } from "zod"
 import { authedProcedure, publicProcedure, router } from "../trpc"
-import { MembershipStatus, Memberships } from "@prisma/client"
 
 export const membershipsRouter = router({
 
-  sendProjectJoinRequest: publicProcedure
+  sendProjectJoinRequest: authedProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -40,13 +39,6 @@ export const membershipsRouter = router({
       }
     }),
   
-  
-
-
-
-
-
-
   getAllUserMemberships: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -126,14 +118,9 @@ export const membershipsRouter = router({
           status: "REJECTED"
         }
       })
-      // await ctx.db.memberships.delete({
-      //   where: {
-      //     id: input
-      //   },
-        //})
     }),
 
-  leaveProject: publicProcedure
+  leaveProject: authedProcedure
     .input(z.object({
       projectId: z.string(),
       userId: z.string()
