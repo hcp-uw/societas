@@ -11,14 +11,14 @@ dayjs.extend(relativeTime);
 const ProjectInfoComponent = ({ data, labels, imageUrls}) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }} className="project-container">
         {/* Left side with Image */}
-        <div style={{ flexBasis: '60%' }}>
+        <div style={{ flexBasis: '50%' }} className='left-side'>
           <ImageSlider images={imageUrls} />
         </div>
 
         {/* Right side with Title, Format, Time, etc. */}
-        <div style={{ flexBasis: '35%' }}>
+        <div style={{ flexBasis: '50%', marginLeft: '30px'}} className='right-side'>
             <h2 style={{ fontWeight: 'bold', marginBottom: '5px' }}>Format</h2>
             <p style={{ marginBottom: '20px' }}>{data.meetType}</p>
             <h2 style={{ fontWeight: 'bold', marginBottom: '5px' }}>Time</h2>
