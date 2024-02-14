@@ -4,18 +4,46 @@ import { MembershipStatus, Memberships } from "@prisma/client"
 
 export const membershipsRouter = router({
 
-  createProjectJoinRequest: publicProcedure
+  sendProjectJoinRequest: publicProcedure
     .input(
       z.object({
         projectId: z.string(),
         ownerId: z.string(),
-        userId: z.string()       
+        userId: z.string(),
+        description: z.optional(z.string()),
+        role: z.optional(z.object({
+          status: z.string(),
+          id: z.string()
+        }))
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(ctx.auth.userId);
-      await ctx.db.memberships.create({ data: input})
+      if(!input.role){
+        await ctx.db.memberships.create({ 
+          data: {
+            projectId: input.projectId,
+            ownerId: input.ownerId,
+            userId: input.userId,
+            description: input.description
+          }
+        })
+      }else if(input.role.status === "REJECTED"){
+        await ctx.db.memberships.update({
+          where: {
+            id: input.role.id
+          },
+          data:{
+            status: "PENDING",
+            description: input.description
+          }
+        })
+      }
     }),
+  
+  
+
+
+
 
 
 
@@ -46,6 +74,7 @@ export const membershipsRouter = router({
         },
       })
     }),
+    
   getRole: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -57,6 +86,7 @@ export const membershipsRouter = router({
       })
     }),
 
+  
 
   getAllIncomingRequests: publicProcedure
     .input(z.string())
@@ -82,25 +112,41 @@ export const membershipsRouter = router({
         },
       })
     }),
-
+  
+  
   // must be owner
-  rejectRequest: authedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        projectId: z.string(),
-      })
-    )
+  rejectRequest: publicProcedure
+    .input(z.string())
     .mutation(async ({ ctx, input }) => {
       await ctx.db.memberships.update({
         where: {
-          projectId_userId: input,
-          status: "PENDING",
+          id: input
         },
-        data: {
-          status: "REJECTED",
+        data:{
+          status: "REJECTED"
+        }
+      })
+      // await ctx.db.memberships.delete({
+      //   where: {
+      //     id: input
+      //   },
+        //})
+    }),
+
+  leaveProject: publicProcedure
+    .input(z.object({
+      projectId: z.string(),
+      userId: z.string()
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // const memberToDelete = {
+      //   projectId: input, 
+      //   userId: ctx.auth.userId
+      // }
+      await ctx.db.memberships.delete({
+        where: {
+          projectId_userId: input
         },
       })
     }),
-
 })

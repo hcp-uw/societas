@@ -143,11 +143,11 @@ export const leaveProjectAction =
     })
     const inputs = inputsSchema.parse(Object.fromEntries(formData))
     if (confirm("Are you sure you want to leave this project?")) {
-      await removeUser(inputs.userId, inputs.projectId)
-      queryClient.invalidateQueries({
-        queryKey: ["projects", inputs.projectId],
-      })
-      toast.success("Left Project")
+      // await removeUser(inputs.userId, inputs.projectId)
+      // queryClient.invalidateQueries({
+      //   queryKey: ["projects", inputs.projectId],
+      // })
+      // toast.success("Left Project")
     }
     return redirect(`/${inputs.projectId}`)
   }
@@ -174,8 +174,8 @@ export default function Project() {
   const utils = trpc.useUtils()
 
 
-  const createJoinReqMutation =
-    trpc.memberships.createProjectJoinRequest.useMutation({
+  const sendJoinReqMutation =
+    trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
         console.log("Request Created")
         setShowModal(false)
@@ -184,18 +184,37 @@ export default function Project() {
       },
     })
 
+
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
+
     e.preventDefault()
     if (!projectId) return
     if (!data) return
     if (!user) return
-    console.log(user?.id)
-    console.log("mutating")
-    createJoinReqMutation.mutate({
-      projectId: projectId,
-      ownerId: data.ownerId,
-      userId: user?.id
-    })
+    const formData = new FormData(e.currentTarget)
+    
+    const description = formData.get("description") as string
+
+
+    if(!role){
+      sendJoinReqMutation.mutate({
+        projectId: projectId,
+        ownerId: data.ownerId,
+        userId: user?.id,
+        description: description,
+      })
+    }else if(role.status === "REJECTED"){
+      sendJoinReqMutation.mutate({
+        projectId: projectId,
+        ownerId: data.ownerId,
+        userId: user?.id,
+        description: description,
+        role: {
+          status: role.status,
+          id: role.id
+        }
+      })
+    }
   }
 
   const requestData = trpc.memberships.getAllPendingRequests.useQuery(
@@ -207,10 +226,9 @@ export default function Project() {
   }
 
 
-  const leaveProjectMutation = trpc.projects.leaveProject.useMutation({
+  const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
     onSuccess(){
       console.log("Left Project");
-      utils.memberships.getAllUserMemberships.invalidate();
       utils.memberships.getRole.invalidate();
       toast.success("Left Project")
     }
@@ -219,7 +237,12 @@ export default function Project() {
   function handleLeaveReq(e: React.FormEvent<HTMLFormElement>){
     e.preventDefault();
     if(!user || !projectId) return;
-    leaveProjectMutation.mutate(projectId);    
+    if (confirm("Are you sure you want to leave this project?")){ 
+      leaveProjectMutation.mutate({
+        projectId: projectId,
+        userId: user?.id
+      });    
+    }
   }
 
 
@@ -293,7 +316,7 @@ export default function Project() {
                 className="w-full"
                 cols={10}
                 rows={10}
-                name="message"
+                name="description"
               />
               <input type="hidden" value={projectId} name="projectId" />
               <input
@@ -307,9 +330,9 @@ export default function Project() {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={createJoinReqMutation.isLoading}
+                disabled={sendJoinReqMutation.isLoading}
               >
-                {createJoinReqMutation.isLoading ? (
+                {sendJoinReqMutation.isLoading ? (
                   <Spinner color="white" />
                 ) : (
                   <p className="py-2">Join</p>
@@ -358,7 +381,7 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : !role ? (
+              ) : !role || role.status === "REJECTED"? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
@@ -545,7 +568,7 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>
-          {dayjjs(data.createdAt.toDate()).fromNow()}
+          {dayjjs(data.createdAt).fromNow()}
         </p>
       </div>
       <img
