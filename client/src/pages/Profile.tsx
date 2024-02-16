@@ -4,14 +4,9 @@ import { Link, useNavigate } from "react-router-dom"
 import { Input, StyledInput } from "../components/inputs"
 import { useForm, SubmitHandler } from "react-hook-form"
 import toast from "react-hot-toast"
-import { getProjectsByUserId } from "../firebase"
-import { useQuery } from "@tanstack/react-query"
 import ProjectsView from "../components/ProjectsView"
+import { trpc } from "../utils/trpc"
 
-const myProjsQuery = (userId: string) => ({
-  queryKey: ["projects", "my"],
-  queryFn: () => getProjectsByUserId(userId),
-})
 
 /*
 * shows profile page. Gets data from userId. 
@@ -19,9 +14,16 @@ const myProjsQuery = (userId: string) => ({
 */
 export default function Profile() {
   const { user } = useUser()
-  const { data, isError, isLoading } = useQuery(
-    myProjsQuery(user ? user.id : "")
-  )
+  // const { data, isError, isLoading } = useQuery(
+  //   myProjsQuery(user ? user.id : "")
+  // )
+
+  const { data, isLoading } = trpc.projects.getByUserId.useQuery(user?.id ?? "");
+  
+
+  if(data){
+    console.log(data)
+  }
 
   const breakpointColumnsObj = {
     default: 3,
@@ -87,7 +89,7 @@ export function EditProfile() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<EditProfileFormVals>()
 
   //handles update of data using the form. 

@@ -22,10 +22,6 @@ import {
 
 import {
   getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithCustomToken,
-  signOut,
 } from "firebase/auth";
 
 const firebaseConfig = {

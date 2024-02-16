@@ -1,7 +1,6 @@
 import { z } from "zod"
 import { authedProcedure, publicProcedure, router } from "../trpc"
 import { TRPCError } from "@trpc/server"
-import { MembershipStatus } from "@prisma/client"
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -33,7 +32,7 @@ export const projectsRouter = router({
   getByUserId: authedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      return await ctx.db.project.findFirst({
+      return await ctx.db.project.findMany({
         where: {
           ownerId: input,
         },
