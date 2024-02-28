@@ -2,7 +2,7 @@ import Masonry from "react-masonry-css"
 import { Link } from "react-router-dom"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { ReactQueryOptions, RouterOutputs } from "../utils/trpc"
+import {RouterOutputs } from "../utils/trpc"
 dayjjs.extend(relativeTime)
 
 type BreakPoints = "default" | "1826" | "1347" | "900"
@@ -10,7 +10,7 @@ type BreakPoints = "default" | "1826" | "1347" | "900"
 type Projects = RouterOutputs["projects"]["getAll"]
 
 export default function ProjectsView(props: {
-  projects: Projects
+  projects: Projects,
   breakPoints: Record<BreakPoints, number>
 }) {
   return (
