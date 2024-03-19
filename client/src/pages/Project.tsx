@@ -5,10 +5,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom"
-import {
-  getAllProjectPosts,
-  getProjectPostById,
-} from "../firebase"
+import { getAllProjectPosts, getProjectPostById } from "../firebase"
 import Spinner from "../components/Spinner"
 import dayjjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -24,7 +21,6 @@ import { trpc } from "../utils/trpc"
 dayjjs.extend(relativeTime)
 
 //get project info
-
 
 //get all posts related to project
 const projectPostsQuery = (id: string) => ({
@@ -51,45 +47,40 @@ function useGetProjectData() {
 export default function Project() {
   // const { projectId } = useParams()
   const { data, isLoading, projectId } = useGetProjectData()
-  const { data: role} =
-    trpc.memberships.getRole.useQuery(projectId ?? "")
+  const { data: role } = trpc.memberships.getRole.useQuery(projectId ?? "")
   const { user } = useUser()
   // const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false)
   const utils = trpc.useUtils()
 
-
   const sendJoinReqMutation =
     trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
         console.log("Request Created")
         setShowModal(false)
-        utils.memberships.getRole.invalidate(projectId);
+        utils.memberships.getRole.invalidate(projectId)
         toast.success("Requested!")
       },
     })
 
-
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
-
     e.preventDefault()
     if (!projectId) return
     if (!data) return
     if (!user) return
     const formData = new FormData(e.currentTarget)
-    
+
     const description = formData.get("description") as string
 
-
-    if(!role){
+    if (!role) {
       sendJoinReqMutation.mutate({
         projectId: projectId,
         ownerId: data.ownerId,
         userId: user?.id,
         description: description,
       })
-    }else if(role.status === "REJECTED"){
+    } else if (role.status === "REJECTED") {
       sendJoinReqMutation.mutate({
         projectId: projectId,
         ownerId: data.ownerId,
@@ -97,8 +88,8 @@ export default function Project() {
         description: description,
         role: {
           status: role.status,
-          id: role.id
-        }
+          id: role.id,
+        },
       })
     }
   }
@@ -111,26 +102,24 @@ export default function Project() {
     console.log(requestData.data)
   }
 
-
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
-    onSuccess(){
-      console.log("Left Project");
-      utils.memberships.getRole.invalidate();
+    onSuccess() {
+      console.log("Left Project")
+      utils.memberships.getRole.invalidate()
       toast.success("Left Project")
-    }
-  });
+    },
+  })
 
-  function handleLeaveReq(e: React.FormEvent<HTMLFormElement>){
-    e.preventDefault();
-    if(!user || !projectId) return;
-    if (confirm("Are you sure you want to leave this project?")){ 
+  function handleLeaveReq(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!user || !projectId) return
+    if (confirm("Are you sure you want to leave this project?")) {
       leaveProjectMutation.mutate({
         projectId: projectId,
-        userId: user?.id
-      });    
+        userId: user?.id,
+      })
     }
   }
-
 
   if (isLoading)
     return (
@@ -198,7 +187,7 @@ export default function Project() {
                 disabled={sendJoinReqMutation.isLoading}
               >
                 {sendJoinReqMutation.isLoading ? (
-                  <Spinner/>
+                  <Spinner />
                 ) : (
                   <p className="py-2">Join</p>
                 )}
@@ -246,7 +235,7 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : !role || role.status === "REJECTED"? (
+              ) : !role || role.status === "REJECTED" ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
@@ -287,7 +276,7 @@ export default function Project() {
 }
 
 type SubmitFetcherBtnProps = {
-  fetcher: FetcherWithComponents<any>
+  fetcher: FetcherWithComponents<unknown>
   message: string
   className?: string
 }
@@ -303,7 +292,7 @@ function SubmitFetcherBtn({
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
-        <Spinner/>
+        <Spinner />
       ) : (
         <p className="py-2">{message}</p>
       )}
