@@ -1,33 +1,24 @@
-import React from "react"
-import ReactDOM from "react-dom/client"
-import App from "./App.jsx"
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import { ClerkProvider } from "@clerk/clerk-react"
-import { QueryClient } from "@tanstack/react-query"
-import Home, { loader as projectsLoader } from "./pages/Home.tsx"
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ClerkProvider } from "@clerk/clerk-react";
+import { QueryClient } from "@tanstack/react-query";
+import Home from "./pages/Home.tsx";
 import Project, {
-  createPostAction,
-  postsLoader as projectPostsLoader,
   ProjectInfo,
-  infoLoader as projectInfoLoader,
   ProjectPostsLayout,
-  action as reqAction,
   CreatePost,
   ProjectPost,
-  postLoader,
-  leaveProjectAction,
-} from "./pages/Project.jsx"
-import ProfileLayout from "./pages/ProfileLayout.tsx"
-import CreateProj, { createProjectAction } from "./pages/CreateProj.tsx"
-import Requests, {
-  resquestAcceptAction,
-  requestRejectAction,
-} from "./pages/Requests.tsx"
-import Intro from "./pages/Intro.jsx"
-import PreferencePage from "./pages/PreferencePage.tsx"
-import WhoopsPage from "./pages/WhoopsPage.tsx"
-import ReportPage from "./pages/ReportPage.tsx"
-import Profile, { EditProfile } from "./pages/Profile.tsx"
+} from "./pages/Project.jsx";
+import ProfileLayout from "./pages/ProfileLayout.tsx";
+import CreateProj from "./pages/CreateProj.tsx";
+import Requests from "./pages/Requests.tsx";
+import Intro from "./pages/Intro.jsx";
+import PreferencePage from "./pages/PreferencePage.tsx";
+import WhoopsPage from "./pages/WhoopsPage.tsx";
+import ReportPage from "./pages/ReportPage.tsx";
+import Profile, { EditProfile } from "./pages/Profile.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,18 +26,18 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60,
     },
   },
-})
+});
 if (!import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY) {
-  throw "Missing Publishable Key"
+  throw "Missing Publishable Key";
 }
 
-const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY
+const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 if (
   localStorage.getItem("firstTimeUser") == null &&
   localStorage.getItem("firstTimeUser") !== "false"
 ) {
-  localStorage.setItem("firstTimeUser", "true")
+  localStorage.setItem("firstTimeUser", "true");
 }
 
 const router = createBrowserRouter([
@@ -57,7 +48,6 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App queryClient={queryClient} />,
-    loader: projectsLoader(queryClient),
     children: [
       {
         index: true,
@@ -66,8 +56,8 @@ const router = createBrowserRouter([
       {
         path: ":projectId",
         element: <Project />,
-        loader: projectInfoLoader(queryClient),
-        action: reqAction(queryClient),
+        // loader: projectInfoLoader(queryClient),
+        // action: reqAction(queryClient),
         children: [
           {
             index: true,
@@ -76,25 +66,21 @@ const router = createBrowserRouter([
           {
             path: "leaveProject",
             element: <ProjectInfo />,
-            action: leaveProjectAction(queryClient),
           },
           {
             path: "posts",
             element: <ProjectPostsLayout />,
-            loader: projectPostsLoader(queryClient),
+            // loader: projectPostsLoader(queryClient),
             children: [
               {
                 path: ":postId",
                 element: <ProjectPost />,
-                loader: postLoader(queryClient),
               },
             ],
           },
           {
             path: "posts/new",
             element: <CreatePost />,
-            loader: projectPostsLoader(queryClient),
-            action: createPostAction(queryClient),
           },
         ],
       },
@@ -105,7 +91,6 @@ const router = createBrowserRouter([
           {
             path: "create",
             element: <CreateProj />,
-            action: createProjectAction(queryClient),
           },
           {
             index: true,
@@ -122,12 +107,10 @@ const router = createBrowserRouter([
           {
             path: "requests/acceptReq",
             element: <Requests />,
-            action: resquestAcceptAction(queryClient),
           },
           {
             path: "requests/rejectReq",
             element: <Requests />,
-            action: requestRejectAction(queryClient),
           },
         ],
       },
@@ -145,12 +128,12 @@ const router = createBrowserRouter([
       },
     ],
   },
-])
+]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={clerkPubKey}>
       <RouterProvider router={router} />
     </ClerkProvider>
-  </React.StrictMode>
-)
+  </React.StrictMode>,
+);

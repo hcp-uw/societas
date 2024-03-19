@@ -1,0 +1,14 @@
+{
+  "name": "societas",
+  "version": "1.0.0",
+  "description": "client and server folders",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write client/src && prettier --write server/src"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "3.2.5"
+  }
+}

@@ -1,6 +1,3 @@
-
-
-  
 export default function PreferencePage() {
   return (
     <div>
@@ -122,5 +119,5 @@ export default function PreferencePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

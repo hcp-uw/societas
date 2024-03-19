@@ -1,25 +1,25 @@
-import "styled-components"
+import "styled-components";
 
 declare module "styled-components" {
   export interface DefaultTheme {
     colors: {
-      mainText: string
-      subText: string
-      lightBg: string
-      primary: string
-      primary_600: string
-      disabled: string
-      whiteText: string
-    }
+      mainText: string;
+      subText: string;
+      lightBg: string;
+      primary: string;
+      primary_600: string;
+      disabled: string;
+      whiteText: string;
+    };
 
     fonts: {
-      default: string
-    }
+      default: string;
+    };
 
     fontWeight: {
-      reguar: number
-      medium: number
-      bold: number
-    }
+      reguar: number;
+      medium: number;
+      bold: number;
+    };
   }
 }

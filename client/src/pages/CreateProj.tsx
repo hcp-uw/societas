@@ -1,60 +1,19 @@
-import styled from "styled-components"
-import { useState } from "react"
-import { createProject } from "../firebase"
-import { toast } from "react-hot-toast"
-import { redirect, useFetcher } from "react-router-dom"
-import { useUser } from "@clerk/clerk-react"
-import { StyledInput, Input, TextArea } from "../components/inputs"
-import { QueryClient } from "@tanstack/react-query"
-import { z } from "zod"
-
-export const createProjectAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: { request: Request }) => {
-    //wait for data
-    const formData = await request.formData()
-    const inputsScheme = z.object({
-      title: z.string(),
-      description: z.string(),
-      meetLocation: z.string(),
-      imageUrl: z.instanceof(Blob),
-      maxMembers: z.string(),
-      ownerId: z.string(),
-      meetType: z.string(),
-      startDate: z.string(),
-    })
-    //parse data into above values.
-    const inputs = inputsScheme.parse(Object.fromEntries(formData))
-
-    //wait until data is parsed
-    await createProject({
-      title: inputs.title,
-      description: inputs.description,
-      meetLocation: inputs.meetLocation,
-      image: inputs.imageUrl,
-      maxMembers: inputs.maxMembers,
-      ownerId: inputs.ownerId,
-      meetType: inputs.meetType,
-      startDate: inputs.startDate,
-    })
-
-    toast.success("Project Created")
-
-    //update project queries.
-    queryClient.invalidateQueries({
-      queryKey: ["projects"],
-    })
-
-    return redirect("/")
-  }
+import styled from "styled-components";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { Form, useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { StyledInput, Input, TextArea } from "../components/inputs";
+import { trpc } from "../utils/trpc";
+import Spinner from "../components/Spinner";
 
 type FormState = {
-  title: string
-  description: string
-  location: string
-  maxMems: string
-  image: Blob | null
-}
+  title: string;
+  description: string;
+  location: string;
+  maxMems: string;
+  image: Blob | null;
+};
 
 export default function CreateProj() {
   //elements to fill when creating a project.
@@ -64,69 +23,70 @@ export default function CreateProj() {
     location: "",
     maxMems: "",
     image: null,
-  }) // state form the inputs
+  }); // state form the inputs
   // const [loading, setLoading] = useState(false)
-  const fetcher = useFetcher()
+  //const fetcher = useFetcher()
+  const utils = trpc.useUtils();
 
-  const { user } = useUser()
+  const navigate = useNavigate();
 
-  if (!user) return <div>Must Be signed in to create project</div>
+  const mutation = trpc.projects.create.useMutation({
+    onSuccess() {
+      utils.projects.getAll.invalidate();
+      toast.success("Project Created!");
+      navigate("/");
+    },
+  });
 
-  // handles deletetion of picture
-  // params:
-  //  index -> index of picture to be deleted
-  // fuVjjnction handleDelPictre(index: number) {
-  //   const newArr = formState.images?.filter((_, i) => i !== index)
-  //   setFormState({ ...formState, images: newArr })
-  // }
+  const { user } = useUser();
 
-  // function handleAddPicture(file: Blob) {
-  //   if (formState.images.includes(file)) {
-  //     throw Error("this already exists")
-  //   }
-  //   setFormState((prev) => ({
-  //     ...prev,
-  //     images: [...prev.images, file],
-  //   }))
-  // }
+  if (!user) return <div>Must Be signed in to create project</div>;
 
-  // return true if form fields are not empty
-  // false otherwiise
-
-  //function to check if values are null or empty
   function isFormValid() {
     Object.values(formState).forEach((val) => {
-      if (val === "" || val === null) return false
-    })
-    return true
+      if (val === "" || val === null) return false;
+    });
+    return true;
   }
 
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!user) return;
+    mutation.mutate({
+      name: formState.title,
+      description: formState.description,
+      meetLocation: formState.location,
+      meetType: "",
+      ownerId: user?.id,
+    });
+  }
   //gets files view and inputs view from formstate.
   return (
-    <fetcher.Form
+    <Form
       method="post"
       className="flex justify-between w-full"
       encType="multipart/form-data"
+      onSubmit={handleSubmit}
     >
       <FilesView formState={formState} setFormState={setFormState} />
       <InputsView
         formState={formState}
         setFormState={setFormState}
         isFormValid={isFormValid}
-        loading={fetcher.state === "submitting"}
+        loading={mutation.isLoading}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
-    </fetcher.Form>
-  )
+    </Form>
+  );
 }
 
 type InputsViewProps = {
-  formState: FormState
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
-  isFormValid: () => boolean
-  loading: boolean
-}
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+  isFormValid: () => boolean;
+  loading: boolean;
+};
 
 //shows the view for inputs to create a new project.
 //updates fiewlds of formState when inputs are made.
@@ -240,7 +200,7 @@ function InputsView({
 
       <SubmitBtnView isFormValid={isFormValid} desktop loading={loading} />
     </InputsWrapper>
-  )
+  );
 }
 
 //shows view for selecting a picture for a project.
@@ -248,10 +208,10 @@ function FilesView({
   formState,
   setFormState,
 }: {
-  formState: FormState
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 }) {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
   return (
     <FilesWrapper className="h-fit">
       <div>
@@ -267,17 +227,17 @@ function FilesView({
           required
           //checks file size and for null returns.
           onChange={(e) => {
-            setError(null)
-            const maxFileSize = 1024 * 1024 // one mb
-            if (!e.target.files) return
-            const file = e.target.files[0]
+            setError(null);
+            const maxFileSize = 1024 * 1024; // one mb
+            if (!e.target.files) return;
+            const file = e.target.files[0];
 
             if (file.size > maxFileSize) {
-              setError("File size is too large")
-              e.target.value = ""
-              return
+              setError("File size is too large");
+              e.target.value = "";
+              return;
             }
-            setFormState((prev) => ({ ...prev, image: file }))
+            setFormState((prev) => ({ ...prev, image: file }));
           }}
         />
         {error && <p className="text-red-500 mt-4">{error}</p>}
@@ -301,7 +261,7 @@ function FilesView({
         </Image>
       )}
     </FilesWrapper>
-  )
+  );
 }
 
 //submit button view.
@@ -310,9 +270,9 @@ function SubmitBtnView({
   desktop,
   loading,
 }: {
-  isFormValid: () => boolean
-  desktop: boolean
-  loading: boolean
+  isFormValid: () => boolean;
+  desktop: boolean;
+  loading: boolean;
 }) {
   return (
     <SubmitWrapper desktop={desktop}>
@@ -332,42 +292,15 @@ function SubmitBtnView({
             loading ? "opacity-100" : "opacity-0"
           }`}
         >
-          <LoadingSpinner size={24} />
+          <Spinner size="24rem" />
         </div>
       </button>
     </SubmitWrapper>
-  )
-}
-
-//to fix maybe?
-function LoadingSpinner({ size }: { size: number }) {
-  return (
-    <div role="status">
-      <svg
-        aria-hidden="true"
-        className="animate-spin fill-slate-300 text-gray-200 dark:text-gray-600"
-        viewBox="0 0 100 101"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        width={size ?? 16}
-        height={size ?? 16}
-      >
-        <path
-          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-          fill="currentColor"
-        />
-        <path
-          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-          fill="currentFill"
-        />
-      </svg>
-      <span className="sr-only">Loading...</span>
-    </div>
-  )
+  );
 }
 
 interface SubmitWrapperProps {
-  readonly desktop?: boolean
+  readonly desktop?: boolean;
 }
 const SubmitWrapper = styled.div<SubmitWrapperProps>`
   width: 100%;
@@ -381,7 +314,7 @@ const SubmitWrapper = styled.div<SubmitWrapperProps>`
     justify-content: flex-end;
     align-items: flex-end;
   }
-`
+`;
 
 const FilesWrapper = styled.div`
   display: flex;
@@ -406,7 +339,7 @@ const FilesWrapper = styled.div`
       color: ${({ theme }) => theme.colors.subText};
     }
   }
-`
+`;
 
 const Image = styled.div`
   position: relative;
@@ -428,7 +361,9 @@ const Image = styled.div`
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 150ms ease-in, background-color 150ms ease-in;
+    transition:
+      opacity 150ms ease-in,
+      background-color 150ms ease-in;
 
     span {
       font-size: 1.3rem;
@@ -442,7 +377,7 @@ const Image = styled.div`
     }
   }
   margin-bottom: 0.5rem;
-`
+`;
 
 const InputsWrapper = styled.div`
   display: flex;
@@ -455,4 +390,4 @@ const InputsWrapper = styled.div`
     top: 0;
     width: 100%;
   }
-`
+`;
