@@ -83,5 +83,5 @@ export default function ReportPage() {
         </button>
       </div>
     </div>
-  )
+  );
 }

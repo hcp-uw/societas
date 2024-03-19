@@ -1,13 +1,13 @@
-import { z } from "zod"
-import { authedProcedure, publicProcedure, router } from "../trpc"
-import { TRPCError } from "@trpc/server"
+import { z } from "zod";
+import { authedProcedure, publicProcedure, router } from "../trpc";
+import { TRPCError } from "@trpc/server";
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const projects = await ctx.db.project.findMany({
       take: 5,
-    })
-    return projects
+    });
+    return projects;
   }),
 
   getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
@@ -15,7 +15,7 @@ export const projectsRouter = router({
       where: {
         id: input,
       },
-    })
+    });
 
     // const membershipts  = await ctx.db
 
@@ -23,10 +23,10 @@ export const projectsRouter = router({
       throw new TRPCError({
         code: "NOT_FOUND",
         message: "No project has corresponding id",
-      })
+      });
     }
 
-    return data
+    return data;
   }),
 
   getByUserId: authedProcedure
@@ -36,35 +36,31 @@ export const projectsRouter = router({
         where: {
           ownerId: input,
         },
-      })
+      });
     }),
 
-  
-
-  
   // must be owner
   kickUser: authedProcedure
     .input(
       z.object({
         userId: z.string(),
         projectId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.memberships.delete({
         where: {
           projectId_userId: input,
         },
-      })
+      });
     }),
-
 
   getPosts: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     return await ctx.db.post.findMany({
       where: {
         projectId: input,
       },
-    })
+    });
   }),
 
   // must be owner
@@ -74,10 +70,10 @@ export const projectsRouter = router({
         projectId: z.string(),
         title: z.string(),
         content: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.post.create({ data: input })
+      await ctx.db.post.create({ data: input });
     }),
 
   create: publicProcedure
@@ -88,15 +84,13 @@ export const projectsRouter = router({
         meetType: z.string(),
         ownerId: z.string(),
         meetLocation: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        await ctx.db.project.create({ data: input })
+        await ctx.db.project.create({ data: input });
       } catch (e) {
-        console.log("here")
+        console.log("here");
       }
     }),
-
-    
-})
+});

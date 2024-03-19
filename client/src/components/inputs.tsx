@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 export const StyledInput = styled.input`
   // the actual input
@@ -17,7 +17,7 @@ export const StyledInput = styled.input`
     outline: none;
     box-shadow: 0px 0px 4px 1px #17a1fa;
   }
-`
+`;
 
 export const Input = styled.div`
   // the pair of input and lable
@@ -40,7 +40,7 @@ export const Input = styled.div`
     font-family: inherit;
     margin-top: 1rem;
   }
-`
+`;
 export const TextArea = styled.textarea`
   font-family: ${({ theme }) => theme.fonts.default};
   resize: none;
@@ -59,4 +59,4 @@ export const TextArea = styled.textarea`
     outline: none;
     box-shadow: 0px 0px 4px 1px #17a1fa;
   }
-`
+`;

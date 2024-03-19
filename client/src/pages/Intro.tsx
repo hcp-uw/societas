@@ -1,12 +1,11 @@
-import { Link } from "react-router-dom"
-import LogoRoute from "../assets/logo.svg"
-import SurferRoute from "../assets/surfer.png"
-import TeamWork from "../assets/Teamwork.svg"
+import { Link } from "react-router-dom";
+import LogoRoute from "../assets/logo.svg";
+import SurferRoute from "../assets/surfer.png";
+import TeamWork from "../assets/Teamwork.svg";
 
 //weclome page. Once "lets go" is clicked, brings you to home page
 
 export default function Intro() {
-
   return (
     <div className=" w-full m-auto pt-8 flex flex-col gap-4 overflow-hidden">
       <h1 className="flex flex-col items-center text-4xl relative">
@@ -90,5 +89,5 @@ export default function Intro() {
         </Link>
       </div>
     </div>
-  )
+  );
 }
