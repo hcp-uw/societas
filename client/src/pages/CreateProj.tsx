@@ -1,55 +1,3 @@
-<<<<<<< HEAD
-import styled from "styled-components"
-import { useState } from "react"
-import { createProject, uploadProjectImage } from "../firebase"
-import { toast } from "react-hot-toast"
-import { Form, useNavigate } from "react-router-dom"
-import { useUser } from "@clerk/clerk-react"
-import { StyledInput, Input, TextArea } from "../components/inputs"
-import { QueryClient, useMutation } from "@tanstack/react-query"
-import { z } from "zod"
-import { trpc } from "../utils/trpc"
-
-// export const createProjectAction =
-//   (queryClient: QueryClient) =>
-//   async ({ request }: { request: Request }) => {
-//     //wait for data
-//     const formData = await request.formData()
-//     const inputsScheme = z.object({
-//       title: z.string(),
-//       description: z.string(),
-//       meetLocation: z.string(),
-//       imageUrl: z.instanceof(Blob),
-//       maxMembers: z.string(),
-//       ownerId: z.string(),
-//       meetType: z.string(),
-//       startDate: z.string(),
-//     })
-//     //parse data into above values.
-//     // const inputs = inputsScheme.parse(Object.fromEntries(formData))
-
-//     //wait until data is parsed
-//     // await createProject({
-//     //   title: inputs.title,
-//     //   description: inputs.description,
-//     //   meetLocation: inputs.meetLocation,
-//     //   image: inputs.imageUrl,
-//     //   maxMembers: inputs.maxMembers,
-//     //   ownerId: inputs.ownerId,
-//     //   meetType: inputs.meetType,
-//     //   startDate: inputs.startDate,
-//     // })
-
-//     toast.success("Project Created")
-
-//     //update project queries.
-//     queryClient.invalidateQueries({
-//       queryKey: ["projects"],
-//     })
-
-//     return redirect("/")
-//   }
-=======
 import styled from "styled-components";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -58,7 +6,8 @@ import { useUser } from "@clerk/clerk-react";
 import { StyledInput, Input, TextArea } from "../components/inputs";
 import { trpc } from "../utils/trpc";
 import Spinner from "../components/Spinner";
->>>>>>> 227491f45aa0e01d72d3e1363660b3bfc7675fba
+import { useMutation } from "@tanstack/react-query";
+import { uploadProjectImage } from "../firebase";
 
 type FormState = {
   title: string;
@@ -102,17 +51,10 @@ export default function CreateProj() {
   })
 
   const mutation = trpc.projects.create.useMutation({
-<<<<<<< HEAD
-    onSuccess(data) {
+    onSuccess() {
       utils.projects.getAll.invalidate()
       toast.success("Project Created!")
       navigate("/")
-=======
-    onSuccess() {
-      utils.projects.getAll.invalidate();
-      toast.success("Project Created!");
-      navigate("/");
->>>>>>> 227491f45aa0e01d72d3e1363660b3bfc7675fba
     },
   });
 
@@ -128,22 +70,10 @@ export default function CreateProj() {
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-<<<<<<< HEAD
     e.preventDefault()
     if (!user) return
     if (!formState.image) return
     uploadImageMutation.mutate(formState.image)
-=======
-    e.preventDefault();
-    if (!user) return;
-    mutation.mutate({
-      name: formState.title,
-      description: formState.description,
-      meetLocation: formState.location,
-      meetType: "",
-      ownerId: user?.id,
-    });
->>>>>>> 227491f45aa0e01d72d3e1363660b3bfc7675fba
   }
   //gets files view and inputs view from formstate.
   return (
