@@ -34,27 +34,24 @@ export default function CreateProj() {
 
   const uploadImageMutation = useMutation({
     mutationFn: (image: Blob) => uploadProjectImage(image),
-    onSuccess (url) {
-      if (!user) return
+    onSuccess(url) {
+      if (!user) return;
       mutation.mutate({
-      name: formState.title,
-      description: formState.description,
-      meetLocation: formState.location,
-      meetType: "",
-      ownerId: user?.id,
-      imageUrl: url
-
-      })
-
+        name: formState.title,
+        description: formState.description,
+        meetLocation: formState.location,
+        meetType: "",
+        ownerId: user?.id,
+        imageUrl: url,
+      });
     },
-
-  })
+  });
 
   const mutation = trpc.projects.create.useMutation({
     onSuccess() {
-      utils.projects.getAll.invalidate()
-      toast.success("Project Created!")
-      navigate("/")
+      utils.projects.getAll.invalidate();
+      toast.success("Project Created!");
+      navigate("/");
     },
   });
 
@@ -70,10 +67,10 @@ export default function CreateProj() {
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!user) return
-    if (!formState.image) return
-    uploadImageMutation.mutate(formState.image)
+    e.preventDefault();
+    if (!user) return;
+    if (!formState.image) return;
+    uploadImageMutation.mutate(formState.image);
   }
   //gets files view and inputs view from formstate.
   return (
