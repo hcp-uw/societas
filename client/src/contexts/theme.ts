@@ -1,4 +1,4 @@
-import { DefaultTheme } from "styled-components"
+import { DefaultTheme } from "styled-components";
 export const theme: DefaultTheme = {
   colors: {
     mainText: "#333333",
@@ -19,4 +19,4 @@ export const theme: DefaultTheme = {
     medium: 500,
     bold: 700,
   },
-}
+};

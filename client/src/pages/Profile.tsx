@@ -1,43 +1,45 @@
-import { useUser } from "@clerk/clerk-react"
-import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { Input, StyledInput } from "../components/inputs"
-import { useForm, SubmitHandler } from "react-hook-form"
-import toast from "react-hot-toast"
-import { getProjectsByUserId } from "../firebase"
-import { useQuery } from "@tanstack/react-query"
-import ProjectsView from "../components/ProjectsView"
-
-const myProjsQuery = (userId: string) => ({
-  queryKey: ["projects", "my"],
-  queryFn: () => getProjectsByUserId(userId),
-})
+import { useUser } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Input, StyledInput } from "../components/inputs";
+import { useForm, SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
+import ProjectsView from "../components/ProjectsView";
+import { trpc } from "../utils/trpc";
 
 /*
-* shows profile page. Gets data from userId. 
-* Also shows all your projects. 
-*/
+ * shows profile page. Gets data from userId.
+ * Also shows all your projects.
+ */
 export default function Profile() {
-  const { user } = useUser()
-  const { data, isError, isLoading } = useQuery(
-    myProjsQuery(user ? user.id : "")
-  )
+  const { user } = useUser();
+  // const { data, isError, isLoading } = useQuery(
+  //   myProjsQuery(user ? user.id : "")
+  // )
+
+  const { data, isLoading } = trpc.projects.getByUserId.useQuery(
+    user?.id ?? "",
+  );
+
+  if (data) {
+    console.log(data);
+  }
 
   const breakpointColumnsObj = {
     default: 3,
     1826: 2,
     1347: 2,
     900: 1,
-  }
+  };
   // user.setProfileImage({
   //   file:
   // })
 
-  if (!user) return <div>loading</div>
+  if (!user) return <div>loading</div>;
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading) return <div>loading</div>;
 
-  if (!data) return <div>There was an issue fetching your projects</div>
+  if (!data) return <div>There was an issue fetching your projects</div>;
   return (
     <div className="flex w-full gap-6 flex-col">
       <div className="flex gap-6 items-center">
@@ -69,30 +71,30 @@ export default function Profile() {
         <ProjectsView projects={data} breakPoints={breakpointColumnsObj} />
       )}
     </div>
-  )
+  );
 }
 
 type EditProfileFormVals = {
-  firstName: string
-  lastName: string
-  bio: string
-  image: FileList
-}
+  firstName: string;
+  lastName: string;
+  bio: string;
+  image: FileList;
+};
 
-//edit profile page and functionality 
+//edit profile page and functionality
 export function EditProfile() {
-  const { user, isLoaded, isSignedIn } = useUser()
-  const [image, setImage] = useState("")
-  const navigate = useNavigate()
+  const { user, isLoaded, isSignedIn } = useUser();
+  const [image, setImage] = useState("");
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<EditProfileFormVals>()
+    formState: { isSubmitting },
+  } = useForm<EditProfileFormVals>();
 
-  //handles update of data using the form. 
+  //handles update of data using the form.
   const onSubmit: SubmitHandler<EditProfileFormVals> = async (data) => {
-    if (!user) return
+    if (!user) return;
     await user.update({
       firstName: data.firstName,
       lastName: data.lastName,
@@ -100,29 +102,29 @@ export function EditProfile() {
       unsafeMetadata: {
         bio: data.bio,
       },
-    })
+    });
 
     if (data.image[0]) {
       await user.setProfileImage({
         file: data.image[0],
-      })
+      });
     }
 
-    toast.success("updated successfully")
-    navigate("/account")
-  }
+    toast.success("updated successfully");
+    navigate("/account");
+  };
 
   useEffect(() => {
-    if (!user) return
-    setImage(user.imageUrl)
-  }, [isLoaded])
+    if (!user) return;
+    setImage(user.imageUrl);
+  }, [isLoaded]);
 
-  if (!isSignedIn) return <div>must be logged in</div>
+  if (!isSignedIn) return <div>must be logged in</div>;
 
-  if (!user) return <div>loading</div>
+  if (!user) return <div>loading</div>;
 
   return (
-    //form to submit. 
+    //form to submit.
     <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 flex-col">
       <div className="relative w-fit">
         <img
@@ -180,7 +182,7 @@ export function EditProfile() {
         accept="image/*"
         {...register("image", {
           onChange: (e) => {
-            setImage(e.target.files[0])
+            setImage(e.target.files[0]);
           },
         })}
       />
@@ -191,5 +193,5 @@ export function EditProfile() {
         {isSubmitting ? "Updating" : "Update"}
       </button>
     </form>
-  )
+  );
 }

@@ -26,5 +26,5 @@ export default function WhoopsPage() {
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,227 +1,125 @@
-import { QueryClient, useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query";
 import {
-  ActionFunctionArgs,
   FetcherWithComponents,
-  LoaderFunctionArgs,
-  redirect,
   useFetcher,
   useNavigate,
   useParams,
-} from "react-router-dom"
-import {
-  createProjectPost,
-  getAllProjectPosts,
-  getProjectById,
-  getProjectPostById,
-  removeUser,
-} from "../firebase"
-import Spinner from "../components/Spinner"
-import dayjjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
-import { useUser } from "@clerk/clerk-react"
-import { TextArea, Input, StyledInput } from "../components/inputs"
-import { useState } from "react"
-import { useEffect } from "react"
-import toast from "react-hot-toast"
-import { NavLink, Outlet, Form } from "react-router-dom"
-import Markdown from "react-markdown"
-import { useMemo } from "react"
-import { z } from "zod"
-import { trpc } from "../utils/trpc"
+} from "react-router-dom";
+import { getAllProjectPosts, getProjectPostById } from "../firebase";
+import Spinner from "../components/Spinner";
+import dayjjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { useUser } from "@clerk/clerk-react";
+import { TextArea, Input, StyledInput } from "../components/inputs";
+import { useState } from "react";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import { NavLink, Outlet, Form } from "react-router-dom";
+import Markdown from "react-markdown";
+import { trpc } from "../utils/trpc";
 
-dayjjs.extend(relativeTime)
+dayjjs.extend(relativeTime);
 
 //get project info
-const projectInfoQuery = (id: string) => ({
-  queryKey: ["projects", id, "info"],
-  queryFn: () => getProjectById(id),
-})
 
 //get all posts related to project
 const projectPostsQuery = (id: string) => ({
   queryKey: ["projects", id, "posts"],
   queryFn: () => getAllProjectPosts(id),
-})
+});
 
 //get singular post related to porject
 const projectPostQuery = (projectId: string, postId: string) => ({
   queryKey: ["projects", projectId, "posts", postId],
   queryFn: () => getProjectPostById(projectId, postId),
-})
-
-//Loaders for Info, allPosts, and posts.
-
-//Maybe combine info and allPosts into one function as their code seems identical
-//Change name of Postloader and Postsloader. A bit confusing.
-
-export const postsLoader =
-  (queryClient: QueryClient) =>
-  async ({ params }: LoaderFunctionArgs) => {
-    if (!params.projectId) throw new Error("no project Id found in url params")
-
-    const query = projectPostsQuery(params.projectId)
-    return (
-      queryClient.getQueryData(query.queryKey) ??
-      (await queryClient.fetchQuery(query))
-    )
-  }
-
-export const postLoader =
-  (queryClient: QueryClient) =>
-  async ({ params }: LoaderFunctionArgs) => {
-    if (!params.projectId) throw new Error("no project Id found in url params")
-    if (!params.postId) throw new Error("no post Id found in url params")
-    const query = projectPostQuery(params.projectId, params.postId)
-    return (
-      queryClient.getQueryData(query.queryKey) ??
-      (await queryClient.fetchQuery(query))
-    )
-  }
-// send request
-export const action =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    //get form data and parse it thorugh to inputsSchema.
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      projectId: z.string(),
-      imageUrl: z.string(),
-      message: z.string(),
-      ownerId: z.string(),
-      projectTitle: z.string(),
-      requestantId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    // await createProjectJoinRequest({
-    //   projectId: inputs.projectId,
-    //   imageUrl: inputs.imageUrl,
-    //   message: inputs.message,
-    //   ownerId: inputs.ownerId,
-    //   projectTitle: inputs.projectTitle,
-    //   requestantId: inputs.requestantId,
-    // })
-
-    //when done invalidate queries and update them.
-    queryClient.invalidateQueries({
-      queryKey: ["projects", inputs.projectId, "info"],
-    })
-    return null
-  }
-
-//same process as above just creating a post in this case and
-//updating a different query.
-export const createPostAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      title: z.string(),
-      comment: z.string(),
-      projectId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-
-    await createProjectPost(inputs.projectId, {
-      title: inputs.title,
-      comment: inputs.comment,
-    })
-
-    queryClient.invalidateQueries({
-      queryKey: ["projects", inputs.projectId, "posts"],
-    })
-
-    return redirect(`/${inputs.projectId}/posts`)
-  }
-
-export const leaveProjectAction =
-  (queryClient: QueryClient) =>
-  async ({ request }: ActionFunctionArgs) => {
-    const formData = await request.formData()
-    const inputsSchema = z.object({
-      projectId: z.string(),
-      userId: z.string(),
-    })
-    const inputs = inputsSchema.parse(Object.fromEntries(formData))
-    if (confirm("Are you sure you want to leave this project?")) {
-      await removeUser(inputs.userId, inputs.projectId)
-      queryClient.invalidateQueries({
-        queryKey: ["projects", inputs.projectId],
-      })
-      toast.success("Left Project")
-    }
-    return redirect(`/${inputs.projectId}`)
-  }
+});
 
 function useGetProjectData() {
-  const { projectId } = useParams()
-  const query = trpc.projects.getById.useQuery(projectId ?? "")
+  const { projectId } = useParams();
+  const query = trpc.projects.getById.useQuery(projectId ?? "");
 
   return {
     projectId,
     ...query,
-  }
+  };
 }
 
 export default function Project() {
-  const { data, isLoading, isError, projectId } = useGetProjectData()
-  const { user } = useUser()
+  // const { projectId } = useParams()
+  const { data, isLoading, projectId } = useGetProjectData();
+  const { data: role } = trpc.memberships.getRole.useQuery(projectId ?? "");
+  const { user } = useUser();
   // const fetcher = useFetcher()
 
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+  const utils = trpc.useUtils();
 
-  //get and store role whenever data or user changes.
-  // const role = useMemo(() => getRole(), [data, user])
-
-  const utils = trpc.useUtils()
-  const createJoinReqMutation =
-    trpc.projects.createProjectJoinRequest.useMutation({
+  const sendJoinReqMutation =
+    trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
-        console.log("Request Created")
-        setShowModal(false)
-        utils.projects.getAllPendingRequests.invalidate()
-        toast.success("Requested!")
+        console.log("Request Created");
+        setShowModal(false);
+        utils.memberships.getRole.invalidate(projectId);
+        toast.success("Requested!");
       },
-    })
+    });
 
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!user) return
-    if (!projectId) return
-    console.log("mutating")
-    createJoinReqMutation.mutate({
-      projectId: projectId,
-      userId: user.id,
-    })
+    e.preventDefault();
+    if (!projectId) return;
+    if (!data) return;
+    if (!user) return;
+    const formData = new FormData(e.currentTarget);
+
+    const description = formData.get("description") as string;
+
+    if (!role) {
+      sendJoinReqMutation.mutate({
+        projectId: projectId,
+        ownerId: data.ownerId,
+        userId: user?.id,
+        description: description,
+      });
+    } else if (role.status === "REJECTED") {
+      sendJoinReqMutation.mutate({
+        projectId: projectId,
+        ownerId: data.ownerId,
+        userId: user?.id,
+        description: description,
+        role: {
+          status: role.status,
+          id: role.id,
+        },
+      });
+    }
   }
 
-  const requestData = trpc.projects.getAllPendingRequests.useQuery(
-    projectId ?? ""
-  )
+  const requestData = trpc.memberships.getAllPendingRequests.useQuery(
+    projectId ?? "",
+  );
 
   if (requestData.data != undefined) {
-    console.log(requestData.data)
+    console.log(requestData.data);
   }
 
-  // function getRole() {
-  //   if (!data || !user) return
-  //   if (data.ownerId === user.id) {
-  //     return "owner"
-  //   } else if (data.members.find((member) => member === user.id)) {
-  //     return "member"
-  //   } else if (data.requestants.find((requestant) => requestant === user.id)) {
-  //     return "requestant"
-  //   } else {
-  //     return "none"
-  //   }
-  // }
+  const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
+    onSuccess() {
+      console.log("Left Project");
+      utils.memberships.getRole.invalidate();
+      toast.success("Left Project");
+    },
+  });
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (fetcher.state === "submitting") {
-  //       setShowModal(false)
-  //     }
-  //   }
-  // }, [fetcher.state])
+  function handleLeaveReq(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!user || !projectId) return;
+    if (confirm("Are you sure you want to leave this project?")) {
+      leaveProjectMutation.mutate({
+        projectId: projectId,
+        userId: user?.id,
+      });
+    }
+  }
 
   if (isLoading)
     return (
@@ -237,9 +135,9 @@ export default function Project() {
       >
         <Spinner size="4rem" />
       </div>
-    )
+    );
 
-  if (!data) return <div>Project was not found</div>
+  if (!data) return <div>Project was not found</div>;
 
   //shows the user the view of the project and ability/options to join.
   //TO FIX: join button is not working.
@@ -272,7 +170,7 @@ export default function Project() {
                 className="w-full"
                 cols={10}
                 rows={10}
-                name="message"
+                name="description"
               />
               <input type="hidden" value={projectId} name="projectId" />
               <input
@@ -286,10 +184,10 @@ export default function Project() {
               <button
                 type="submit"
                 className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
-                disabled={createJoinReqMutation.isPending}
+                disabled={sendJoinReqMutation.isLoading}
               >
-                {createJoinReqMutation.isPending ? (
-                  <Spinner color="white" />
+                {sendJoinReqMutation.isLoading ? (
+                  <Spinner />
                 ) : (
                   <p className="py-2">Join</p>
                 )}
@@ -328,13 +226,7 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              <button
-                className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
-                onClick={() => setShowModal(true)}
-              >
-                Join
-              </button>
-              {/* {role === "owner" ? (
+              {data.ownerId === user?.id ? (
                 <div className="flex gap-4 items-center">
                   <NavLink
                     to="posts/new"
@@ -343,20 +235,20 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : role === "none" ? (
+              ) : !role || role.status === "REJECTED" ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
                 >
                   Join
                 </button>
-              ) : role === "requestant" ? (
+              ) : role.status === "PENDING" ? (
                 <div className="py-1 px-6 bg-zinc-200 rounded-lg cursor-default">
                   Requested
                 </div>
-              ) : role === "member" ? (
+              ) : role.status === "ACCEPTED" ? (
                 <>
-                  <Form method="post" action="leaveProject">
+                  <Form method="post" onSubmit={handleLeaveReq}>
                     <input
                       type="hidden"
                       value={user ? user.id : ""}
@@ -373,21 +265,21 @@ export default function Project() {
                 </>
               ) : (
                 <div>Log in to join!</div>
-              )} */}
+              )}
             </div>
           </nav>
           {/* <Outlet /> */}
         </div>
       </div>
     </>
-  )
+  );
 }
 
 type SubmitFetcherBtnProps = {
-  fetcher: FetcherWithComponents<any>
-  message: string
-  className?: string
-}
+  fetcher: FetcherWithComponents<unknown>;
+  message: string;
+  className?: string;
+};
 function SubmitFetcherBtn({
   fetcher,
   message,
@@ -400,32 +292,32 @@ function SubmitFetcherBtn({
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
-        <Spinner color="white" />
+        <Spinner />
       ) : (
         <p className="py-2">{message}</p>
       )}
     </button>
-  )
+  );
 }
 
 export function CreatePost() {
-  const { user } = useUser()
-  const { data, isLoading, projectId } = useGetProjectData()
-  const [isPreview, setIsPreview] = useState(false)
-  const [comment, setComment] = useState("")
-  const [title, setTitle] = useState("")
-  const fetcher = useFetcher()
-  const navigate = useNavigate()
+  const { user } = useUser();
+  const { data, isLoading, projectId } = useGetProjectData();
+  const [isPreview, setIsPreview] = useState(false);
+  const [comment, setComment] = useState("");
+  const [title, setTitle] = useState("");
+  const fetcher = useFetcher();
+  const navigate = useNavigate();
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading) return <div>loading</div>;
 
-  if (!user) return <div>loading</div>
+  if (!user) return <div>loading</div>;
 
-  if (!data) return <div>something went wrong! Try reloading</div>
+  if (!data) return <div>something went wrong! Try reloading</div>;
 
   if (data.ownerId !== user.id) {
-    toast.error("Can only create post if owner")
-    navigate("..")
+    toast.error("Can only create post if owner");
+    navigate("..");
   }
 
   return (
@@ -500,15 +392,15 @@ export function CreatePost() {
         />
       </fetcher.Form>
     </div>
-  )
+  );
 }
 
 export function ProjectInfo() {
-  const { data, isLoading } = useGetProjectData()
+  const { data, isLoading } = useGetProjectData();
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading) return <div>loading</div>;
 
-  if (!data) return <div>something went wrong, Try again!</div>
+  if (!data) return <div>something went wrong, Try again!</div>;
 
   return (
     <div className="flex justify-between w-full gap-16">
@@ -524,52 +416,52 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Start Date:
           </span>
-          {data.startDate}
+          {data.createdAt}
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
             Posted:
           </span>
-          {dayjjs(data.createdAt.toDate()).fromNow()}
+          {dayjjs(data.createdAt).fromNow()}
         </p>
       </div>
       <img
-        src={data.imageUrl}
+        src={"" /*to fix later*/}
         alt=""
         width={400}
         height={400}
         className="rounded-lg"
       />
     </div>
-  )
+  );
 }
 
 export function ProjectPostsLayout() {
-  const { projectId, postId } = useParams()
+  const { projectId, postId } = useParams();
   const { data, isLoading, isError } = useQuery(
-    projectPostsQuery(projectId ?? "")
-  )
-  const navigate = useNavigate()
+    projectPostsQuery(projectId ?? ""),
+  );
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (postId === undefined && data) {
-      console.log("here")
+      console.log("here");
 
-      if (data.length === 0) return
-      navigate(`/${projectId}/posts/${data[0].id}`)
+      if (data.length === 0) return;
+      navigate(`/${projectId}/posts/${data[0].id}`);
     }
-  }, [])
+  }, []);
 
-  if (isLoading) return <div>loading posts</div>
+  if (isLoading) return <div>loading posts</div>;
 
-  if (isError) return <div>something went wrong</div>
+  if (isError) return <div>something went wrong</div>;
 
   if (data.length === 0)
     return (
       <div className="font-medium text-zinc-800 text-lg">
         No Blog post to show
       </div>
-    )
+    );
 
   return (
     <div className="flex justify-between gap-8 w-full overflow-hidden max-h-[800px]">
@@ -581,8 +473,8 @@ export function ProjectPostsLayout() {
               isActive
                 ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-2 gap-16 justify-between items-center p-4 border-blue-500 bg-zinc-300 max-w-xs transition-all"
                 : isPending
-                ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors"
-                : "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors "
+                  ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors"
+                  : "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors "
             }
             to={`${post.id}`}
           >
@@ -597,18 +489,18 @@ export function ProjectPostsLayout() {
       </div>
       <Outlet />
     </div>
-  )
+  );
 }
 
 export function ProjectPost() {
-  const params = useParams()
+  const params = useParams();
   const { data, isLoading } = useQuery(
-    projectPostQuery(params.projectId ?? "", params.postId ?? "")
-  )
+    projectPostQuery(params.projectId ?? "", params.postId ?? ""),
+  );
 
-  if (isLoading) return <div>loading..</div>
+  if (isLoading) return <div>loading..</div>;
 
-  if (!data) return <div>something went wrong</div>
+  if (!data) return <div>something went wrong</div>;
 
   return (
     <div className="flex-1 border-1 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
@@ -616,5 +508,5 @@ export function ProjectPost() {
         <Markdown>{data.comment}</Markdown>
       </article>
     </div>
-  )
+  );
 }

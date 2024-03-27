@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { authedProcedure, publicProcedure, router } from "../trpc";
+import { TRPCError } from "@trpc/server";
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -10,79 +11,30 @@ export const projectsRouter = router({
   }),
 
   getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    return await ctx.db.project.findFirst({
+    const data = await ctx.db.project.findFirst({
       where: {
         id: input,
       },
     });
+
+    // const membershipts  = await ctx.db
+
+    if (!data) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "No project has corresponding id",
+      });
+    }
+
+    return data;
   }),
 
   getByUserId: authedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      return await ctx.db.project.findFirst({
+      return await ctx.db.project.findMany({
         where: {
           ownerId: input,
-        },
-      });
-    }),
-
-  createProjectJoinRequest: publicProcedure
-    .input(
-      z.object({
-        projectId: z.string(),
-        userId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      // if already exists, will throw invalid invocation error
-      await ctx.db.memberships.create({ data: input });
-    }),
-
-  getAllPendingRequests: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      return await ctx.db.memberships.findMany({
-        where: {
-          userId: input,
-          status: "PENDING",
-        },
-        select: {
-          projectId: true,
-        },
-      });
-    }),
-
-  // must be owner
-  acceptRequest: authedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          id: input,
-        },
-        data: {
-          status: "ACCEPTED",
-        },
-      });
-    }),
-
-  // must be owner
-  rejectRequest: authedProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-        projectId: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.memberships.update({
-        where: {
-          projectId_userId: input,
-          status: "PENDING",
-        },
-        data: {
-          status: "REJECTED",
         },
       });
     }),
@@ -93,7 +45,7 @@ export const projectsRouter = router({
       z.object({
         userId: z.string(),
         projectId: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.memberships.delete({
@@ -118,7 +70,7 @@ export const projectsRouter = router({
         projectId: z.string(),
         title: z.string(),
         content: z.string(),
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.post.create({ data: input });
@@ -132,8 +84,12 @@ export const projectsRouter = router({
         meetType: z.string(),
         ownerId: z.string(),
         meetLocation: z.string(),
+<<<<<<< HEAD
         imageUrl: z.string()
       })
+=======
+      }),
+>>>>>>> 227491f45aa0e01d72d3e1363660b3bfc7675fba
     )
     .mutation(async ({ ctx, input }) => {
       try {

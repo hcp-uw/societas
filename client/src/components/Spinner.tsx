@@ -1,9 +1,8 @@
 // import styled from "styled-components"
 // import PropTypes from "prop-types"
 
-
 //Buffering animation - the circle that spins when things are loading
-export default function Spinner({ color = "#383838", size = "3rem" }) {
+export default function Spinner({ size = "3rem" }) {
   return (
     <div role="status">
       <svg
@@ -26,7 +25,7 @@ export default function Spinner({ color = "#383838", size = "3rem" }) {
       </svg>
       <span className="sr-only">Loading...</span>
     </div>
-  )
+  );
 }
 
 // const StyledSpinner = styled.div`
