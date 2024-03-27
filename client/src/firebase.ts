@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 
 import { getAuth } from "firebase/auth";
+import { v4 as uuidv4 } from "uuid";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -39,9 +40,9 @@ export const storage = getStorage(app);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-export async function uploadProjectImage(projId: string, image: Blob) {
+export async function uploadProjectImage(image: Blob) {
   //creates a referance/link for the image.
-  const imageRef = ref(storage, `projects/${projId}`);
+  const imageRef = ref(storage, `projects/${uuidv4()}`);
   //uploads image to reference
   await uploadBytes(imageRef, image);
 
@@ -86,7 +87,7 @@ export async function createProject({
     startDate: startDate,
   });
 
-  const url = await uploadProjectImage(docRef.id, image);
+  const url = await uploadProjectImage(image);
   await updateDoc(docRef, {
     imageUrl: url,
   });
