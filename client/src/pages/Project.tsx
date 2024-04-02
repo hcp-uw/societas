@@ -1,97 +1,88 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query";
 import {
   FetcherWithComponents,
   Navigate,
   useFetcher,
   useNavigate,
   useParams,
-} from "react-router-dom"
-import {
-  getAllProjectPosts,
-  getProjectPostById,
-} from "../firebase"
-import Spinner from "../components/Spinner"
-import dayjjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
-import { useUser } from "@clerk/clerk-react"
-import { TextArea, Input, StyledInput } from "../components/inputs"
-import { useState } from "react"
-import { useEffect } from "react"
-import toast from "react-hot-toast"
-import { NavLink, Outlet, Form } from "react-router-dom"
-import Markdown from "react-markdown"
-import { trpc } from "../utils/trpc"
+} from "react-router-dom";
+import { getAllProjectPosts, getProjectPostById } from "../firebase";
+import Spinner from "../components/Spinner";
+import dayjjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { useUser } from "@clerk/clerk-react";
+import { TextArea, Input, StyledInput } from "../components/inputs";
+import { useState } from "react";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import { NavLink, Outlet, Form } from "react-router-dom";
+import Markdown from "react-markdown";
+import { trpc } from "../utils/trpc";
 
-dayjjs.extend(relativeTime)
+dayjjs.extend(relativeTime);
 
 //get project info
-
 
 //get all posts related to project
 const projectPostsQuery = (id: string) => ({
   queryKey: ["projects", id, "posts"],
   queryFn: () => getAllProjectPosts(id),
-})
+});
 
 //get singular post related to porject
 const projectPostQuery = (projectId: string, postId: string) => ({
   queryKey: ["projects", projectId, "posts", postId],
   queryFn: () => getProjectPostById(projectId, postId),
-})
+});
 
 function useGetProjectData() {
-  const { projectId } = useParams()
-  const query = trpc.projects.getById.useQuery(projectId ?? "")
+  const { projectId } = useParams();
+  const query = trpc.projects.getById.useQuery(projectId ?? "");
 
   return {
     projectId,
     ...query,
-  }
+  };
 }
 
 export default function Project() {
   // const { projectId } = useParams()
-  const { data, isLoading, projectId } = useGetProjectData()
-  const { data: role} =
-    trpc.memberships.getRole.useQuery(projectId ?? "")
-  const { user } = useUser()
+  const { data, isLoading, projectId } = useGetProjectData();
+  const { data: role } = trpc.memberships.getRole.useQuery(projectId ?? "");
+  const { user } = useUser();
   const navigate = useNavigate();
   // const fetcher = useFetcher()
 
-  const [showModal, setShowModal] = useState(false)
-  const utils = trpc.useUtils()
-
+  const [showModal, setShowModal] = useState(false);
+  const utils = trpc.useUtils();
 
   const sendJoinReqMutation =
     trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
-        console.log("Request Created")
-        setShowModal(false)
+        console.log("Request Created");
+        setShowModal(false);
         utils.memberships.getRole.invalidate(projectId);
-        toast.success("Requested!")
+        toast.success("Requested!");
       },
-    })
-
+    });
 
   function handleJoinReqSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!projectId) return;
+    if (!data) return;
+    if (!user) return;
+    const formData = new FormData(e.currentTarget);
 
-    e.preventDefault()
-    if (!projectId) return
-    if (!data) return
-    if (!user) return
-    const formData = new FormData(e.currentTarget)
-    
-    const description = formData.get("description") as string
+    const description = formData.get("description") as string;
 
-
-    if(!role){
+    if (!role) {
       sendJoinReqMutation.mutate({
         projectId: projectId,
         ownerId: data.ownerId,
         userId: user?.id,
         description: description,
-      })
-    }else if(role.status === "REJECTED"){
+      });
+    } else if (role.status === "REJECTED") {
       sendJoinReqMutation.mutate({
         projectId: projectId,
         ownerId: data.ownerId,
@@ -99,37 +90,36 @@ export default function Project() {
         description: description,
         role: {
           status: role.status,
-          id: role.id
-        }
-      })
+          id: role.id,
+        },
+      });
     }
   }
 
   const requestData = trpc.memberships.getAllPendingRequests.useQuery(
-    projectId ?? ""
-  )
+    projectId ?? "",
+  );
 
   if (requestData.data != undefined) {
-    console.log(requestData.data)
+    console.log(requestData.data);
   }
 
-
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
-    onSuccess(){
+    onSuccess() {
       console.log("Left Project");
       utils.memberships.getRole.invalidate();
-      toast.success("Left Project")
-    }
+      toast.success("Left Project");
+    },
   });
 
-  function handleLeaveReq(e: React.FormEvent<HTMLFormElement>){
+  function handleLeaveReq(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if(!user || !projectId) return;
-    if (confirm("Are you sure you want to leave this project?")){ 
+    if (!user || !projectId) return;
+    if (confirm("Are you sure you want to leave this project?")) {
       leaveProjectMutation.mutate({
         projectId: projectId,
-        userId: user?.id
-      });    
+        userId: user?.id,
+      });
     }
   }
 
@@ -168,9 +158,9 @@ export default function Project() {
       >
         <Spinner size="4rem" />
       </div>
-    )
+    );
 
-  if (!data) return <div>Project was not found</div>
+  if (!data) return <div>Project was not found</div>;
 
   //shows the user the view of the project and ability/options to join.
   //TO FIX: join button is not working.
@@ -220,7 +210,7 @@ export default function Project() {
                 disabled={sendJoinReqMutation.isLoading}
               >
                 {sendJoinReqMutation.isLoading ? (
-                  <Spinner/>
+                  <Spinner />
                 ) : (
                   <p className="py-2">Join</p>
                 )}
@@ -268,7 +258,7 @@ export default function Project() {
                     New Post
                   </NavLink>
                 </div>
-              ) : !role || role.status === "REJECTED"? (
+              ) : !role || role.status === "REJECTED" ? (
                 <button
                   className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
                   onClick={() => setShowModal(true)}
@@ -305,14 +295,14 @@ export default function Project() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
 type SubmitFetcherBtnProps = {
-  fetcher: FetcherWithComponents<any>
-  message: string
-  className?: string
-}
+  fetcher: FetcherWithComponents<unknown>;
+  message: string;
+  className?: string;
+};
 function SubmitFetcherBtn({
   fetcher,
   message,
@@ -325,32 +315,32 @@ function SubmitFetcherBtn({
       disabled={fetcher.state === "submitting"}
     >
       {fetcher.state === "submitting" ? (
-        <Spinner/>
+        <Spinner />
       ) : (
         <p className="py-2">{message}</p>
       )}
     </button>
-  )
+  );
 }
 
 export function CreatePost() {
-  const { user } = useUser()
-  const { data, isLoading, projectId } = useGetProjectData()
-  const [isPreview, setIsPreview] = useState(false)
-  const [comment, setComment] = useState("")
-  const [title, setTitle] = useState("")
-  const fetcher = useFetcher()
-  const navigate = useNavigate()
+  const { user } = useUser();
+  const { data, isLoading, projectId } = useGetProjectData();
+  const [isPreview, setIsPreview] = useState(false);
+  const [comment, setComment] = useState("");
+  const [title, setTitle] = useState("");
+  const fetcher = useFetcher();
+  const navigate = useNavigate();
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading) return <div>loading</div>;
 
-  if (!user) return <div>loading</div>
+  if (!user) return <div>loading</div>;
 
-  if (!data) return <div>something went wrong! Try reloading</div>
+  if (!data) return <div>something went wrong! Try reloading</div>;
 
   if (data.ownerId !== user.id) {
-    toast.error("Can only create post if owner")
-    navigate("..")
+    toast.error("Can only create post if owner");
+    navigate("..");
   }
 
   return (
@@ -425,15 +415,15 @@ export function CreatePost() {
         />
       </fetcher.Form>
     </div>
-  )
+  );
 }
 
 export function ProjectInfo() {
-  const { data, isLoading } = useGetProjectData()
+  const { data, isLoading } = useGetProjectData();
 
-  if (isLoading) return <div>loading</div>
+  if (isLoading) return <div>loading</div>;
 
-  if (!data) return <div>something went wrong, Try again!</div>
+  if (!data) return <div>something went wrong, Try again!</div>;
 
   return (
     <div className="flex justify-between w-full gap-16">
@@ -466,35 +456,35 @@ export function ProjectInfo() {
         className="rounded-lg"
       />
     </div>
-  )
+  );
 }
 
 export function ProjectPostsLayout() {
-  const { projectId, postId } = useParams()
+  const { projectId, postId } = useParams();
   const { data, isLoading, isError } = useQuery(
-    projectPostsQuery(projectId ?? "")
-  )
-  const navigate = useNavigate()
+    projectPostsQuery(projectId ?? ""),
+  );
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (postId === undefined && data) {
-      console.log("here")
+      console.log("here");
 
-      if (data.length === 0) return
-      navigate(`/${projectId}/posts/${data[0].id}`)
+      if (data.length === 0) return;
+      navigate(`/${projectId}/posts/${data[0].id}`);
     }
-  }, [])
+  }, []);
 
-  if (isLoading) return <div>loading posts</div>
+  if (isLoading) return <div>loading posts</div>;
 
-  if (isError) return <div>something went wrong</div>
+  if (isError) return <div>something went wrong</div>;
 
   if (data.length === 0)
     return (
       <div className="font-medium text-zinc-800 text-lg">
         No Blog post to show
       </div>
-    )
+    );
 
   return (
     <div className="flex justify-between gap-8 w-full overflow-hidden max-h-[800px]">
@@ -506,8 +496,8 @@ export function ProjectPostsLayout() {
               isActive
                 ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-2 gap-16 justify-between items-center p-4 border-blue-500 bg-zinc-300 max-w-xs transition-all"
                 : isPending
-                ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors"
-                : "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors "
+                  ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors"
+                  : "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors "
             }
             to={`${post.id}`}
           >
@@ -522,18 +512,18 @@ export function ProjectPostsLayout() {
       </div>
       <Outlet />
     </div>
-  )
+  );
 }
 
 export function ProjectPost() {
-  const params = useParams()
+  const params = useParams();
   const { data, isLoading } = useQuery(
-    projectPostQuery(params.projectId ?? "", params.postId ?? "")
-  )
+    projectPostQuery(params.projectId ?? "", params.postId ?? ""),
+  );
 
-  if (isLoading) return <div>loading..</div>
+  if (isLoading) return <div>loading..</div>;
 
-  if (!data) return <div>something went wrong</div>
+  if (!data) return <div>something went wrong</div>;
 
   return (
     <div className="flex-1 border-1 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
@@ -541,5 +531,5 @@ export function ProjectPost() {
         <Markdown>{data.comment}</Markdown>
       </article>
     </div>
-  )
+  );
 }

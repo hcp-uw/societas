@@ -1,17 +1,17 @@
-import Masonry from "react-masonry-css"
-import { Link } from "react-router-dom"
-import dayjjs from "dayjs"
-import relativeTime from "dayjs/plugin/relativeTime"
-import {RouterOutputs } from "../utils/trpc"
-dayjjs.extend(relativeTime)
+import Masonry from "react-masonry-css";
+import { Link } from "react-router-dom";
+import dayjjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { RouterOutputs } from "../utils/trpc";
+dayjjs.extend(relativeTime);
 
-type BreakPoints = "default" | "1826" | "1347" | "900"
+type BreakPoints = "default" | "1826" | "1347" | "900";
 
-type Projects = RouterOutputs["projects"]["getAll"]
+type Projects = RouterOutputs["projects"]["getAll"];
 
 export default function ProjectsView(props: {
-  projects: Projects,
-  breakPoints: Record<BreakPoints, number>
+  projects: Projects;
+  breakPoints: Record<BreakPoints, number>;
 }) {
   return (
     <Masonry
@@ -27,14 +27,14 @@ export default function ProjectsView(props: {
         >
           {
             <img
-              src={""}
+              src={proj.imageUrl}
               width={350}
               height={400}
               loading="lazy"
               className="object-cover rounded-lg max-h-[400px] opacity-0 transition-opacity m-auto"
               onLoad={(e) => {
-                e.currentTarget.classList.remove("opacity-0")
-                e.currentTarget.classList.add("opacity-1")
+                e.currentTarget.classList.remove("opacity-0");
+                e.currentTarget.classList.add("opacity-1");
               }}
             />
           }
@@ -63,11 +63,11 @@ export default function ProjectsView(props: {
         </Link>
       ))}
     </Masonry>
-  )
+  );
 }
 
 const Blob = (props: { children: React.ReactNode }) => (
   <p className="bg-zinc-300 rounded-xl flex items-center w-fit text-sm text-zinc-700 gap-1 p-1">
     {props.children}
   </p>
-)
+);

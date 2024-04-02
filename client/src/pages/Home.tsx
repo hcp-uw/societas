@@ -1,15 +1,14 @@
-import { useUser } from "@clerk/clerk-react"
-import Spinner from "../components/Spinner"
-import ProjectsView from "../components/ProjectsView"
-import { trpc } from "../utils/trpc"
-
+import { useUser } from "@clerk/clerk-react";
+import Spinner from "../components/Spinner";
+import ProjectsView from "../components/ProjectsView";
+import { trpc } from "../utils/trpc";
 
 export default function Home() {
-  const { user } = useUser()
-  const { data } = trpc.projects.getAll.useQuery()
+  const { user } = useUser();
+  const { data } = trpc.projects.getAll.useQuery();
 
   if (data) {
-    console.log(data)
+    console.log(data);
   }
 
   //home page with "welcome" and projects shown.
@@ -25,7 +24,7 @@ export default function Home() {
 
       <Projects />
     </div>
-  )
+  );
 }
 
 /*
@@ -34,11 +33,10 @@ export default function Home() {
  *else return project view.
  */
 
- 
 function Projects() {
   //const { data, isLoading } = useQuery(projectsQuery())
 
-  const {data, isLoading} = trpc.projects.getAll.useQuery();
+  const { data, isLoading } = trpc.projects.getAll.useQuery();
 
   if (isLoading)
     return (
@@ -54,16 +52,16 @@ function Projects() {
       >
         <Spinner size="4rem" />
       </div>
-    )
+    );
 
-  if (!data) return <div>Something went wrong!</div>
+  if (!data) return <div>Something went wrong!</div>;
 
   const breakpointColumnsObj = {
     default: 4,
     1826: 3,
     1347: 2,
     900: 1,
-  }
+  };
 
-  return <ProjectsView projects={data} breakPoints={breakpointColumnsObj} />
+  return <ProjectsView projects={data} breakPoints={breakpointColumnsObj} />;
 }

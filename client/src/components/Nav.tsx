@@ -1,11 +1,11 @@
-import LogoRoute from "../assets/logo.png"
-import { SignInButton, SignUpButton } from "@clerk/clerk-react"
-import { useUser } from "@clerk/clerk-react"
-import { NavLink } from "react-router-dom"
+import LogoRoute from "../assets/logo.png";
+import { SignInButton, SignUpButton } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
+import { NavLink } from "react-router-dom";
 
 export default function Nav() {
   //get user.
-  const { user } = useUser()
+  const { user } = useUser();
 
   //returns header of logo and profile button or "sign in/sign up" if user is not registered.
   return (
@@ -48,5 +48,5 @@ export default function Nav() {
         )}
       </nav>
     </header>
-  )
+  );
 }

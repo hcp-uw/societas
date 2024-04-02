@@ -20,9 +20,8 @@ import {
   DocumentData,
 } from "firebase/firestore";
 
-import {
-  getAuth,
-} from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import { v4 as uuidv4 } from "uuid";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -41,9 +40,9 @@ export const storage = getStorage(app);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-export async function uploadProjectImage(projId: string, image: Blob) {
+export async function uploadProjectImage(image: Blob) {
   //creates a referance/link for the image.
-  const imageRef = ref(storage, `projects/${projId}`);
+  const imageRef = ref(storage, `projects/${uuidv4()}`);
   //uploads image to reference
   await uploadBytes(imageRef, image);
 
@@ -88,7 +87,7 @@ export async function createProject({
     startDate: startDate,
   });
 
-  const url = await uploadProjectImage(docRef.id, image);
+  const url = await uploadProjectImage(image);
   await updateDoc(docRef, {
     imageUrl: url,
   });
@@ -200,7 +199,7 @@ export async function getAllPendingRequests(currentUserId: string) {
   const q = query(
     requestsRef,
     where("ownerId", "==", currentUserId),
-    where("status", "==", "pending")
+    where("status", "==", "pending"),
   );
   const qSnapShot = await getDocs(q);
 
@@ -210,7 +209,7 @@ export async function getAllPendingRequests(currentUserId: string) {
 export async function acceptRequest(
   requestId: string,
   projectId: string,
-  requestantId: string
+  requestantId: string,
 ) {
   await updateDoc(doc(db, "requests", requestId), {
     status: "accepted",
@@ -227,7 +226,7 @@ export async function acceptRequest(
 export async function rejectRequest(
   requestId: string,
   projectId: string,
-  requestantId: string
+  requestantId: string,
 ) {
   await updateDoc(doc(db, "requests", requestId), {
     status: "rejected",
@@ -259,14 +258,14 @@ type ProjPost = {
 //get docs/data from firebase and then return as array with IDs.
 export async function getAllProjectPosts(projectId: string) {
   const projPostsSnap = await getDocs(
-    collection(db, `projects/${projectId}/posts`)
+    collection(db, `projects/${projectId}/posts`),
   );
 
   return addIdsToSnapShot(projPostsSnap) as ProjPost[];
 }
 export async function createProjectPost(
   projectId: string,
-  post: { title: string; comment: string }
+  post: { title: string; comment: string },
 ) {
   await addDoc(collection(db, `projects/${projectId}/posts`), {
     title: post.title,
@@ -278,11 +277,11 @@ export async function createProjectPost(
 
 export async function getProjectPostById(
   projectId: string,
-  projectPostId: string
+  projectPostId: string,
 ) {
   if (projectId.length < 1 || projectPostId.length < 1) return;
   const postSnapShot = await getDoc(
-    doc(db, `projects/${projectId}/posts/${projectPostId}`)
+    doc(db, `projects/${projectId}/posts/${projectPostId}`),
   );
 
   if (!postSnapShot.exists()) return;

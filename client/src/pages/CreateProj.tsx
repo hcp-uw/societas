@@ -1,21 +1,21 @@
-import styled from "styled-components"
-import { useState } from "react"
-import { toast } from "react-hot-toast"
-import { Form, useNavigate } from "react-router-dom"
-import { useUser } from "@clerk/clerk-react"
-import { StyledInput, Input, TextArea } from "../components/inputs"
-import { trpc } from "../utils/trpc"
-import Spinner from "../components/Spinner"
-
-
+import styled from "styled-components";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { Form, useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { StyledInput, Input, TextArea } from "../components/inputs";
+import { trpc } from "../utils/trpc";
+import Spinner from "../components/Spinner";
+import { useMutation } from "@tanstack/react-query";
+import { uploadProjectImage } from "../firebase";
 
 type FormState = {
-  title: string
-  description: string
-  location: string
-  maxMems: string
-  image: Blob | null
-}
+  title: string;
+  description: string;
+  location: string;
+  maxMems: string;
+  image: Blob | null;
+};
 
 export default function CreateProj() {
   //elements to fill when creating a project.
@@ -25,42 +25,52 @@ export default function CreateProj() {
     location: "",
     maxMems: "",
     image: null,
-  }) // state form the inputs
+  }); // state form the inputs
   // const [loading, setLoading] = useState(false)
   //const fetcher = useFetcher()
-  const utils = trpc.useUtils()
+  const utils = trpc.useUtils();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const uploadImageMutation = useMutation({
+    mutationFn: (image: Blob) => uploadProjectImage(image),
+    onSuccess(url) {
+      if (!user) return;
+      mutation.mutate({
+        name: formState.title,
+        description: formState.description,
+        meetLocation: formState.location,
+        meetType: "",
+        ownerId: user?.id,
+        imageUrl: url,
+      });
+    },
+  });
 
   const mutation = trpc.projects.create.useMutation({
     onSuccess() {
-      utils.projects.getAll.invalidate()
-      toast.success("Project Created!")
-      navigate("/")
+      utils.projects.getAll.invalidate();
+      toast.success("Project Created!");
+      navigate("/");
     },
-  })
+  });
 
-  const { user } = useUser()
+  const { user } = useUser();
 
-  if (!user) return <div>Must Be signed in to create project</div>
+  if (!user) return <div>Must Be signed in to create project</div>;
 
   function isFormValid() {
     Object.values(formState).forEach((val) => {
-      if (val === "" || val === null) return false
-    })
-    return true
+      if (val === "" || val === null) return false;
+    });
+    return true;
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (!user) return
-    mutation.mutate({
-      name: formState.title,
-      description: formState.description,
-      meetLocation: formState.location,
-      meetType: "",
-      ownerId: user?.id,
-    })
+    e.preventDefault();
+    if (!user) return;
+    if (!formState.image) return;
+    uploadImageMutation.mutate(formState.image);
   }
   //gets files view and inputs view from formstate.
   return (
@@ -80,15 +90,15 @@ export default function CreateProj() {
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
     </Form>
-  )
+  );
 }
 
 type InputsViewProps = {
-  formState: FormState
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
-  isFormValid: () => boolean
-  loading: boolean
-}
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+  isFormValid: () => boolean;
+  loading: boolean;
+};
 
 //shows the view for inputs to create a new project.
 //updates fiewlds of formState when inputs are made.
@@ -202,7 +212,7 @@ function InputsView({
 
       <SubmitBtnView isFormValid={isFormValid} desktop loading={loading} />
     </InputsWrapper>
-  )
+  );
 }
 
 //shows view for selecting a picture for a project.
@@ -210,10 +220,10 @@ function FilesView({
   formState,
   setFormState,
 }: {
-  formState: FormState
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+  formState: FormState;
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 }) {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
   return (
     <FilesWrapper className="h-fit">
       <div>
@@ -229,17 +239,17 @@ function FilesView({
           required
           //checks file size and for null returns.
           onChange={(e) => {
-            setError(null)
-            const maxFileSize = 1024 * 1024 // one mb
-            if (!e.target.files) return
-            const file = e.target.files[0]
+            setError(null);
+            const maxFileSize = 1024 * 1024; // one mb
+            if (!e.target.files) return;
+            const file = e.target.files[0];
 
             if (file.size > maxFileSize) {
-              setError("File size is too large")
-              e.target.value = ""
-              return
+              setError("File size is too large");
+              e.target.value = "";
+              return;
             }
-            setFormState((prev) => ({ ...prev, image: file }))
+            setFormState((prev) => ({ ...prev, image: file }));
           }}
         />
         {error && <p className="text-red-500 mt-4">{error}</p>}
@@ -263,7 +273,7 @@ function FilesView({
         </Image>
       )}
     </FilesWrapper>
-  )
+  );
 }
 
 //submit button view.
@@ -272,9 +282,9 @@ function SubmitBtnView({
   desktop,
   loading,
 }: {
-  isFormValid: () => boolean
-  desktop: boolean
-  loading: boolean
+  isFormValid: () => boolean;
+  desktop: boolean;
+  loading: boolean;
 }) {
   return (
     <SubmitWrapper desktop={desktop}>
@@ -294,17 +304,15 @@ function SubmitBtnView({
             loading ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Spinner size= "24rem" />
+          <Spinner size="24rem" />
         </div>
       </button>
     </SubmitWrapper>
-  )
+  );
 }
 
-
-
 interface SubmitWrapperProps {
-  readonly desktop?: boolean
+  readonly desktop?: boolean;
 }
 const SubmitWrapper = styled.div<SubmitWrapperProps>`
   width: 100%;
@@ -318,7 +326,7 @@ const SubmitWrapper = styled.div<SubmitWrapperProps>`
     justify-content: flex-end;
     align-items: flex-end;
   }
-`
+`;
 
 const FilesWrapper = styled.div`
   display: flex;
@@ -343,7 +351,7 @@ const FilesWrapper = styled.div`
       color: ${({ theme }) => theme.colors.subText};
     }
   }
-`
+`;
 
 const Image = styled.div`
   position: relative;
@@ -365,7 +373,9 @@ const Image = styled.div`
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 150ms ease-in, background-color 150ms ease-in;
+    transition:
+      opacity 150ms ease-in,
+      background-color 150ms ease-in;
 
     span {
       font-size: 1.3rem;
@@ -379,7 +389,7 @@ const Image = styled.div`
     }
   }
   margin-bottom: 0.5rem;
-`
+`;
 
 const InputsWrapper = styled.div`
   display: flex;
@@ -392,4 +402,4 @@ const InputsWrapper = styled.div`
     top: 0;
     width: 100%;
   }
-`
+`;
