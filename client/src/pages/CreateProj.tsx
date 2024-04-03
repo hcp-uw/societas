@@ -6,6 +6,8 @@ import { useUser } from "@clerk/clerk-react";
 import { StyledInput, Input, TextArea } from "../components/inputs";
 import { trpc } from "../utils/trpc";
 import Spinner from "../components/Spinner";
+import { useMutation } from "@tanstack/react-query";
+import { uploadProjectImage } from "../firebase";
 
 type FormState = {
   title: string;
@@ -30,6 +32,21 @@ export default function CreateProj() {
 
   const navigate = useNavigate();
 
+  const uploadImageMutation = useMutation({
+    mutationFn: (image: Blob) => uploadProjectImage(image),
+    onSuccess(url) {
+      if (!user) return;
+      mutation.mutate({
+        name: formState.title,
+        description: formState.description,
+        meetLocation: formState.location,
+        meetType: "",
+        ownerId: user?.id,
+        imageUrl: url,
+      });
+    },
+  });
+
   const mutation = trpc.projects.create.useMutation({
     onSuccess() {
       utils.projects.getAll.invalidate();
@@ -52,13 +69,8 @@ export default function CreateProj() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user) return;
-    mutation.mutate({
-      name: formState.title,
-      description: formState.description,
-      meetLocation: formState.location,
-      meetType: "",
-      ownerId: user?.id,
-    });
+    if (!formState.image) return;
+    uploadImageMutation.mutate(formState.image);
   }
   //gets files view and inputs view from formstate.
   return (
