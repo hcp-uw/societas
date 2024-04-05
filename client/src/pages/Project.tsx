@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   FetcherWithComponents,
+  Navigate,
   useFetcher,
   useNavigate,
   useParams,
@@ -49,6 +50,7 @@ export default function Project() {
   const { data, isLoading, projectId } = useGetProjectData();
   const { data: role } = trpc.memberships.getRole.useQuery(projectId ?? "");
   const { user } = useUser();
+  const navigate = useNavigate();
   // const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false);
@@ -120,6 +122,30 @@ export default function Project() {
       });
     }
   }
+
+
+  // TO DO: Delete Project
+  
+  // const deleteProjectMutation = trpc.projects.delete.useMutation({
+  //   onSuccess(){
+  //     utils.projects.getAll.invalidate();
+  //     toast.success("projectDeleted");
+  //     navigate("/");
+  //   }
+  // })
+
+  // function handleDeleteProject(e: React.FormEvent<HTMLFormElement>){
+  //   e.preventDefault();
+  //   if(!user || !data || !projectId) return;
+
+  //   if(user.id === data.ownerId){
+  //     deleteProjectMutation.mutate({
+  //       projectId: projectId,
+  //       ownerId: user.id
+  //     })
+  //   }
+  // }
+
 
   if (isLoading)
     return (

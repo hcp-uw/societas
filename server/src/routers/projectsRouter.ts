@@ -94,4 +94,52 @@ export const projectsRouter = router({
         console.log("here");
       }
     }),
-});
+
+  delete: authedProcedure
+    .input(z.object({
+      projectId: z.string(),
+      ownerId: z.string()
+    }))
+    .mutation(async ({ctx, input}) => {
+      try{
+        await ctx.db.project.delete({
+          where: {
+            id: input.projectId,
+            ownerId: input.ownerId
+          }
+        })
+      }catch(e){
+        console.log("deletion failed")
+      }
+    }),
+
+  getByTags: authedProcedure
+    .input(z.array(z.string()))
+    
+    .query(async ({ctx, input}) => {
+      try{
+        console.log("input: ");
+        console.log(input.toString());
+        return await ctx.db.project.findMany({
+          where:{
+            tags:{    
+              hasEvery: input
+            }
+          }
+        })
+      }catch(e){
+        console.log("Search by Tags failed");
+        return undefined;
+      }
+    })
+})
+const generateRelationFilter = (tags: string[], relationName: string, column: string) => 
+        tags.map((tag) => ({
+  [relationName]: {
+    every:{
+      [column]:{
+        
+      }
+    }
+  }
+}))
