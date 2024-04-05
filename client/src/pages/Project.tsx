@@ -123,25 +123,28 @@ export default function Project() {
     }
   }
 
-  const deleteProjectMutation = trpc.projects.delete.useMutation({
-    onSuccess(){
-      utils.projects.getAll.invalidate();
-      toast.success("projectDeleted");
-      navigate("/");
-    }
-  })
 
-  function handleDeleteProject(e: React.FormEvent<HTMLFormElement>){
-    e.preventDefault();
-    if(!user || !data || !projectId) return;
+  // TO DO: Delete Project
+  
+  // const deleteProjectMutation = trpc.projects.delete.useMutation({
+  //   onSuccess(){
+  //     utils.projects.getAll.invalidate();
+  //     toast.success("projectDeleted");
+  //     navigate("/");
+  //   }
+  // })
 
-    if(user.id === data.ownerId){
-      deleteProjectMutation.mutate({
-        projectId: projectId,
-        ownerId: user.id
-      })
-    }
-  }
+  // function handleDeleteProject(e: React.FormEvent<HTMLFormElement>){
+  //   e.preventDefault();
+  //   if(!user || !data || !projectId) return;
+
+  //   if(user.id === data.ownerId){
+  //     deleteProjectMutation.mutate({
+  //       projectId: projectId,
+  //       ownerId: user.id
+  //     })
+  //   }
+  // }
 
 
   if (isLoading)
