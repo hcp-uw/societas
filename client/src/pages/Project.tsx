@@ -12,7 +12,7 @@ import dayjjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useUser } from "@clerk/clerk-react";
 import { TextArea, Input, StyledInput } from "../components/inputs";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { NavLink, Outlet, Form } from "react-router-dom";
@@ -124,27 +124,30 @@ export default function Project() {
   }
 
 
-  // TO DO: Delete Project
   
-  // const deleteProjectMutation = trpc.projects.delete.useMutation({
-  //   onSuccess(){
-  //     utils.projects.getAll.invalidate();
-  //     toast.success("projectDeleted");
-  //     navigate("/");
-  //   }
-  // })
+  const deleteProjectMutation = trpc.projects.delete.useMutation({
+    onSuccess(){
+      utils.projects.getAll.invalidate();
+      toast.success("projectDeleted");
+      navigate("/");
+    }
+  })
 
-  // function handleDeleteProject(e: React.FormEvent<HTMLFormElement>){
-  //   e.preventDefault();
-  //   if(!user || !data || !projectId) return;
+  function handleDeleteProject(e: React.MouseEvent<HTMLButtonElement>){
+    e.preventDefault();
+    if(!user || !data || !projectId) return;
 
-  //   if(user.id === data.ownerId){
-  //     deleteProjectMutation.mutate({
-  //       projectId: projectId,
-  //       ownerId: user.id
-  //     })
-  //   }
-  // }
+    const confirmMsg : string = "When deleting this project all data"
+                                + " relating to it will be lost."
+                                + " Are you sure you want to delete it?";
+    if(user.id === data.ownerId && window.confirm(confirmMsg)){
+      deleteProjectMutation.mutate({
+        projectId: projectId,
+        ownerId: user.id
+      })
+      
+    }
+  }
 
 
   if (isLoading)
@@ -260,6 +263,12 @@ export default function Project() {
                   >
                     New Post
                   </NavLink>
+                  <button
+                    className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FF0000] font-medium hover:bg-red-700 transition-colors"
+                    onClick={handleDeleteProject}
+                  >
+                    Delete
+                  </button>
                 </div>
               ) : !role || role.status === "REJECTED" ? (
                 <button
