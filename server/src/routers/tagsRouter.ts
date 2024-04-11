@@ -17,5 +17,35 @@ export const tagsRouter = router({
         if(isNew)
           await ctx.db.tag.create({data: {name: tag.toLocaleLowerCase()}})
       }
+    }),
+  
+  getAutocompleteOptions: authedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      if(input === "") 
+        return;
+      
+      const startsWith = await ctx.db.tag.findMany({
+        where: {
+          name: {
+            startsWith: input
+          }
+        }
+      })
+      const containsNotStartsWith = await ctx.db.tag.findMany({
+        where:{
+          NOT: {
+            name: {
+              startsWith: input
+            }
+          },
+          AND: {
+            name: {
+              contains: input
+            }
+          }
+        }
+      })
+      return startsWith.concat(containsNotStartsWith);
     })
 })
