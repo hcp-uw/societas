@@ -85,6 +85,7 @@ export const projectsRouter = router({
         ownerId: z.string(),
         meetLocation: z.string(),
         imageUrl: z.string(),
+        tags: z.array(z.string())
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -133,13 +134,3 @@ export const projectsRouter = router({
       }
     })
 })
-const generateRelationFilter = (tags: string[], relationName: string, column: string) => 
-        tags.map((tag) => ({
-  [relationName]: {
-    every:{
-      [column]:{
-        
-      }
-    }
-  }
-}))

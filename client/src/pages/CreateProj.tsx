@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Form, useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
@@ -17,6 +17,11 @@ type FormState = {
   image: Blob | null;
 };
 
+type TagsState = {
+  input: string;
+  tags: string[];
+}
+
 export default function CreateProj() {
   //elements to fill when creating a project.
   const [formState, setFormState] = useState<FormState>({
@@ -28,32 +33,48 @@ export default function CreateProj() {
   }); // state form the inputs
   // const [loading, setLoading] = useState(false)
   //const fetcher = useFetcher()
+  const [tagsState, setTagsState] = useState<TagsState>({
+    input: "",
+    tags: []
+  })
+
   const utils = trpc.useUtils();
 
   const navigate = useNavigate();
+
+  const projMutation = trpc.projects.create.useMutation({
+    onSuccess() {
+      utils.projects.getAll.invalidate();
+      toast.success("Project Created!");
+      navigate("/");
+      tagMutation.mutate(tagsState.tags);
+    },
+  });
+
+  const tagMutation = trpc.tags.addTags.useMutation({
+    onSuccess(){
+      // TO DO: 
+    }
+  })
+
 
   const uploadImageMutation = useMutation({
     mutationFn: (image: Blob) => uploadProjectImage(image),
     onSuccess(url) {
       if (!user) return;
-      mutation.mutate({
+      projMutation.mutate({
         name: formState.title,
         description: formState.description,
         meetLocation: formState.location,
         meetType: "",
         ownerId: user?.id,
         imageUrl: url,
+        tags: tagsState.tags
       });
     },
   });
 
-  const mutation = trpc.projects.create.useMutation({
-    onSuccess() {
-      utils.projects.getAll.invalidate();
-      toast.success("Project Created!");
-      navigate("/");
-    },
-  });
+ 
 
   const { user } = useUser();
 
@@ -80,18 +101,97 @@ export default function CreateProj() {
       encType="multipart/form-data"
       onSubmit={handleSubmit}
     >
-      <FilesView formState={formState} setFormState={setFormState} />
+      <div>
+        <FilesView formState={formState} setFormState={setFormState} />
+        <AddTagsView tagsState={tagsState} setTagsState={setTagsState}/>
+      </div>
       <InputsView
         formState={formState}
         setFormState={setFormState}
         isFormValid={isFormValid}
-        loading={mutation.isLoading}
+        loading={projMutation.isLoading}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
     </Form>
   );
 }
+
+
+function AddTagsView({
+  tagsState,
+  setTagsState,
+}: {
+  tagsState: TagsState;
+  setTagsState: React.Dispatch<React.SetStateAction<TagsState>>;
+}){
+  function handleTagChange(e: ChangeEvent<HTMLInputElement>){
+    e.preventDefault();
+    setTagsState({input: e.target.value, tags: tagsState.tags})
+  }
+
+  function handleTagSubmit(){
+    if(tagsState.tags.indexOf(tagsState.input) != -1){
+      alert("you have already added this tag");
+      return;
+    }
+    setTagsState({input: "", tags: [...tagsState.tags, tagsState.input]})
+  }
+
+  function handleTagDelete(tag: string){
+    const newTags : string[] = tagsState.tags.concat([]);  // create a deep copy
+    const index = newTags.indexOf(tag);
+    if(index == -1){
+      console.error("Tag not found in added tags");
+      return;
+    }
+    newTags.splice(index, 1);
+    setTagsState({input: tagsState.input, tags: newTags})
+  }
+
+
+  return(
+    <div>
+      <Input>
+        <label htmlFor="meetLocation">Meet Location</label>
+        <StyledInput
+          type="text"
+          id="tags"
+          name="tags"
+          placeholder="Enter Tags Here"
+          value = {tagsState.input}
+          onChange={handleTagChange}
+          //onKeyDown={e => e.key == 'Enter' ? handleTagSubmit : ''}
+        />
+        <input 
+          type = "button" 
+          className="group relative flex items-center justify-center bg-blue-500 text-zinc-100 cursor-pointer py-2 px-4 rounded-3xl transition-all hover:bg-blue-600 hover:shadow-md disabled:bg-blue-300 disabled:pointer-events-none min-w-[8rem] aria-busy:bg-blue-300 aria-busy:pointer-events-none"
+          value = "Add"
+          onClick={handleTagSubmit}
+        />
+      </Input>
+      <br></br>
+      <ul>
+        {tagsState.tags.map((tag) => {
+          return <li>
+            {tag}
+            
+            <input 
+              type = "button" 
+              value="Delete" 
+              className="mx-8 my-2 border-2 border-red-500 border-solid border-spacing-3 w-24"
+              onClick={() => handleTagDelete(tag)}
+            />
+          </li>
+            
+       
+        })}
+      </ul>
+    </div>
+  )
+}
+
+
 
 type InputsViewProps = {
   formState: FormState;
@@ -225,56 +325,61 @@ function FilesView({
 }) {
   const [error, setError] = useState<string | null>(null);
   return (
-    <FilesWrapper className="h-fit">
-      <div>
-        <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
-          Select a picture
-        </h1>
-        <input
-          type="file"
-          accept="image/*"
-          className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
-          name="imageUrl"
-          id="image"
-          required
-          //checks file size and for null returns.
-          onChange={(e) => {
-            setError(null);
-            const maxFileSize = 1024 * 1024; // one mb
-            if (!e.target.files) return;
-            const file = e.target.files[0];
+    <div>
+      <FilesWrapper className="h-fit">
+        <div>
+          <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
+            Select a picture
+          </h1>
+          <input
+            type="file"
+            accept="image/*"
+            className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
+            name="imageUrl"
+            id="image"
+            required
+            //checks file size and for null returns.
+            onChange={(e) => {
+              setError(null);
+              const maxFileSize = 1024 * 1024; // one mb
+              if (!e.target.files) return;
+              const file = e.target.files[0];
 
-            if (file.size > maxFileSize) {
-              setError("File size is too large");
-              e.target.value = "";
-              return;
-            }
-            setFormState((prev) => ({ ...prev, image: file }));
-          }}
-        />
-        {error && <p className="text-red-500 mt-4">{error}</p>}
-      </div>
-      {formState.image && (
-        //loads the image and shows it on screen. Allows you to close it and not show it.
-        <Image key={formState.image.name}>
-          <button
-            onClick={() => setFormState((prev) => ({ ...prev, image: null }))}
-            type="button"
-            className="hover:bg-zinc-300 bg-slate-100  "
-          >
-            <span className="material-symbols-outlined">close</span>
-          </button>
-          <img
-            src={URL.createObjectURL(formState.image)}
-            alt={formState.image.name}
-            key={formState.image.name}
-            width={300}
+              if (file.size > maxFileSize) {
+                setError("File size is too large");
+                e.target.value = "";
+                return;
+              }
+              setFormState((prev) => ({ ...prev, image: file }));
+            }}
           />
-        </Image>
-      )}
-    </FilesWrapper>
+          {error && <p className="text-red-500 mt-4">{error}</p>}
+        </div>
+        {formState.image && (
+          //loads the image and shows it on screen. Allows you to close it and not show it.
+          <Image key={formState.image.name}>
+            <button
+              onClick={() => setFormState((prev) => ({ ...prev, image: null }))}
+              type="button"
+              className="hover:bg-zinc-300 bg-slate-100  "
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <img
+              src={URL.createObjectURL(formState.image)}
+              alt={formState.image.name}
+              key={formState.image.name}
+              width={300}
+            />
+          </Image>
+        )}
+      </FilesWrapper>
+      
+    </div>
   );
 }
+
+
 
 //submit button view.
 function SubmitBtnView({
@@ -333,6 +438,7 @@ const FilesWrapper = styled.div`
   flex-direction: column;
   gap: 1rem;
   height: fit-content;
+  min-height: 21rem;
 
   label {
     all: unset;

@@ -25,16 +25,14 @@ model Project {
   posts        Post[]
   memberships  Memberships[]
   imageUrl     String
-
 }
 
-// model Tag {
-//   id       String           @id @default(uuid())
-//   name     String
-//   projects TagsOnProjects[]
+model Tag {
+  id       String           @id @default(uuid())
+  name     String
 
-//   @@unique([name])
-// }
+  @@unique([name])
+}
 
 // model TagsOnProjects {
 //   project   Project @relation(fields: [projectId], references: [id])
