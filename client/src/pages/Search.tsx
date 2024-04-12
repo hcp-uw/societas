@@ -65,6 +65,7 @@ export default function Search(){
   useEffect(() => {
     if(filterState.isAutcompleted){
       addItem();
+      setFilterState(prev => ({...prev, isAutcompleted: false}))
     }
   }, [filterState.isAutcompleted])
 

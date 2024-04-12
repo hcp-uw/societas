@@ -294,7 +294,7 @@ export default function Project() {
               )}
             </div>
           </nav>
-          {/* <Outlet /> */}
+          <Outlet /> 
         </div>
       </div>
     </>
@@ -449,6 +449,12 @@ export function ProjectInfo() {
             Posted:
           </span>
           {dayjjs(data.createdAt).fromNow()}
+        </p>
+        <p className = "capitalize">
+          <span className="underline font-semibold mr-3 underline-offset-4">
+            Tags:
+          </span>
+          {data.tags.join(", ")}
         </p>
       </div>
       <img
