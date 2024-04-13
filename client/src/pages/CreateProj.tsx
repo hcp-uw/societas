@@ -8,6 +8,7 @@ import { trpc } from "../utils/trpc";
 import Spinner from "../components/Spinner";
 import { useMutation } from "@tanstack/react-query";
 import { uploadProjectImage } from "../firebase";
+import GetAutcomplete from "../utils/Autcomplete";
 
 type FormState = {
   title: string;
@@ -130,12 +131,15 @@ function AddTagsView({
     setTagsState({input: e.target.value, tags: tagsState.tags})
   }
 
-  function handleTagSubmit(){
-    if(tagsState.tags.indexOf(tagsState.input) != -1){
+  function handleTagSubmit(tag ?: string){
+    const val : string = tag === undefined ? tagsState.input.trim() : tag.trim();
+    if(tagsState.tags.indexOf(val) != -1){
       alert("you have already added this tag");
       return;
     }
-    setTagsState({input: "", tags: [...tagsState.tags, tagsState.input]})
+    if(val === "")
+      return;
+    setTagsState({input: "", tags: [...tagsState.tags, val]})
   }
 
   function handleTagDelete(tag: string){
@@ -149,11 +153,13 @@ function AddTagsView({
     setTagsState({input: tagsState.input, tags: newTags})
   }
 
+  
+
 
   return(
     <div>
       <Input>
-        <label htmlFor="meetLocation">Meet Location</label>
+        <label htmlFor="meetLocation">Project Tags</label>
         <StyledInput
           type="text"
           id="tags"
@@ -161,16 +167,22 @@ function AddTagsView({
           placeholder="Enter Tags Here"
           value = {tagsState.input}
           onChange={handleTagChange}
-          //onKeyDown={e => e.key == 'Enter' ? handleTagSubmit : ''}
+          // {e => e.key == 'Enter' ? handleTagSubmit : ''}
         />
         <input 
           type = "button" 
           className="group relative flex items-center justify-center bg-blue-500 text-zinc-100 cursor-pointer py-2 px-4 rounded-3xl transition-all hover:bg-blue-600 hover:shadow-md disabled:bg-blue-300 disabled:pointer-events-none min-w-[8rem] aria-busy:bg-blue-300 aria-busy:pointer-events-none"
           value = "Add"
-          onClick={handleTagSubmit}
+          onClick={() => handleTagSubmit()}
         />
       </Input>
       <br></br>
+      <br></br>
+      <h3 className="text-2xl">Autocomplete Options:</h3>
+      <GetAutcomplete input = {tagsState.input} onSelect={handleTagSubmit}/>
+      <br></br>
+      <br></br>
+      <h3 className="text-2xl">Added Tags: </h3>
       <ul>
         {tagsState.tags.map((tag) => {
           return <li>

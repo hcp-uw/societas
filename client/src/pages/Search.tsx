@@ -2,12 +2,12 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import ProjectsView from "../components/ProjectsView";
 import { util } from "zod";
+import GetAutcomplete from "../utils/Autcomplete";
 
 
 type FilterState = {
   input: string,
   tags: string[],
-  isAutcompleted: boolean
 }
 
 export default function Search(){
@@ -16,7 +16,6 @@ export default function Search(){
   const [filterState, setFilterState] = useState<FilterState>({
     input: "",
     tags: [],
-    isAutcompleted: false
   });
 
   const {data: projData} = trpc.projects.getByTags.useQuery(filterState.tags);
@@ -32,13 +31,19 @@ export default function Search(){
     900: 1,
   }
 
-  const addItem = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    const val = filterState.input.trim();
-    if(val === "" || filterState.tags.indexOf(val) !== -1)
+  const addItem = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const newTag = filterState.input.trim();
+
+    if(newTag === "" || filterState.tags.indexOf(newTag) !== -1)
       return;
-    setFilterState(prev => ({...prev, input: "", tags: [...prev.tags, val], }));
+    setFilterState(prev => ({...prev, input: "", tags: [...prev.tags, newTag], }));
     utils.projects.getByTags.invalidate();
+  }
+  const onSelectAutocomplete = (tag : string) => {
+    const newTag = tag.trim();
+    setFilterState(({input: "", tags: [...filterState.tags, newTag], }));
   }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -57,18 +62,6 @@ export default function Search(){
     newTags.splice(index, 1);
     setFilterState(prev => ({...prev, tags: newTags}));
   }
-
-  const handleSelectAutocomplete = (tag: string) => {
-    setFilterState(prev => ({...prev, input: tag, isAutcompleted: true}));
-  }
-
-  useEffect(() => {
-    if(filterState.isAutcompleted){
-      addItem();
-      setFilterState(prev => ({...prev, isAutcompleted: false}))
-    }
-  }, [filterState.isAutcompleted])
-
 
   return (
     <>
@@ -98,17 +91,7 @@ export default function Search(){
         <br /> 
         <br /> 
         <h3 className = "text-2xl">Autcomplete Results:</h3>
-        {autcompleteOptions?.map(tag => {
-          return <div>
-            {tag.name}
-            <input 
-              type = "button"
-              value = "Select"
-              onClick={() => handleSelectAutocomplete(tag.name)}
-              className="mx-8 my-2 border-2 border-red-500 border-solid border-spacing-3 w-24"
-            />
-          </div>;
-        })}
+        <GetAutcomplete input = {filterState.input} onSelect = {onSelectAutocomplete}/>
         <br /> 
         <br /> 
         <br /> 
