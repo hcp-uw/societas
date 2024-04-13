@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { NavLink, Outlet, Form } from 'react-router-dom';
 import Markdown from 'react-markdown';
-import { ReactQueryOptions, RouterOutputs, trpc } from '../utils/trpc';
+import { RouterOutputs, trpc } from '../utils/trpc';
 
 dayjjs.extend(relativeTime);
 
@@ -301,11 +301,7 @@ function StatusChip({
         </NavLink>
       </div>
     );
-  }
-
-  if (!role) return <div>error getting role</div>;
-
-  if (role.status === 'REJECTED') {
+  } else if (role.status === 'REJECTED') {
     return (
       <button
         className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
