@@ -19,16 +19,6 @@ export default function ProfileLayout() {
           My profile
         </ProfileLink>
 
-        <ProfileLink to="create">
-          <span className="material-symbols-outlined">add_circle</span>
-          Create Project
-        </ProfileLink>
-
-        <ProfileLink to="requests">
-          <span className="material-symbols-outlined">favorite</span>
-          Requests
-        </ProfileLink>
-
         <SignOutButton signOutCallback={handleSignout}>
           <div className="flex p-2 rounded gap-2 items-center hover:bg-red-400 hover:text-zinc-100 transition-colors cursor-pointer">
             <span className="material-symbols-outlined">logout</span>

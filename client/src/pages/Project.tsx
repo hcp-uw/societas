@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   FetcherWithComponents,
-  Navigate,
   useFetcher,
   useNavigate,
   useParams,
@@ -46,12 +45,9 @@ function useGetProjectData() {
 }
 
 export default function Project() {
-  // const { projectId } = useParams()
   const { data, isLoading, projectId } = useGetProjectData();
   const { data: role } = trpc.memberships.getRole.useQuery(projectId ?? "");
   const { user } = useUser();
-  const navigate = useNavigate();
-  // const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false);
   const utils = trpc.useUtils();
@@ -294,7 +290,7 @@ export default function Project() {
               )}
             </div>
           </nav>
-          {/* <Outlet /> */}
+          <Outlet /> 
         </div>
       </div>
     </>
@@ -442,7 +438,7 @@ export function ProjectInfo() {
           <span className="underline font-semibold mr-3 underline-offset-4">
             Start Date:
           </span>
-          {data.createdAt}
+          {data.startDate}
         </p>
         <p className="capitalize">
           <span className="underline font-semibold mr-3 underline-offset-4">
@@ -452,7 +448,7 @@ export function ProjectInfo() {
         </p>
       </div>
       <img
-        src={"" /*to fix later*/}
+        src={data.imageUrl}
         alt=""
         width={400}
         height={400}

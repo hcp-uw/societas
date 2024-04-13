@@ -85,6 +85,7 @@ export const projectsRouter = router({
         ownerId: z.string(),
         meetLocation: z.string(),
         imageUrl: z.string(),
+		startDate: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

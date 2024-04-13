@@ -22,7 +22,15 @@ export default function Nav() {
         </NavLink>
 
         {user ? (
-          <div>
+          <div className="flex justify-center items-center gap-4">
+			<NavLink to="/create" className="capitalize flex items-center gap-1">
+				<span className="material-symbols-outlined">add_circle</span>
+				create project
+			</NavLink>
+			<NavLink to="/requests" className="capitalize flex items-center gap-1">
+				<span className="material-symbols-outlined">favorite</span>
+				requests
+			</NavLink>
             <NavLink to="/account">
               <img
                 src={user.imageUrl}
@@ -31,6 +39,7 @@ export default function Nav() {
                 className="rounded-full object-cover w-14 h-14"
               />
             </NavLink>
+
           </div>
         ) : (
           <div className="flex gap-4">
