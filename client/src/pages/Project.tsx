@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { NavLink, Outlet, Form } from 'react-router-dom';
 import Markdown from 'react-markdown';
-import { RouterOutputs, trpc } from '../utils/trpc';
+import { ReactQueryOptions, RouterOutputs, trpc } from '../utils/trpc';
 
 dayjjs.extend(relativeTime);
 
@@ -290,6 +290,7 @@ function StatusChip({
     return <div>Log in to join!</div>;
   }
 
+
   if (user.user?.id === ownerId) {
     return (
       <div className="flex gap-4 items-center">
@@ -301,7 +302,12 @@ function StatusChip({
         </NavLink>
       </div>
     );
-  } else if (role.status === 'REJECTED') {
+
+  }
+
+  if (!role) return <div>error getting role</div>;
+
+  if (role.status === 'REJECTED') {
     return (
       <button
         className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
