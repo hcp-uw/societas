@@ -1,22 +1,22 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 import {
   FetcherWithComponents,
   useFetcher,
   useNavigate,
   useParams,
-} from "react-router-dom";
-import { getAllProjectPosts, getProjectPostById } from "../firebase";
-import Spinner from "../components/Spinner";
-import dayjjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { useUser } from "@clerk/clerk-react";
-import { TextArea, Input, StyledInput } from "../components/inputs";
-import { useState } from "react";
-import { useEffect } from "react";
-import toast from "react-hot-toast";
-import { NavLink, Outlet, Form } from "react-router-dom";
-import Markdown from "react-markdown";
-import { trpc } from "../utils/trpc";
+} from 'react-router-dom';
+import { getAllProjectPosts, getProjectPostById } from '../firebase';
+import Spinner from '../components/Spinner';
+import dayjjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { useUser } from '@clerk/clerk-react';
+import { TextArea, Input, StyledInput } from '../components/inputs';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { NavLink, Outlet, Form } from 'react-router-dom';
+import Markdown from 'react-markdown';
+import { ReactQueryOptions, RouterOutputs, trpc } from '../utils/trpc';
 
 dayjjs.extend(relativeTime);
 
@@ -24,19 +24,19 @@ dayjjs.extend(relativeTime);
 
 //get all posts related to project
 const projectPostsQuery = (id: string) => ({
-  queryKey: ["projects", id, "posts"],
+  queryKey: ['projects', id, 'posts'],
   queryFn: () => getAllProjectPosts(id),
 });
 
 //get singular post related to porject
 const projectPostQuery = (projectId: string, postId: string) => ({
-  queryKey: ["projects", projectId, "posts", postId],
+  queryKey: ['projects', projectId, 'posts', postId],
   queryFn: () => getProjectPostById(projectId, postId),
 });
 
 function useGetProjectData() {
   const { projectId } = useParams();
-  const query = trpc.projects.getById.useQuery(projectId ?? "");
+  const query = trpc.projects.getById.useQuery(projectId ?? '');
 
   return {
     projectId,
@@ -46,7 +46,8 @@ function useGetProjectData() {
 
 export default function Project() {
   const { data, isLoading, projectId } = useGetProjectData();
-  const { data: role } = trpc.memberships.getRole.useQuery(projectId ?? "");
+  const { data: role, isLoading: roleIsLoading } =
+    trpc.memberships.getRole.useQuery(projectId ?? '');
   const { user } = useUser();
 
   const [showModal, setShowModal] = useState(false);
@@ -55,10 +56,10 @@ export default function Project() {
   const sendJoinReqMutation =
     trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
-        console.log("Request Created");
+        console.log('Request Created');
         setShowModal(false);
         utils.memberships.getRole.invalidate(projectId);
-        toast.success("Requested!");
+        toast.success('Requested!');
       },
     });
 
@@ -69,7 +70,7 @@ export default function Project() {
     if (!user) return;
     const formData = new FormData(e.currentTarget);
 
-    const description = formData.get("description") as string;
+    const description = formData.get('description') as string;
 
     if (!role) {
       sendJoinReqMutation.mutate({
@@ -78,7 +79,7 @@ export default function Project() {
         userId: user?.id,
         description: description,
       });
-    } else if (role.status === "REJECTED") {
+    } else if (role.status === 'REJECTED') {
       sendJoinReqMutation.mutate({
         projectId: projectId,
         ownerId: data.ownerId,
@@ -93,7 +94,7 @@ export default function Project() {
   }
 
   const requestData = trpc.memberships.getAllPendingRequests.useQuery(
-    projectId ?? "",
+    projectId ?? '',
   );
 
   if (requestData.data != undefined) {
@@ -102,16 +103,16 @@ export default function Project() {
 
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
     onSuccess() {
-      console.log("Left Project");
+      console.log('Left Project');
       utils.memberships.getRole.invalidate();
-      toast.success("Left Project");
+      toast.success('Left Project');
     },
   });
 
   function handleLeaveReq(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user || !projectId) return;
-    if (confirm("Are you sure you want to leave this project?")) {
+    if (confirm('Are you sure you want to leave this project?')) {
       leaveProjectMutation.mutate({
         projectId: projectId,
         userId: user?.id,
@@ -119,9 +120,8 @@ export default function Project() {
     }
   }
 
-
   // TO DO: Delete Project
-  
+
   // const deleteProjectMutation = trpc.projects.delete.useMutation({
   //   onSuccess(){
   //     utils.projects.getAll.invalidate();
@@ -142,17 +142,16 @@ export default function Project() {
   //   }
   // }
 
-
   if (isLoading)
     return (
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          margin: "auto",
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 'auto',
         }}
       >
         <Spinner size="4rem" />
@@ -183,7 +182,7 @@ export default function Project() {
                 </button>
               </label>
               <p className="mb-2">
-                Show the owner of this project why you might be a good fit!{" "}
+                Show the owner of this project why you might be a good fit!{' '}
                 <br />
                 This is entirely optional<span className="text-red-500">*</span>
               </p>
@@ -197,7 +196,7 @@ export default function Project() {
               <input type="hidden" value={projectId} name="projectId" />
               <input
                 type="hidden"
-                value={user ? user.id : ""}
+                value={user ? user.id : ''}
                 name="requestantId"
               />
               <input type="hidden" value={data.ownerId} name="ownerId" />
@@ -229,8 +228,8 @@ export default function Project() {
                 end
                 className={({ isActive }) =>
                   isActive
-                    ? " font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
-                    : " border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors"
+                    ? ' font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors'
+                    : ' border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors'
                 }
               >
                 Project Info
@@ -239,8 +238,8 @@ export default function Project() {
                 to={`/${projectId}/posts`}
                 className={({ isActive }) =>
                   isActive
-                    ? " font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors"
-                    : " border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors"
+                    ? ' font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors'
+                    : ' border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors'
                 }
               >
                 Blog Posts
@@ -248,53 +247,95 @@ export default function Project() {
             </div>
 
             <div className="flex gap-4 flex-row-reverse">
-              {data.ownerId === user?.id ? (
-                <div className="flex gap-4 items-center">
-                  <NavLink
-                    to="posts/new"
-                    className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
-                  >
-                    New Post
-                  </NavLink>
-                </div>
-              ) : !role || role.status === "REJECTED" ? (
-                <button
-                  className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
-                  onClick={() => setShowModal(true)}
-                >
-                  Join
-                </button>
-              ) : role.status === "PENDING" ? (
-                <div className="py-1 px-6 bg-zinc-200 rounded-lg cursor-default">
-                  Requested
-                </div>
-              ) : role.status === "ACCEPTED" ? (
-                <>
-                  <Form method="post" onSubmit={handleLeaveReq}>
-                    <input
-                      type="hidden"
-                      value={user ? user.id : ""}
-                      name="userId"
-                    />
-                    <input type="hidden" value={projectId} name="projectId" />
-                    <button className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors">
-                      Leave Project
-                    </button>
-                  </Form>
-                  <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
-                    Member
-                  </div>
-                </>
-              ) : (
-                <div>Log in to join!</div>
-              )}
+              <StatusChip
+                projectId={projectId ?? ''}
+                role={role}
+                setShowModal={setShowModal}
+                isLoading={roleIsLoading}
+                ownerId={data.ownerId}
+                handleLeaveReq={handleLeaveReq}
+              />
             </div>
           </nav>
-          <Outlet /> 
+          <Outlet />
         </div>
       </div>
     </>
   );
+}
+
+type GetRole = RouterOutputs['memberships']['getRole'] | undefined;
+type StatusChipProps = {
+  role: GetRole;
+  isLoading: boolean;
+  ownerId: string;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  projectId: string;
+  handleLeaveReq: (e: React.FormEvent<HTMLFormElement>) => void;
+};
+
+function StatusChip({
+  role,
+  isLoading,
+  ownerId,
+  setShowModal,
+  handleLeaveReq,
+  projectId,
+}: StatusChipProps) {
+  const user = useUser();
+
+  if (isLoading) return <div>getting role</div>;
+
+  if (!user.isSignedIn) {
+    return <div>Log in to join!</div>;
+  }
+
+  if (user.user?.id === ownerId) {
+    return (
+      <div className="flex gap-4 items-center">
+        <NavLink
+          to="posts/new"
+          className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
+        >
+          New Post
+        </NavLink>
+      </div>
+    );
+  }
+
+  if (!role) return <div>error getting role</div>;
+
+  if (role.status === 'REJECTED') {
+    return (
+      <button
+        className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
+        onClick={() => setShowModal(true)}
+      >
+        Join
+      </button>
+    );
+  } else if (role.status === 'PENDING') {
+    return (
+      <div className="py-1 px-6 bg-zinc-200 rounded-lg cursor-default">
+        Requested
+      </div>
+    );
+  } else if (role.status === 'ACCEPTED') {
+    return (
+      <>
+        <Form method="post" onSubmit={handleLeaveReq}>
+          <input type="hidden" value={user ? user.user.id : ''} name="userId" />
+          <input type="hidden" value={projectId} name="projectId" />
+          <button className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors">
+            Leave Project
+          </button>
+        </Form>
+        <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
+          Member
+        </div>
+      </>
+    );
+  }
 }
 
 type SubmitFetcherBtnProps = {
@@ -311,9 +352,9 @@ function SubmitFetcherBtn({
     <button
       type="submit"
       className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400 ${className}`}
-      disabled={fetcher.state === "submitting"}
+      disabled={fetcher.state === 'submitting'}
     >
-      {fetcher.state === "submitting" ? (
+      {fetcher.state === 'submitting' ? (
         <Spinner />
       ) : (
         <p className="py-2">{message}</p>
@@ -323,11 +364,11 @@ function SubmitFetcherBtn({
 }
 
 export function CreatePost() {
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
   const { data, isLoading, projectId } = useGetProjectData();
   const [isPreview, setIsPreview] = useState(false);
-  const [comment, setComment] = useState("");
-  const [title, setTitle] = useState("");
+  const [comment, setComment] = useState('');
+  const [title, setTitle] = useState('');
   const fetcher = useFetcher();
   const navigate = useNavigate();
 
@@ -338,8 +379,8 @@ export function CreatePost() {
   if (!data) return <div>something went wrong! Try reloading</div>;
 
   if (data.ownerId !== user.id) {
-    toast.error("Can only create post if owner");
-    navigate("..");
+    toast.error('Can only create post if owner');
+    navigate('..');
   }
 
   return (
@@ -349,7 +390,7 @@ export function CreatePost() {
           onClick={() => setIsPreview((prev) => !prev)}
           className="bg-zinc-100 hover:bg-zinc-200 transition-colors py-2 px-6 rounded-lg"
         >
-          {isPreview ? "Edit Text" : "Preview"}
+          {isPreview ? 'Edit Text' : 'Preview'}
         </button>
       </div>
       <fetcher.Form method="post" className="flex gap-4 flex-col w-full">
@@ -461,13 +502,13 @@ export function ProjectInfo() {
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams();
   const { data, isLoading, isError } = useQuery(
-    projectPostsQuery(projectId ?? ""),
+    projectPostsQuery(projectId ?? ''),
   );
   const navigate = useNavigate();
 
   useEffect(() => {
     if (postId === undefined && data) {
-      console.log("here");
+      console.log('here');
 
       if (data.length === 0) return;
       navigate(`/${projectId}/posts/${data[0].id}`);
@@ -493,10 +534,10 @@ export function ProjectPostsLayout() {
             key={post.id}
             className={({ isActive, isPending }) =>
               isActive
-                ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-2 gap-16 justify-between items-center p-4 border-blue-500 bg-zinc-300 max-w-xs transition-all"
+                ? 'flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-2 gap-16 justify-between items-center p-4 border-blue-500 bg-zinc-300 max-w-xs transition-all'
                 : isPending
-                  ? "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors"
-                  : "flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors "
+                  ? 'flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-500 animate-pulse max-w-xs transition-colors'
+                  : 'flex w-full first:border-t first:rounded-t-lg last:rounded-b-lg border-x gap-16 justify-between items-center p-4 border-b border-zinc-400 max-w-xs hover:bg-zinc-200 transition-colors '
             }
             to={`${post.id}`}
           >
@@ -517,7 +558,7 @@ export function ProjectPostsLayout() {
 export function ProjectPost() {
   const params = useParams();
   const { data, isLoading } = useQuery(
-    projectPostQuery(params.projectId ?? "", params.postId ?? ""),
+    projectPostQuery(params.projectId ?? '', params.postId ?? ''),
   );
 
   if (isLoading) return <div>loading..</div>;

@@ -1,7 +1,7 @@
-import LogoRoute from "../assets/logo.png";
-import { SignInButton, SignUpButton } from "@clerk/clerk-react";
-import { useUser } from "@clerk/clerk-react";
-import { NavLink } from "react-router-dom";
+import LogoRoute from '../assets/logo.png';
+import { SignInButton, SignUpButton } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
+import { NavLink } from 'react-router-dom';
 
 export default function Nav() {
   //get user.
@@ -9,37 +9,70 @@ export default function Nav() {
 
   //returns header of logo and profile button or "sign in/sign up" if user is not registered.
   return (
-    <header className="border-b-2 py-2">
+    <header className="border-b-2 py-1">
       <nav className="flex max-w-[80%] justify-between items-center m-auto">
-        <NavLink to="/">
-          <img
-            src={LogoRoute}
-            alt="Societas Logo"
-            width={70}
-            className="object-cover w-[70px]"
-            loading="eager"
-          />
-        </NavLink>
+        <div className="flex items-center gap-4 text-zinc-400">
+          <NavLink to="/">
+            <img
+              src={LogoRoute}
+              alt="Societas Logo"
+              width={60}
+              className="object-cover"
+              loading="eager"
+            />
+          </NavLink>
+          {user && (
+            <>
+              <svg
+                width="10"
+                height="32"
+                viewBox="0 0 10 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8.59998 0.700012L9.59998 0.800012L1.09998 31.7L0.0999756 31.6L8.59998 0.700012Z"
+                  fill="#8C8C8C"
+                />
+              </svg>
+
+              <div className="gap-3 flex">
+                <NavLink
+                  to="/create"
+                  className={({ isActive }) =>
+                    `capitalize flex items-center gap-1 transition-all hover:text-zinc-900 ${
+                      isActive && 'text-zinc-900 font-medium'
+                    }`
+                  }
+                >
+                  create project
+                </NavLink>
+                <NavLink
+                  to="/requests"
+                  className={({ isActive }) =>
+                    `capitalize flex items-center gap-1 transition-all hover:text-zinc-900 ${
+                      isActive && 'text-zinc-900 font-medium'
+                    }`
+                  }
+                >
+                  requests
+                </NavLink>
+              </div>
+            </>
+          )}
+        </div>
 
         {user ? (
           <div className="flex justify-center items-center gap-4">
-			<NavLink to="/create" className="capitalize flex items-center gap-1">
-				<span className="material-symbols-outlined">add_circle</span>
-				create project
-			</NavLink>
-			<NavLink to="/requests" className="capitalize flex items-center gap-1">
-				<span className="material-symbols-outlined">favorite</span>
-				requests
-			</NavLink>
             <NavLink to="/account">
               <img
                 src={user.imageUrl}
                 alt={`${user.fullName} profile image`}
-                width={70}
-                className="rounded-full object-cover w-14 h-14"
+                width={60}
+                height={60}
+                className="rounded-full h-12 w-12 object-cover"
               />
             </NavLink>
-
           </div>
         ) : (
           <div className="flex gap-4">
