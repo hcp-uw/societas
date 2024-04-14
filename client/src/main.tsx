@@ -19,7 +19,7 @@ import PreferencePage from "./pages/PreferencePage.tsx";
 import WhoopsPage from "./pages/WhoopsPage.tsx";
 import ReportPage from "./pages/ReportPage.tsx";
 import Profile, { EditProfile } from "./pages/Profile.tsx";
-import Search from "./pages/Search.tsx"
+import Search from "./pages/Search.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,10 +55,16 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "create",
+        element: <CreateProj />,
+      },
+      {
+        path: "requests",
+        element: <Requests />,
+      },
+      {
         path: ":projectId",
         element: <Project />,
-        // loader: projectInfoLoader(queryClient),
-        // action: reqAction(queryClient),
         children: [
           {
             index: true,
@@ -90,20 +96,12 @@ const router = createBrowserRouter([
         element: <ProfileLayout />,
         children: [
           {
-            path: "create",
-            element: <CreateProj />,
-          },
-          {
             index: true,
             element: <Profile />,
           },
           {
             path: "edit",
             element: <EditProfile />,
-          },
-          {
-            path: "requests",
-            element: <Requests />,
           },
           {
             path: "requests/acceptReq",
@@ -129,7 +127,7 @@ const router = createBrowserRouter([
       },
       {
         path: "search",
-        element: <Search/>,
+        element: <Search />,
       },
     ],
   },
