@@ -23,13 +23,17 @@ export const tagsRouter = router({
     .input(z.string())
     .query(async ({ ctx, input }) => {
       if(input === "") 
-        return;
+        return "";
       
       const startsWith = await ctx.db.tag.findMany({
         where: {
           name: {
             startsWith: input
-          }
+          },
+          
+        },
+        select: {
+            name: true
         }
       })
       const containsNotStartsWith = await ctx.db.tag.findMany({
@@ -44,8 +48,12 @@ export const tagsRouter = router({
               contains: input
             }
           }
+        },
+        select: {
+            name: true
         }
       })
+      console.log(startsWith.concat(containsNotStartsWith))
       return startsWith.concat(containsNotStartsWith);
     })
 })

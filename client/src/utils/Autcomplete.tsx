@@ -1,39 +1,48 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { trpc } from "./trpc";
+import { StyledInput } from "../components/inputs";
 
 type AutcompleteParams = {
-  input : string, 
-  onSelect : Function
-}
+  onSelect: (str: string) => void;
+};
 
-export default function GetAutcomplete(params: AutcompleteParams){
-  const [isSelected, setIsSelected] = useState<boolean>(false);
-  const {data: autcompleteOptions} = trpc.tags.getAutocompleteOptions.useQuery(params.input);
+export default function GetAutcomplete(params: AutcompleteParams) {
+  const [input, setInput] = useState<string>("");
+  const { data: autcompleteOptions } =
+    trpc.tags.getAutocompleteOptions.useQuery(input);
 
   const handleSelectAutocomplete = (tag: string) => {
     params.onSelect(tag);
-  }
+    setInput("");
+  };
 
-  
-  // useEffect(() => {
-  //   if(isSelected){
-  //     params.onSelect();
-  //     setIsSelected(false);
-  //   }
-  // }, [isSelected])
+  return (
+    <>
+      <StyledInput
+        type="text"
+        className="border"
+        onChange={(e) => setInput(e.target.value)}
+        value={input}
+      />
+      {autcompleteOptions &&
+        autcompleteOptions?.map((tag) => (
+          <div className="flex bg-zinc-400 ">
+            <p className="">{tag.name}</p>
+            <button
+              type="button"
+              className=""
+              onClick={() => handleSelectAutocomplete(tag.name)}
+            >
+              <span className="material-symbols-outlined">done</span>
+            </button>
+          </div>
+        ))}
 
-  return <>
-    {autcompleteOptions?.map(tag => {
-      return <div>
-        {tag.name}
-        <input 
-          type = "button"
-          value = "Select"
-          onClick={() => handleSelectAutocomplete(tag.name)}
-          className="mx-8 my-2 border-2 border-red-500 border-solid border-spacing-3 w-24"
-        />
-      </div>;
-    })}
-  </>
-
+      {input.length > 0 && autcompleteOptions?.length === 0 && (
+        <div>
+          {input} <button type="button">create</button>
+        </div>
+      )}
+    </>
+  );
 }
