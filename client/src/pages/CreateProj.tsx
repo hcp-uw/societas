@@ -35,6 +35,8 @@ export default function CreateProj() {
     // const [loading, setLoading] = useState(false)
     //const fetcher = useFetcher()
 
+    const [addedTags, setAddedTags] = useState<string[]>([]);
+
     const utils = trpc.useUtils();
 
     const navigate = useNavigate();
@@ -44,7 +46,7 @@ export default function CreateProj() {
             utils.projects.getAll.invalidate();
             toast.success("Project Created!");
             navigate("/");
-            tagMutation.mutate(tagsState.tags);
+            tagMutation.mutate(addedTags);
         },
     });
 
@@ -65,7 +67,7 @@ export default function CreateProj() {
                 meetType: "",
                 ownerId: user?.id,
                 imageUrl: url,
-                tags: tagsState.tags,
+                tags: addedTags,
             });
         },
     });
@@ -97,7 +99,7 @@ export default function CreateProj() {
         >
             <div>
                 <FilesView formState={formState} setFormState={setFormState} />
-                <AddTagsView />
+                <AddTagsView addedTags={addedTags} setAddedTags = {setAddedTags}/>
             </div>
             <InputsView
                 formState={formState}
@@ -111,8 +113,13 @@ export default function CreateProj() {
     );
 }
 
-function AddTagsView() {
-    const [addedTags, setAddedTags] = useState<string[]>([]);
+function AddTagsView({
+  addedTags, 
+  setAddedTags
+} : {
+  addedTags: string[], 
+  setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
+}) {
     const [errors, setErrors] = useState<string[]>([]);
 
     function handleAddTag(tag: string) {
