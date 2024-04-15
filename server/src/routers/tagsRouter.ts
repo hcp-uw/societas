@@ -53,7 +53,6 @@ export const tagsRouter = router({
           name: true,
         },
       });
-      console.log(startsWith.concat(containsNotStartsWith));
       return startsWith.concat(containsNotStartsWith);
     }),
 });

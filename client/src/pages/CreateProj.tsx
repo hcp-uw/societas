@@ -89,7 +89,7 @@ export default function CreateProj() {
   return (
     <Form
       method="post"
-      className="flex max-w-6xl mx-auto mt-4 justify-between w-full"
+      className="flex max-w-6xl gap-2 mx-auto mt-4 justify-between w-full"
       encType="multipart/form-data"
       onSubmit={handleSubmit}
     >
