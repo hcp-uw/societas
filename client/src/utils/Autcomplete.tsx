@@ -21,6 +21,7 @@ export default function GetAutcomplete(params: AutcompleteParams) {
       <StyledInput
         type="text"
         className="border"
+        placeholder="Search for tag"
         onChange={(e) => setInput(e.target.value)}
         value={input}
       />
