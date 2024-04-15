@@ -76,7 +76,7 @@ export const projectsRouter = router({
       await ctx.db.post.create({ data: input });
     }),
 
-  create: publicProcedure
+  create: authedProcedure 
     .input(
       z.object({
         name: z.string(),

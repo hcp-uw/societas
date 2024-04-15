@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { authedProcedure, publicProcedure, router } from '../trpc';
+import { authedProcedure, router } from '../trpc';
 
 export const tagsRouter = router({
   addTags: authedProcedure
