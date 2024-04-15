@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { authedProcedure, publicProcedure, router } from "../trpc";
+import { z } from 'zod';
+import { authedProcedure, publicProcedure, router } from '../trpc';
 
 export const membershipsRouter = router({
   sendProjectJoinRequest: authedProcedure
@@ -27,13 +27,13 @@ export const membershipsRouter = router({
             description: input.description,
           },
         });
-      } else if (input.role.status === "REJECTED") {
+      } else if (input.role.status === 'REJECTED') {
         await ctx.db.memberships.update({
           where: {
             id: input.role.id,
           },
           data: {
-            status: "PENDING",
+            status: 'PENDING',
             description: input.description,
           },
         });
@@ -46,7 +46,7 @@ export const membershipsRouter = router({
       return await ctx.db.memberships.findMany({
         where: {
           userId: input,
-          status: "ACCEPTED",
+          status: 'ACCEPTED',
         },
         select: {
           projectId: true,
@@ -60,7 +60,7 @@ export const membershipsRouter = router({
       return await ctx.db.memberships.findMany({
         where: {
           userId: input,
-          status: "PENDING",
+          status: 'PENDING',
         },
         select: {
           projectId: true,
@@ -83,7 +83,7 @@ export const membershipsRouter = router({
       return await ctx.db.memberships.findMany({
         where: {
           ownerId: input,
-          status: "PENDING",
+          status: 'PENDING',
         },
       });
     }),
@@ -97,7 +97,7 @@ export const membershipsRouter = router({
           id: input,
         },
         data: {
-          status: "ACCEPTED",
+          status: 'ACCEPTED',
         },
       });
     }),
@@ -111,7 +111,7 @@ export const membershipsRouter = router({
           id: input,
         },
         data: {
-          status: "REJECTED",
+          status: 'REJECTED',
         },
       });
     }),

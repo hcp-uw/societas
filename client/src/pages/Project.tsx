@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   FetcherWithComponents,
+  Navigate,
   useFetcher,
   useNavigate,
   useParams,
@@ -49,6 +50,8 @@ export default function Project() {
   const { data: role, isLoading: roleIsLoading } =
     trpc.memberships.getRole.useQuery(projectId ?? '');
   const { user } = useUser();
+  const navigate = useNavigate();
+  // const fetcher = useFetcher()
 
   const [showModal, setShowModal] = useState(false);
   const utils = trpc.useUtils();
@@ -290,7 +293,6 @@ function StatusChip({
     return <div>Log in to join!</div>;
   }
 
-
   if (user.user?.id === ownerId) {
     return (
       <div className="flex gap-4 items-center">
@@ -302,7 +304,6 @@ function StatusChip({
         </NavLink>
       </div>
     );
-
   }
 
   if (!role) return <div>error getting role</div>;
@@ -488,6 +489,12 @@ export function ProjectInfo() {
             Posted:
           </span>
           {dayjjs(data.createdAt).fromNow()}
+        </p>
+        <p className="capitalize">
+          <span className="underline font-semibold mr-3 underline-offset-4">
+            Tags:
+          </span>
+          {data.tags.join(', ')}
         </p>
       </div>
       <img

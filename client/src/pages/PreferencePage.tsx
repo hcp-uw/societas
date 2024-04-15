@@ -8,7 +8,7 @@ export default function PreferencePage() {
         <p className="PP-text1">Please check the boxes you are interested. </p>
         {/* buttons */}
         <div
-          style={{ marginTop: "2em", marginLeft: "1em" }}
+          style={{ marginTop: '2em', marginLeft: '1em' }}
           className="col align-self-center"
         >
           <div className="PPbutton-container col ">
@@ -88,7 +88,7 @@ export default function PreferencePage() {
 
         {/* text 2 */}
         <p className="PP-text2">
-          Feel free to type in other fields as you like.{" "}
+          Feel free to type in other fields as you like.{' '}
         </p>
 
         <div className="PPWrapper2">

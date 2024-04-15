@@ -1,82 +1,125 @@
-import { useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { trpc } from '../utils/trpc';
 import ProjectsView from '../components/ProjectsView';
+import { util } from 'zod';
+import GetAutcomplete from '../utils/Autcomplete';
+
+type FilterState = {
+  input: string;
+  tags: string[];
+};
 
 export default function Search() {
-    const [searchTags, setSearchTags] = useState(['']);
-    const { data } = trpc.projects.getByTags.useQuery(searchTags);
-    const utils = trpc.useUtils();
-    const searchTagInputRef = useRef<HTMLInputElement>(null);
+  const utils = trpc.useUtils();
 
-    const breakpointColumnsObj = {
-        default: 4,
-        1826: 3,
-        1347: 2,
-        900: 1,
-    };
+  const [filterState, setFilterState] = useState<FilterState>({
+    input: '',
+    tags: [],
+  });
 
-    const addItem = (e: React.FormEvent) => {
-        e.preventDefault();
-        const prev = searchTags;
-        if (searchTagInputRef.current !== null) {
-            const value = searchTagInputRef.current.value;
-            if (value === '') return;
-            setSearchTags((prev) => {
-                if (prev.length === 1 && prev[0] === '') return [value];
-                else return [...prev, value];
-            });
-            searchTagInputRef.current.value = '';
-        }
-        utils.projects.getByTags.invalidate(prev);
+  const { data: projData } = trpc.projects.getByTags.useQuery(filterState.tags);
+  const { data: autcompleteOptions } =
+    trpc.tags.getAutocompleteOptions.useQuery(filterState.input);
 
-        return;
-    };
+  const [errorState, setErrorState] = useState<boolean>(false);
 
-    const handleSearchReq = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(data);
-    };
+  const breakpointColumnsObj = {
+    default: 4,
+    1826: 3,
+    1347: 2,
+    900: 1,
+  };
 
-    return (
-        <>
-            <div
-                style={{
-                    textAlign: 'center',
-                    fontSize: 20,
-                }}
-            >
-                <br />
-                <form onSubmit={addItem}>
-                    Add Tags to Search:
-                    <input
-                        type="text"
-                        ref={searchTagInputRef}
-                        style={{
-                            border: '10px',
-                            backgroundColor: 'pink',
-                            //borderColor: "red"
-                        }}
-                    />
-                    <button>Add</button>
-                </form>
+  const addItem = (e: React.FormEvent) => {
+    e.preventDefault();
 
-                <br />
-                <br />
-                <form onSubmit={handleSearchReq}>
-                    <button>Search</button>
-                </form>
-                <br />
-                <br />
+    const newTag = filterState.input.trim();
 
-                <h3>Search Tags:</h3>
-                {searchTags.map((tag) => {
-                    return <div>{tag}</div>;
-                })}
+    if (newTag === '' || filterState.tags.indexOf(newTag) !== -1) return;
+    setFilterState((prev) => ({
+      ...prev,
+      input: '',
+      tags: [...prev.tags, newTag],
+    }));
+    utils.projects.getByTags.invalidate();
+  };
+  const onSelectAutocomplete = (tag: string) => {
+    const newTag = tag.trim();
+    setFilterState({ input: '', tags: [...filterState.tags, newTag] });
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setFilterState((prev) => ({ ...prev, input: e.target.value }));
+    utils.tags.getAutocompleteOptions.invalidate();
+  };
+
+  const handleTagDelete = (tag: string) => {
+    const newTags: string[] = filterState.tags.concat([]); // create a deep copy
+    const index = newTags.indexOf(tag);
+    if (index == -1) {
+      console.error('Tag not found in added tags');
+      return;
+    }
+    newTags.splice(index, 1);
+    setFilterState((prev) => ({ ...prev, tags: newTags }));
+  };
+
+  return (
+    <>
+      <div
+        style={{
+          textAlign: 'center',
+          fontSize: 20,
+        }}
+      >
+        <br />
+        <form className="text-2xl" onSubmit={addItem}>
+          Add Tags to Search:
+          <input
+            type="text"
+            value={filterState.input}
+            onChange={handleInputChange}
+            style={{
+              border: '10px',
+              backgroundColor: 'pink',
+              //borderColor: "red"
+            }}
+          />
+          <button>Add</button>
+        </form>
+        <br />
+        <br />
+        <br />
+        <h3 className="text-2xl">Autcomplete Results:</h3>
+        <GetAutcomplete onSelect={onSelectAutocomplete} />
+        <br />
+        <br />
+        <br />
+        <h3 className="text-2xl">Search Tags:</h3>
+        {filterState.tags.map((tag) => {
+          return (
+            <div>
+              {tag}
+              <input
+                type="button"
+                value="Delete"
+                onClick={() => handleTagDelete(tag)}
+                className="mx-8 my-2 border-2 border-red-500 border-solid border-spacing-3 w-24"
+              />
             </div>
-            <ProjectsView
-                projects={data === undefined ? [] : data}
-                breakPoints={breakpointColumnsObj}
-            />
-        </>
-    );
+          );
+        })}
+
+        <br />
+        <br />
+        <br />
+        <br />
+      </div>
+      <ProjectsView
+        projects={projData === undefined ? [] : projData}
+        breakPoints={breakpointColumnsObj}
+      />
+    </>
+  );
 }

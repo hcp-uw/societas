@@ -1,7 +1,7 @@
-import { useUser } from "@clerk/clerk-react";
-import Spinner from "../components/Spinner";
-import ProjectsView from "../components/ProjectsView";
-import { trpc } from "../utils/trpc";
+import { useUser } from '@clerk/clerk-react';
+import Spinner from '../components/Spinner';
+import ProjectsView from '../components/ProjectsView';
+import { trpc } from '../utils/trpc';
 
 export default function Home() {
   const { user } = useUser();
@@ -42,12 +42,12 @@ function Projects() {
     return (
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          margin: "auto",
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: 'auto',
         }}
       >
         <Spinner size="4rem" />

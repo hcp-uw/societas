@@ -1,15 +1,15 @@
-import { SignOutButton } from "@clerk/clerk-react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
-import toast from "react-hot-toast";
+import { SignOutButton } from '@clerk/clerk-react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 //shows/handles layout for lefthand navigation in profile page
 export default function ProfileLayout() {
   const navigate = useNavigate();
 
   function handleSignout() {
-    navigate("/");
-    toast.success("Successfully Signout");
+    navigate('/');
+    toast.success('Successfully Signout');
   }
   return (
     <div className="flex mt-6 gap-32">
@@ -47,10 +47,10 @@ function ProfileLink({
       end={end}
       className={({ isActive, isPending }) =>
         isActive
-          ? "flex p-2 rounded-lg gap-2 transition-colors items-center border-2 border-blue-400 bg-zinc-300"
+          ? 'flex p-2 rounded-lg gap-2 transition-colors items-center border-2 border-blue-400 bg-zinc-300'
           : isPending
-            ? "flex p-2 rounded-lg gap-2 transition-colors items-center border-2 border-transparent bg-zinc-400"
-            : "flex p-2 rounded-lg gap-2 transition-colors items-center border-2 border-transparent hover:bg-zinc-300"
+            ? 'flex p-2 rounded-lg gap-2 transition-colors items-center border-2 border-transparent bg-zinc-400'
+            : 'flex p-2 rounded-lg gap-2 transition-colors items-center border-2 border-transparent hover:bg-zinc-300'
       }
     >
       {children}

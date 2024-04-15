@@ -1,15 +1,15 @@
-import { createGlobalStyle } from "styled-components";
-import { ThemeProvider } from "styled-components";
-import { theme } from "./contexts/theme";
-import Nav from "./components/Nav";
-import { Toaster } from "react-hot-toast";
-import "./index.css";
-import { Outlet } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
-import { useState } from "react";
-import { trpc } from "./utils/trpc";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink } from "@trpc/client";
+import { createGlobalStyle } from 'styled-components';
+import { ThemeProvider } from 'styled-components';
+import { theme } from './contexts/theme';
+import Nav from './components/Nav';
+import { Toaster } from 'react-hot-toast';
+import './index.css';
+import { Outlet } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
+import { useState } from 'react';
+import { trpc } from './utils/trpc';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { httpBatchLink } from '@trpc/client';
 
 export default function App({ queryClient }: { queryClient: QueryClient }) {
   const { getToken, userId } = useAuth();
@@ -18,13 +18,13 @@ export default function App({ queryClient }: { queryClient: QueryClient }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://localhost:3001",
+          url: 'http://localhost:3001',
           // You can pass any HTTP headers you wish here
           async headers() {
             const token = await getToken();
             return {
               authorization: token ?? undefined,
-              userId: userId ?? "",
+              userId: userId ?? '',
             };
           },
         }),
