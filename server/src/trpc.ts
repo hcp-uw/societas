@@ -1,7 +1,7 @@
-import { TRPCError, initTRPC } from "@trpc/server";
-import { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
-import { prisma } from "./db";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+import { TRPCError, initTRPC } from '@trpc/server';
+import { CreateHTTPContextOptions } from '@trpc/server/adapters/standalone';
+import { prisma } from './db';
+import { clerkClient } from '@clerk/clerk-sdk-node';
 
 //inner context
 function createContextInner(opts: CreateHTTPContextOptions) {
@@ -34,8 +34,8 @@ const enforeceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
     await clerkClient.verifyToken(ctx.auth.authorization);
   } catch (err) {
     throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "user is not logged in",
+      code: 'UNAUTHORIZED',
+      message: 'user is not logged in',
     });
   }
 

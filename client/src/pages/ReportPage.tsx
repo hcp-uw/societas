@@ -9,14 +9,14 @@ export default function ReportPage() {
 
       <div
         className="row"
-        style={{ marginLeft: "5%", marginRight: "15%", marginTop: "5em" }}
+        style={{ marginLeft: '5%', marginRight: '15%', marginTop: '5em' }}
       >
-        <div className="col-7 RP-text1" style={{ textAlign: "center" }}>
-          User to Report:{" "}
+        <div className="col-7 RP-text1" style={{ textAlign: 'center' }}>
+          User to Report:{' '}
         </div>
         <div
           className="col-5"
-          style={{ paddingLeft: "2em", paddingRight: "0" }}
+          style={{ paddingLeft: '2em', paddingRight: '0' }}
         >
           <input
             type="text"
@@ -30,14 +30,14 @@ export default function ReportPage() {
 
       <div
         className="row"
-        style={{ marginLeft: "5%", marginRight: "15%", marginTop: "5em" }}
+        style={{ marginLeft: '5%', marginRight: '15%', marginTop: '5em' }}
       >
-        <div className="col-7 RP-text1" style={{ textAlign: "center" }}>
-          Project to report:{" "}
+        <div className="col-7 RP-text1" style={{ textAlign: 'center' }}>
+          Project to report:{' '}
         </div>
         <div
           className="col-5"
-          style={{ paddingLeft: "2em", paddingRight: "0" }}
+          style={{ paddingLeft: '2em', paddingRight: '0' }}
         >
           <input
             type="text"
@@ -51,14 +51,14 @@ export default function ReportPage() {
 
       <div
         className="row"
-        style={{ marginLeft: "5%", marginRight: "15%", marginTop: "5em" }}
+        style={{ marginLeft: '5%', marginRight: '15%', marginTop: '5em' }}
       >
-        <div className="col-7 RP-text1" style={{ textAlign: "center" }}>
-          Comment on the offense:{" "}
+        <div className="col-7 RP-text1" style={{ textAlign: 'center' }}>
+          Comment on the offense:{' '}
         </div>
         <div
           className="col-5"
-          style={{ paddingLeft: "2em", paddingRight: "0" }}
+          style={{ paddingLeft: '2em', paddingRight: '0' }}
         >
           <input
             type="text"
@@ -73,9 +73,9 @@ export default function ReportPage() {
       <div
         className="row"
         style={{
-          justifyContent: "center",
-          marginTop: "6em",
-          marginBottom: "4em",
+          justifyContent: 'center',
+          marginTop: '6em',
+          marginBottom: '4em',
         }}
       >
         <button type="button" className="RP-button">

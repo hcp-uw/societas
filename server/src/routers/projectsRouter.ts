@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { authedProcedure, publicProcedure, router } from "../trpc";
-import { TRPCError } from "@trpc/server";
+import { z } from 'zod';
+import { authedProcedure, publicProcedure, router } from '../trpc';
+import { TRPCError } from '@trpc/server';
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -21,8 +21,8 @@ export const projectsRouter = router({
 
     if (!data) {
       throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "No project has corresponding id",
+        code: 'NOT_FOUND',
+        message: 'No project has corresponding id',
       });
     }
 
@@ -85,52 +85,67 @@ export const projectsRouter = router({
         ownerId: z.string(),
         meetLocation: z.string(),
         imageUrl: z.string(),
-        tags: z.array(z.string())
+        startDate: z.string(),
+        tags: z.array(z.string()),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
         await ctx.db.project.create({ data: input });
       } catch (e) {
-        console.log("here");
+        console.log('here');
       }
     }),
 
   delete: authedProcedure
-    .input(z.object({
-      projectId: z.string(),
-      ownerId: z.string()
-    }))
-    .mutation(async ({ctx, input}) => {
-      try{
+    .input(
+      z.object({
+        projectId: z.string(),
+        ownerId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
         await ctx.db.project.delete({
           where: {
             id: input.projectId,
-            ownerId: input.ownerId
-          }
-        })
-      }catch(e){
-        console.log("deletion failed")
+            ownerId: input.ownerId,
+          },
+        });
+      } catch (e) {
+        console.log('deletion failed');
       }
     }),
 
   getByTags: authedProcedure
     .input(z.array(z.string()))
-    
-    .query(async ({ctx, input}) => {
-      try{
-        console.log("input: ");
+
+    .query(async ({ ctx, input }) => {
+      try {
+        console.log('input: ');
         console.log(input.toString());
         return await ctx.db.project.findMany({
-          where:{
-            tags:{    
-              hasEvery: input
-            }
-          }
-        })
-      }catch(e){
-        console.log("Search by Tags failed");
+          where: {
+            tags: {
+              hasEvery: input,
+            },
+          },
+        });
+      } catch (e) {
+        console.log('Search by Tags failed');
         return undefined;
       }
-    })
-})
+    }),
+});
+const generateRelationFilter = (
+  tags: string[],
+  relationName: string,
+  column: string,
+) =>
+  tags.map((tag) => ({
+    [relationName]: {
+      every: {
+        [column]: {},
+      },
+    },
+  }));

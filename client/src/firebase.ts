@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   getFirestore,
   collection,
@@ -18,10 +18,10 @@ import {
   type Timestamp,
   QuerySnapshot,
   DocumentData,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
-import { getAuth } from "firebase/auth";
-import { v4 as uuidv4 } from "uuid";
+import { getAuth } from 'firebase/auth';
+import { v4 as uuidv4 } from 'uuid';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -74,7 +74,7 @@ export async function createProject({
   meetType,
   startDate,
 }: CreateProjParams) {
-  const docRef = await addDoc(collection(db, "projects"), {
+  const docRef = await addDoc(collection(db, 'projects'), {
     title: title,
     description: description,
     meetLocation: meetLocation,
@@ -93,7 +93,7 @@ export async function createProject({
   });
 }
 
-type MeetType = "in-person" | "hybrid" | "remote";
+type MeetType = 'in-person' | 'hybrid' | 'remote';
 export type Project = {
   id: string;
   title: string;
@@ -112,17 +112,17 @@ export type Project = {
 //gets all projects from projects collection
 //returns as array of Projects with IDs.
 export async function getAllProjects() {
-  const snapshot = await getDocs(collection(db, "projects"));
-  console.log("getting projects");
+  const snapshot = await getDocs(collection(db, 'projects'));
+  console.log('getting projects');
 
   return addIdsToSnapShot(snapshot) as Project[];
 }
 
 export async function getProjectById(id: string) {
-  if (id === "") return;
-  const docSnapshot = await getDoc(doc(db, "projects", id));
+  if (id === '') return;
+  const docSnapshot = await getDoc(doc(db, 'projects', id));
 
-  if (!docSnapshot.exists()) throw new Error("project does not exists");
+  if (!docSnapshot.exists()) throw new Error('project does not exists');
 
   const data = { id: docSnapshot.id, ...docSnapshot.data() } as Project;
 
@@ -131,8 +131,8 @@ export async function getProjectById(id: string) {
 
 export async function getProjectsByUserId(userId: string) {
   if (userId.length < 1) return;
-  const projsRef = collection(db, "projects");
-  const q = query(projsRef, where("ownerId", "==", userId));
+  const projsRef = collection(db, 'projects');
+  const q = query(projsRef, where('ownerId', '==', userId));
   const qSnapShot = await getDocs(q);
 
   return addIdsToSnapShot(qSnapShot) as Project[];
@@ -160,16 +160,16 @@ export async function createProjectJoinRequest({
 }: JoinReqParams) {
   //gets project reference and updates requestants field of project
   //by doing a union so that the same person isn't shown requesting multiple times.
-  const projectRef = doc(db, "projects", projectId);
+  const projectRef = doc(db, 'projects', projectId);
   await updateDoc(projectRef, {
     requestants: arrayUnion(requestantId),
   });
 
   //adds the request to the request document.
-  const requestRef = await addDoc(collection(db, "requests"), {
+  const requestRef = await addDoc(collection(db, 'requests'), {
     requestantId: requestantId,
     projectId: projectId,
-    status: "pending",
+    status: 'pending',
     ownerId: ownerId,
     message: message,
     createdAt: serverTimestamp(),
@@ -195,11 +195,11 @@ type Request = {
 
 //gets user's current requests.
 export async function getAllPendingRequests(currentUserId: string) {
-  const requestsRef = collection(db, "requests");
+  const requestsRef = collection(db, 'requests');
   const q = query(
     requestsRef,
-    where("ownerId", "==", currentUserId),
-    where("status", "==", "pending"),
+    where('ownerId', '==', currentUserId),
+    where('status', '==', 'pending'),
   );
   const qSnapShot = await getDocs(q);
 
@@ -211,16 +211,16 @@ export async function acceptRequest(
   projectId: string,
   requestantId: string,
 ) {
-  await updateDoc(doc(db, "requests", requestId), {
-    status: "accepted",
+  await updateDoc(doc(db, 'requests', requestId), {
+    status: 'accepted',
   });
 
-  await updateDoc(doc(db, "projects", projectId), {
+  await updateDoc(doc(db, 'projects', projectId), {
     members: arrayUnion(requestantId),
     requestants: arrayRemove(requestantId),
   });
 
-  console.log("success");
+  console.log('success');
 }
 
 export async function rejectRequest(
@@ -228,22 +228,22 @@ export async function rejectRequest(
   projectId: string,
   requestantId: string,
 ) {
-  await updateDoc(doc(db, "requests", requestId), {
-    status: "rejected",
+  await updateDoc(doc(db, 'requests', requestId), {
+    status: 'rejected',
   });
 
-  await updateDoc(doc(db, "projects", projectId), {
+  await updateDoc(doc(db, 'projects', projectId), {
     requestants: arrayRemove(requestantId),
   });
 
-  console.log("success");
+  console.log('success');
 }
 
 export async function removeUser(userId: string, projectId: string) {
-  await updateDoc(doc(db, "projects", projectId), {
+  await updateDoc(doc(db, 'projects', projectId), {
     members: arrayRemove(userId),
   });
-  console.log("success");
+  console.log('success');
 }
 
 // project posts

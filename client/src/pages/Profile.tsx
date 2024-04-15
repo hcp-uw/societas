@@ -1,11 +1,11 @@
-import { useUser } from "@clerk/clerk-react";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Input, StyledInput } from "../components/inputs";
-import { useForm, SubmitHandler } from "react-hook-form";
-import toast from "react-hot-toast";
-import ProjectsView from "../components/ProjectsView";
-import { trpc } from "../utils/trpc";
+import { useUser } from '@clerk/clerk-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Input, StyledInput } from '../components/inputs';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import ProjectsView from '../components/ProjectsView';
+import { trpc } from '../utils/trpc';
 
 /*
  * shows profile page. Gets data from userId.
@@ -18,7 +18,7 @@ export default function Profile() {
   // )
 
   const { data, isLoading } = trpc.projects.getByUserId.useQuery(
-    user?.id ?? "",
+    user?.id ?? '',
   );
 
   if (data) {
@@ -52,7 +52,7 @@ export default function Profile() {
         />
         <div className="flex flex-col">
           <h1 className="text-3xl font-medium">{user.fullName}</h1>
-          <p>{(user.unsafeMetadata.bio as string) ?? "No bio"}</p>
+          <p>{(user.unsafeMetadata.bio as string) ?? 'No bio'}</p>
         </div>
 
         <Link
@@ -84,7 +84,7 @@ type EditProfileFormVals = {
 //edit profile page and functionality
 export function EditProfile() {
   const { user, isLoaded, isSignedIn } = useUser();
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState('');
   const navigate = useNavigate();
   const {
     register,
@@ -110,8 +110,8 @@ export function EditProfile() {
       });
     }
 
-    toast.success("updated successfully");
-    navigate("/account");
+    toast.success('updated successfully');
+    navigate('/account');
   };
 
   useEffect(() => {
@@ -128,7 +128,7 @@ export function EditProfile() {
     <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 flex-col">
       <div className="relative w-fit">
         <img
-          src={typeof image === "string" ? image : URL.createObjectURL(image)}
+          src={typeof image === 'string' ? image : URL.createObjectURL(image)}
           alt="Your profile image"
           className="rounded-full object-cover h-20 w-20"
           width={100}
@@ -148,8 +148,8 @@ export function EditProfile() {
           <StyledInput
             type="text"
             id="firstName"
-            defaultValue={user.firstName ?? ""}
-            {...register("firstName")}
+            defaultValue={user.firstName ?? ''}
+            {...register('firstName')}
           />
         </Input>
         <Input>
@@ -157,8 +157,8 @@ export function EditProfile() {
           <StyledInput
             type="text"
             id="lastName"
-            defaultValue={user.lastName ?? ""}
-            {...register("lastName")}
+            defaultValue={user.lastName ?? ''}
+            {...register('lastName')}
           />
         </Input>
       </div>
@@ -168,10 +168,10 @@ export function EditProfile() {
           type="text"
           id="bio"
           defaultValue={
-            user.unsafeMetadata ? (user.unsafeMetadata.bio as string) : ""
+            user.unsafeMetadata ? (user.unsafeMetadata.bio as string) : ''
           }
           placeholder="Biography"
-          {...register("bio")}
+          {...register('bio')}
         />
       </Input>
 
@@ -180,7 +180,7 @@ export function EditProfile() {
         id="editImage"
         className="hidden"
         accept="image/*"
-        {...register("image", {
+        {...register('image', {
           onChange: (e) => {
             setImage(e.target.files[0]);
           },
@@ -190,7 +190,7 @@ export function EditProfile() {
         disabled={isSubmitting}
         className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 py-2 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
       >
-        {isSubmitting ? "Updating" : "Update"}
+        {isSubmitting ? 'Updating' : 'Update'}
       </button>
     </form>
   );

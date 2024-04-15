@@ -1,59 +1,59 @@
-import { z } from "zod";
-import { authedProcedure, publicProcedure, router } from "../trpc";
+import { z } from 'zod';
+import { authedProcedure, publicProcedure, router } from '../trpc';
 
 export const tagsRouter = router({
   addTags: authedProcedure
     .input(z.array(z.string()))
     .mutation(async ({ ctx, input }) => {
-      for(const tag of input){
-        const isNew : boolean = null == await ctx.db.tag.findFirst({
-          where: {
-            name: {
-              equals: tag,
-              mode: "insensitive"
-            }
-          }
-        })
-        if(isNew)
-          await ctx.db.tag.create({data: {name: tag.toLocaleLowerCase()}})
+      for (const tag of input) {
+        const isNew: boolean =
+          null ==
+          (await ctx.db.tag.findFirst({
+            where: {
+              name: {
+                equals: tag,
+                mode: 'insensitive',
+              },
+            },
+          }));
+        if (isNew)
+          await ctx.db.tag.create({ data: { name: tag.toLocaleLowerCase() } });
       }
     }),
-  
+
   getAutocompleteOptions: authedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      if(input === "") 
-        return "";
-      
+      if (input === '') return '';
+
       const startsWith = await ctx.db.tag.findMany({
         where: {
           name: {
-            startsWith: input
+            startsWith: input,
           },
-          
         },
         select: {
-            name: true
-        }
-      })
+          name: true,
+        },
+      });
       const containsNotStartsWith = await ctx.db.tag.findMany({
-        where:{
+        where: {
           NOT: {
             name: {
-              startsWith: input
-            }
+              startsWith: input,
+            },
           },
           AND: {
             name: {
-              contains: input
-            }
-          }
+              contains: input,
+            },
+          },
         },
         select: {
-            name: true
-        }
-      })
-      console.log(startsWith.concat(containsNotStartsWith))
+          name: true,
+        },
+      });
+      console.log(startsWith.concat(containsNotStartsWith));
       return startsWith.concat(containsNotStartsWith);
-    })
-})
+    }),
+});

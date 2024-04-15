@@ -1,9 +1,9 @@
-import { createTRPCContext, router } from "./trpc";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import cors from "cors";
-import { projectsRouter } from "./routers/projectsRouter";
-import { membershipsRouter } from "./routers/membershipsRouter";
-import { tagsRouter } from "./routers/tagsRouter";
+import { createTRPCContext, router } from './trpc';
+import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import cors from 'cors';
+import { projectsRouter } from './routers/projectsRouter';
+import { membershipsRouter } from './routers/membershipsRouter';
+import { tagsRouter } from './routers/tagsRouter';
 
 const appRouter = router({
   projects: projectsRouter,
@@ -21,8 +21,8 @@ const server = createHTTPServer({
     console.log(error);
   },
   middleware: cors({
-    origin: "*",
+    origin: '*',
   }),
 });
 server.listen(3001);
-console.log("Server running running on http://localhost:3001");
+console.log('Server running running on http://localhost:3001');

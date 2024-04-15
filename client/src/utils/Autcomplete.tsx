@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { trpc } from "./trpc";
-import { StyledInput } from "../components/inputs";
+import { useState } from 'react';
+import { trpc } from './trpc';
+import { StyledInput } from '../components/inputs';
 
 type AutcompleteParams = {
   onSelect: (str: string) => void;
 };
 
 export default function GetAutcomplete(params: AutcompleteParams) {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>('');
   const { data: autcompleteOptions } =
     trpc.tags.getAutocompleteOptions.useQuery(input);
 
   const handleSelectAutocomplete = (tag: string) => {
     params.onSelect(tag);
-    setInput("");
+    setInput('');
   };
 
   return (
