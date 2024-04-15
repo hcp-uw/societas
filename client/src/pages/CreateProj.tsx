@@ -8,7 +8,7 @@ import { trpc } from '../utils/trpc';
 import Spinner from '../components/Spinner';
 import { useMutation } from '@tanstack/react-query';
 import { uploadProjectImage } from '../firebase';
-import GetAutcomplete from '../utils/Autcomplete';
+import TagsAutocomplete from '../components/TagsAutocomplete';
 
 type FormState = {
   title: string;
@@ -135,17 +135,26 @@ function AddTagsView({
 
   return (
     <>
-      <ul className="">
-        {addedTags.map((tag) => {
-          return (
-            <li key={tag} className="rounded-full bg-zinc-200 w-fit flex py-1 px-3 items-center gap-2 justify-center">
-              <p>{tag}</p>
-              <SmCloseBtn onClose={() => handleTagDelete(tag)} />
-            </li>
-          );
-        })}
+      <ul className="flex">
+        {addedTags.length > 0 ? (
+          <>
+            {addedTags.map((tag) => {
+              return (
+                <li
+                  key={tag}
+                  className="rounded-full bg-zinc-200 w-fit flex py-1 px-3 items-center gap-2 justify-center"
+                >
+                  <p>{tag}</p>
+                  <SmCloseBtn onClose={() => handleTagDelete(tag)} />
+                </li>
+              );
+            })}
+          </>
+        ) : (
+          <div className='text-zinc-400 text-md lowercase'>No tags selected, search one!</div>
+        )}
       </ul>
-      <GetAutcomplete onSelect={handleAddTag} />
+      <TagsAutocomplete onSelect={handleAddTag} />
     </>
   );
 }
@@ -206,7 +215,7 @@ function InputsView({
         ></TextArea>
       </Input>
 
-      <Input className='flex flex-col gap-2'>
+      <Input className="flex flex-col gap-2">
         <label>tags</label>
         <AddTagsView addedTags={addedTags} setAddedTags={setAddedTags} />
       </Input>
