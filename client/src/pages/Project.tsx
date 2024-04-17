@@ -375,6 +375,8 @@ export function CreatePost() {
   const fetcher = useFetcher();
   const navigate = useNavigate();
 
+  const mutation = trpc.posts.createPost.useMutation();
+
   if (isLoading) return <div>loading</div>;
 
   if (!user) return <div>loading</div>;
@@ -384,6 +386,27 @@ export function CreatePost() {
   if (data.ownerId !== user.id) {
     toast.error('Can only create post if owner');
     navigate('..');
+  }
+
+  function handleSubmit(e:React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const inputsSchema = z.object({
+      title: z.string(),
+      content: z.string(),
+      projectId: z.string(),
+    })
+    const inputs = inputsSchema.parse(Object.fromEntries(formData));
+    mutation.mutate(
+      {
+        projectId: inputs.projectId,
+        title: inputs.title,
+        content: inputs.content
+      }
+    )
+
   }
 
   return (
@@ -396,7 +419,8 @@ export function CreatePost() {
           {isPreview ? 'Edit Text' : 'Preview'}
         </button>
       </div>
-      <fetcher.Form method="post" className="flex gap-4 flex-col w-full">
+      <Form onSubmit={handleSubmit}
+       className="flex gap-4 flex-col w-full">
         {isPreview ? (
           <>
             <h1 className="text-xl font-bold">
@@ -449,14 +473,17 @@ export function CreatePost() {
             </div>
           </>
         )}
-        <input type="hidden" name="comment" value={comment} />
+        <input type="hidden" name="content" value={comment} />
         <input type="hidden" name="projectId" value={projectId} />
-        <SubmitFetcherBtn
+        {/* <SubmitFetcherBtn
           fetcher={fetcher}
           message="Create Post"
           className="w-fit"
-        />
-      </fetcher.Form>
+        /> */}
+        <button type='submit'>
+          Submit
+        </button>
+      </Form>
     </div>
   );
 }
@@ -510,6 +537,8 @@ export function ProjectInfo() {
 
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams();
+  const { data, isLoading, isError } = trpc.posts.getById.useQuery(projectId ?? "");
+  
   const { data, isLoading, isError } = useQuery(
     projectPostsQuery(projectId ?? ''),
   );

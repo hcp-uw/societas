@@ -4,10 +4,12 @@ import cors from 'cors';
 import { projectsRouter } from './routers/projectsRouter';
 import { membershipsRouter } from './routers/membershipsRouter';
 import { tagsRouter } from './routers/tagsRouter';
+import { postsRouter } from "./routers/postsRouter";
 
 const appRouter = router({
   projects: projectsRouter,
   memberships: membershipsRouter,
+  posts: postsRouter,
   tags: tagsRouter,
 });
 // Export type router type signature,
