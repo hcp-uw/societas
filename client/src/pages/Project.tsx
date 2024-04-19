@@ -306,6 +306,16 @@ function StatusChip({
     );
   }
 
+  if (user.isSignedIn && !role) {
+    return (
+      <button
+        className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
+        onClick={() => setShowModal(true)}
+      >
+        Join
+      </button>)
+  }
+
   if (!role) return <div>error getting role</div>;
 
   if (role.status === 'REJECTED') {
@@ -537,11 +547,8 @@ export function ProjectInfo() {
 
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams();
-  const { data, isLoading, isError } = trpc.posts.getById.useQuery(projectId ?? "");
+  const { data, isLoading, isError } = trpc.posts.getByProjectId.useQuery(projectId ?? "");
   
-  const { data, isLoading, isError } = useQuery(
-    projectPostsQuery(projectId ?? ''),
-  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -582,7 +589,7 @@ export function ProjectPostsLayout() {
             <div>
               <p className="font-medium text-zinc-800">{post.title}</p>
               <p className="text-sm text-zinc-600">
-                {dayjjs(post.createdAt.toDate()).toDate().toLocaleDateString()}
+                {dayjjs(post.createdAt).toDate().toLocaleDateString()}
               </p>
             </div>
           </NavLink>

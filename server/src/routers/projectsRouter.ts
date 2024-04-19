@@ -17,8 +17,6 @@ export const projectsRouter = router({
       },
     });
 
-    // const membershipts  = await ctx.db
-
     if (!data) {
       throw new TRPCError({
         code: 'NOT_FOUND',

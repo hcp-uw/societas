@@ -121,7 +121,7 @@ function AddTagsView({
 
   function handleAddTag(tag: string) {
     const val: string = tag.trim();
-    if (addedTags.indexOf(val) != -1) {
+    if (addedTags.indexOf(val) !== -1) {
       setErrors((prev) => [...prev, 'you have already added this tag']);
       return;
     }
