@@ -17,8 +17,6 @@ export const projectsRouter = router({
       },
     });
 
-    // const membershipts  = await ctx.db
-
     if (!data) {
       throw new TRPCError({
         code: 'NOT_FOUND',
@@ -76,7 +74,7 @@ export const projectsRouter = router({
       await ctx.db.post.create({ data: input });
     }),
 
-  create: publicProcedure
+  create: authedProcedure 
     .input(
       z.object({
         name: z.string(),

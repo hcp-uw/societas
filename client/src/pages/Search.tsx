@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { trpc } from '../utils/trpc';
 import ProjectsView from '../components/ProjectsView';
 import { util } from 'zod';
-import GetAutcomplete from '../utils/Autcomplete';
+import TagsAutocomplete from '../components/TagsAutocomplete';
 
 type FilterState = {
   input: string;
@@ -92,7 +92,7 @@ export default function Search() {
         <br />
         <br />
         <h3 className="text-2xl">Autcomplete Results:</h3>
-        <GetAutcomplete onSelect={onSelectAutocomplete} />
+        <TagsAutocomplete onSelect={onSelectAutocomplete} />
         <br />
         <br />
         <br />
