@@ -16,7 +16,6 @@ type FormState = {
   location: string;
   maxMems: string;
   startDate: string;
-  startDate: string;
   image: Blob | null;
 };
 
@@ -391,7 +390,7 @@ function SubmitBtnView({
             loading ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Spinner size="1.5rem" />
+          <Spinner size={24} />
         </div>
       </button>
     </SubmitWrapper>
