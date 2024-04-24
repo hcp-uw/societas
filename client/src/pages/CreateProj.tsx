@@ -14,6 +14,7 @@ type FormState = {
   description: string;
   location: string;
   maxMems: string;
+  startDate: string;
   image: Blob | null;
 };
 
@@ -24,6 +25,7 @@ export default function CreateProj() {
     description: "",
     location: "",
     maxMems: "",
+    startDate: "",
     image: null,
   }); // state form the inputs
   // const [loading, setLoading] = useState(false)
@@ -42,6 +44,8 @@ export default function CreateProj() {
         meetLocation: formState.location,
         meetType: "",
         ownerId: user?.id,
+        // maxMems: formState.maxMems,
+        // startDate: formState.startDate,
         imageUrl: url,
       });
     },
@@ -205,7 +209,16 @@ function InputsView({
           </Input>
           <Input className="flex-1">
             <label htmlFor="startDate">Start Date</label>
-            <StyledInput type="date" name="startDate" id="startDate" />
+            <StyledInput 
+              type="date" 
+              name="startDate" 
+              id="startDate" 
+              onChange={(e) =>
+                setFormState({ ...formState, startDate: e.target.value })
+              }
+              value={formState.startDate}
+              required
+              disabled={loading}/>
           </Input>
         </div>
       </div>

@@ -25,7 +25,9 @@ model Project {
   posts        Post[]
   memberships  Memberships[]
   imageUrl     String
-
+  ratings      Ratings[]
+  startDate    String
+  maxMems      String
 }
 
 // model Tag {
@@ -87,4 +89,17 @@ enum MembershipStatus {
   ACCEPTED
   PENDING
   REJECTED
+}
+
+model Ratings {
+  id          String           @id @default(uuid())
+  createdAt   DateTime         @default(now())
+  feedback    String
+  rating     Int
+  updatedAt   DateTime         @updatedAt
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  @@unique([projectId, userId])
+  @@index([projectId])
 }
