@@ -7,13 +7,13 @@ export default function WhoopsPage() {
       <div className="row justify-content-center WP-wrapper">
         <div
           className="text-wrap"
-          style={{ width: "50%", textAlign: "center" }}
+          style={{ width: '50%', textAlign: 'center' }}
         >
           <p className="WP-text1">
             This post is already posted, you can't post redundant project.
           </p>
           <p className="WP-text1">
-            You can contact us through xxxxx@gmail.com{" "}
+            You can contact us through xxxxx@gmail.com{' '}
           </p>
           <p className="WP-text1">Thank you for your understanding. </p>
         </div>

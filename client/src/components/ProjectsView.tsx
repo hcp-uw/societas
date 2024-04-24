@@ -1,13 +1,13 @@
-import Masonry from "react-masonry-css";
-import { Link } from "react-router-dom";
-import dayjjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { RouterOutputs } from "../utils/trpc";
+import Masonry from 'react-masonry-css';
+import { Link } from 'react-router-dom';
+import dayjjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { RouterOutputs } from '../utils/trpc';
 dayjjs.extend(relativeTime);
 
-type BreakPoints = "default" | "1826" | "1347" | "900";
+type BreakPoints = 'default' | '1826' | '1347' | '900';
 
-type Projects = RouterOutputs["projects"]["getAll"];
+type Projects = RouterOutputs['projects']['getAll'];
 
 export default function ProjectsView(props: {
   projects: Projects;
@@ -33,8 +33,8 @@ export default function ProjectsView(props: {
               loading="lazy"
               className="object-cover rounded-lg max-h-[400px] opacity-0 transition-opacity m-auto"
               onLoad={(e) => {
-                e.currentTarget.classList.remove("opacity-0");
-                e.currentTarget.classList.add("opacity-1");
+                e.currentTarget.classList.remove('opacity-0');
+                e.currentTarget.classList.add('opacity-1');
               }}
             />
           }
@@ -48,9 +48,9 @@ export default function ProjectsView(props: {
               {dayjjs(proj.createdAt).fromNow()}
             </Blob>
             <Blob>
-              {proj.meetType === "in-person" ? (
+              {proj.meetType === 'in-person' ? (
                 <span className="material-symbols-outlined">groups</span>
-              ) : proj.meetType === "remote" ? (
+              ) : proj.meetType === 'remote' ? (
                 <span className="material-symbols-outlined">language</span>
               ) : (
                 <span className="material-symbols-outlined">
@@ -59,6 +59,7 @@ export default function ProjectsView(props: {
               )}
               {proj.meetType}
             </Blob>
+            {proj.tags.map(tag => <Blob><p>{tag}</p></Blob>)}
           </div>
         </Link>
       ))}

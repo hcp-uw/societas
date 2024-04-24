@@ -1,14 +1,18 @@
-import { createTRPCContext, router } from "./trpc";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import cors from "cors";
-import { projectsRouter } from "./routers/projectsRouter";
-import { membershipsRouter } from "./routers/membershipsRouter";
+import { createTRPCContext, router } from './trpc';
+import { createHTTPServer } from '@trpc/server/adapters/standalone';
+import cors from 'cors';
+import { projectsRouter } from './routers/projectsRouter';
+import { membershipsRouter } from './routers/membershipsRouter';
+import { tagsRouter } from './routers/tagsRouter';
+import { postsRouter } from "./routers/postsRouter";
 import { ratingRouter } from "./routers/ratingsRouter";
 
 const appRouter = router({
   projects: projectsRouter,
   memberships: membershipsRouter,
   ratings: ratingRouter,
+  posts: postsRouter,
+  tags: tagsRouter,
 });
 // Export type router type signature,
 // NOT the router itself.
@@ -21,8 +25,8 @@ const server = createHTTPServer({
     console.log(error);
   },
   middleware: cors({
-    origin: "*",
+    origin: '*',
   }),
 });
 server.listen(3001);
-console.log("Server running running on http://localhost:3001");
+console.log('Server running running on http://localhost:3001');

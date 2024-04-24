@@ -1,10 +1,10 @@
-import { useUser } from "@clerk/clerk-react";
-import dayjjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import toast from "react-hot-toast";
-import { z } from "zod";
-import { trpc } from "../utils/trpc";
-import React from "react";
+import { useUser } from '@clerk/clerk-react';
+import dayjjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
+import { trpc } from '../utils/trpc';
+import React from 'react';
 dayjjs.extend(relativeTime);
 
 //request page to be shown.
@@ -15,14 +15,14 @@ export default function Requests() {
   // )
 
   const { data, isLoading, isError } =
-    trpc.memberships.getAllIncomingRequests.useQuery(user?.id ?? "");
+    trpc.memberships.getAllIncomingRequests.useQuery(user?.id ?? '');
   const utils = trpc.useUtils();
 
   const acceptRequestMutation = trpc.memberships.acceptRequest.useMutation({
     onSuccess() {
-      console.log("Request Accepted");
+      console.log('Request Accepted');
       utils.memberships.getAllIncomingRequests.invalidate();
-      toast.success("Request Accepted");
+      toast.success('Request Accepted');
     },
   });
 
@@ -38,9 +38,9 @@ export default function Requests() {
 
   const rejectRequestMutation = trpc.memberships.rejectRequest.useMutation({
     onSuccess() {
-      console.log("Request Rejected");
+      console.log('Request Rejected');
       utils.memberships.getAllIncomingRequests.invalidate();
-      toast.success("Request Rejected");
+      toast.success('Request Rejected');
     },
   });
 
@@ -73,7 +73,7 @@ export default function Requests() {
           className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
         >
           <div className="flex gap-6">
-            <img src={""} alt="" width={200} height={200} />
+            <img src={''} alt="" width={200} height={200} />
             <div className="">
               <p className="text-sm text-zinc-600">
                 {dayjjs(request.createdAt).toDate().toLocaleDateString()}
@@ -82,7 +82,7 @@ export default function Requests() {
                 {request.description}
               </h1>
 
-              <p>{""}</p>
+              <p>{''}</p>
             </div>
           </div>
           <div className="flex gap-4 items-center">

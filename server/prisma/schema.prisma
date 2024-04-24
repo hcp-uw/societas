@@ -30,13 +30,12 @@ model Project {
   maxMems      String
 }
 
-// model Tag {
-//   id       String           @id @default(uuid())
-//   name     String
-//   projects TagsOnProjects[]
+model Tag {
+  id       String           @id @default(uuid())
+  name     String
 
-//   @@unique([name])
-// }
+  @@unique([name])
+}
 
 // model TagsOnProjects {
 //   project   Project @relation(fields: [projectId], references: [id])

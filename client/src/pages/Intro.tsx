@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
-import LogoRoute from "../assets/logo.svg";
-import SurferRoute from "../assets/surfer.png";
-import TeamWork from "../assets/Teamwork.svg";
+import { Link } from 'react-router-dom';
+import LogoRoute from '../assets/logo.svg';
+import SurferRoute from '../assets/surfer.png';
+import TeamWork from '../assets/Teamwork.svg';
 
 //weclome page. Once "lets go" is clicked, brings you to home page
 
@@ -82,7 +82,7 @@ export default function Intro() {
       <div className="introButton-container">
         <Link
           className="bg-[#ffd559] py-3 px-8 text-2xl rounded-lg hover:bg-[#FBBC05] hover:-translate-y-1 hover:shadow-lg transition-all"
-          onClick={() => localStorage.setItem("firstTimeUser", "false")}
+          onClick={() => localStorage.setItem('firstTimeUser', 'false')}
           to="/"
         >
           {"Let's Go!"}
