@@ -582,3 +582,19 @@ export function ProjectPost() {
     </div>
   );
 }
+
+export function MemberList(){
+  const params = useParams();
+  const {data, isLoading} = trpc.projects.getMembers.useQuery(params.projectId ?? "");
+  
+  if (isLoading) return <div>loading...</div>
+
+  if(!data) return <div>Error Fetching Members</div>
+
+
+  return <div>
+    {data.memberships.map( (member) => {
+      return <li>{member.userId}</li>
+    })}
+  </div>
+}
