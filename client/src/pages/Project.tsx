@@ -1,12 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import {
   FetcherWithComponents,
-  Navigate,
-  useFetcher,
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { getAllProjectPosts, getProjectPostById } from '../firebase';
 import Spinner from '../components/Spinner';
 import dayjjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -17,23 +13,10 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { NavLink, Outlet, Form } from 'react-router-dom';
 import Markdown from 'react-markdown';
-import { ReactQueryOptions, RouterOutputs, trpc } from '../utils/trpc';
+import { RouterOutputs, trpc } from '../utils/trpc';
+import { z } from 'zod';
 
 dayjjs.extend(relativeTime);
-
-//get project info
-
-//get all posts related to project
-const projectPostsQuery = (id: string) => ({
-  queryKey: ['projects', id, 'posts'],
-  queryFn: () => getAllProjectPosts(id),
-});
-
-//get singular post related to porject
-const projectPostQuery = (projectId: string, postId: string) => ({
-  queryKey: ['projects', projectId, 'posts', postId],
-  queryFn: () => getProjectPostById(projectId, postId),
-});
 
 function useGetProjectData() {
   const { projectId } = useParams();
@@ -50,9 +33,6 @@ export default function Project() {
   const { data: role, isLoading: roleIsLoading } =
     trpc.memberships.getRole.useQuery(projectId ?? '');
   const { user } = useUser();
-  const navigate = useNavigate();
-  // const fetcher = useFetcher()
-
   const [showModal, setShowModal] = useState(false);
   const utils = trpc.useUtils();
 
@@ -267,6 +247,24 @@ export default function Project() {
   );
 }
 
+function SubmitBtn({
+  mutationLoading,
+  label,
+}: {
+  mutationLoading: boolean;
+  label: string;
+}) {
+  return (
+    <button
+      type="submit"
+      className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400`}
+      disabled={mutationLoading}
+    >
+      {mutationLoading ? <Spinner /> : <p className="py-2">{label}</p>}
+    </button>
+  );
+}
+
 type GetRole = RouterOutputs['memberships']['getRole'] | undefined;
 type StatusChipProps = {
   role: GetRole;
@@ -306,6 +304,17 @@ function StatusChip({
     );
   }
 
+  if (user.isSignedIn && !role) {
+    return (
+      <button
+        className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-[#FBBC05] font-medium hover:bg-yellow-500 transition-colors"
+        onClick={() => setShowModal(true)}
+      >
+        Join
+      </button>
+    );
+  }
+
   if (!role) return <div>error getting role</div>;
 
   if (role.status === 'REJECTED') {
@@ -341,39 +350,22 @@ function StatusChip({
   }
 }
 
-type SubmitFetcherBtnProps = {
-  fetcher: FetcherWithComponents<unknown>;
-  message: string;
-  className?: string;
-};
-function SubmitFetcherBtn({
-  fetcher,
-  message,
-  className,
-}: SubmitFetcherBtnProps) {
-  return (
-    <button
-      type="submit"
-      className={`bg-blue-500 hover:bg-blue-600 transition-colors text-slate-100 px-4 rounded-lg mt-4 flex items-center justify-center min-w-[10rem] disabled:bg-blue-400 ${className}`}
-      disabled={fetcher.state === 'submitting'}
-    >
-      {fetcher.state === 'submitting' ? (
-        <Spinner />
-      ) : (
-        <p className="py-2">{message}</p>
-      )}
-    </button>
-  );
-}
-
 export function CreatePost() {
-  const { user, isSignedIn } = useUser();
+  const { user } = useUser();
   const { data, isLoading, projectId } = useGetProjectData();
   const [isPreview, setIsPreview] = useState(false);
   const [comment, setComment] = useState('');
   const [title, setTitle] = useState('');
-  const fetcher = useFetcher();
   const navigate = useNavigate();
+  const utils = trpc.useUtils();
+
+  const mutation = trpc.posts.createPost.useMutation({
+    onSuccess() {
+      navigate('../posts');
+      toast.success('post created!');
+      utils.posts.getByProjectId.invalidate(projectId);
+    },
+  });
 
   if (isLoading) return <div>loading</div>;
 
@@ -383,7 +375,25 @@ export function CreatePost() {
 
   if (data.ownerId !== user.id) {
     toast.error('Can only create post if owner');
-    navigate('..');
+    navigate('posts');
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const inputsSchema = z.object({
+      title: z.string(),
+      content: z.string(),
+      projectId: z.string(),
+    });
+    const inputs = inputsSchema.parse(Object.fromEntries(formData));
+    mutation.mutate({
+      projectId: inputs.projectId,
+      title: inputs.title,
+      content: inputs.content,
+    });
   }
 
   return (
@@ -396,7 +406,7 @@ export function CreatePost() {
           {isPreview ? 'Edit Text' : 'Preview'}
         </button>
       </div>
-      <fetcher.Form method="post" className="flex gap-4 flex-col w-full">
+      <Form onSubmit={handleSubmit} className="flex gap-4 flex-col w-full">
         {isPreview ? (
           <>
             <h1 className="text-xl font-bold">
@@ -449,14 +459,10 @@ export function CreatePost() {
             </div>
           </>
         )}
-        <input type="hidden" name="comment" value={comment} />
+        <input type="hidden" name="content" value={comment} />
         <input type="hidden" name="projectId" value={projectId} />
-        <SubmitFetcherBtn
-          fetcher={fetcher}
-          message="Create Post"
-          className="w-fit"
-        />
-      </fetcher.Form>
+        <SubmitBtn label="Submit" mutationLoading={mutation.isLoading} />
+      </Form>
     </div>
   );
 }
@@ -510,9 +516,10 @@ export function ProjectInfo() {
 
 export function ProjectPostsLayout() {
   const { projectId, postId } = useParams();
-  const { data, isLoading, isError } = useQuery(
-    projectPostsQuery(projectId ?? ''),
+  const { data, isLoading, isError } = trpc.posts.getByProjectId.useQuery(
+    projectId ?? '',
   );
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -553,7 +560,7 @@ export function ProjectPostsLayout() {
             <div>
               <p className="font-medium text-zinc-800">{post.title}</p>
               <p className="text-sm text-zinc-600">
-                {dayjjs(post.createdAt.toDate()).toDate().toLocaleDateString()}
+                {dayjjs(post.createdAt).toDate().toLocaleDateString()}
               </p>
             </div>
           </NavLink>
@@ -566,10 +573,7 @@ export function ProjectPostsLayout() {
 
 export function ProjectPost() {
   const params = useParams();
-  const { data, isLoading } = useQuery(
-    projectPostQuery(params.projectId ?? '', params.postId ?? ''),
-  );
-
+  const { data, isLoading } = trpc.posts.getById.useQuery(params.postId ?? '');
   if (isLoading) return <div>loading..</div>;
 
   if (!data) return <div>something went wrong</div>;
@@ -577,7 +581,7 @@ export function ProjectPost() {
   return (
     <div className="flex-1 border-1 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
       <article className="prose prose-base prose-slate">
-        <Markdown>{data.comment}</Markdown>
+        <Markdown>{data.content}</Markdown>
       </article>
     </div>
   );

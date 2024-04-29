@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React, { ChangeEvent, useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Form, useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
@@ -8,7 +8,7 @@ import { trpc } from '../utils/trpc';
 import Spinner from '../components/Spinner';
 import { useMutation } from '@tanstack/react-query';
 import { uploadProjectImage } from '../firebase';
-import GetAutcomplete from '../utils/Autcomplete';
+import TagsAutocomplete from '../components/TagsAutocomplete';
 
 type FormState = {
   title: string;
@@ -34,8 +34,6 @@ export default function CreateProj() {
     image: null,
     startDate: '',
   }); // state form the inputs
-  // const [loading, setLoading] = useState(false)
-  //const fetcher = useFetcher()
 
   const [addedTags, setAddedTags] = useState<string[]>([]);
 
@@ -75,14 +73,6 @@ export default function CreateProj() {
     },
   });
 
-  const mutation = trpc.projects.create.useMutation({
-    onSuccess() {
-      utils.projects.getAll.invalidate();
-      toast.success('Project Created!');
-      navigate('/');
-    },
-  });
-
   const { user } = useUser();
 
   if (!user) return <div>Must Be signed in to create project</div>;
@@ -104,19 +94,20 @@ export default function CreateProj() {
   return (
     <Form
       method="post"
-      className="flex justify-between w-full"
+      className="flex max-w-6xl gap-2 mx-auto mt-4 justify-between w-full"
       encType="multipart/form-data"
       onSubmit={handleSubmit}
     >
       <div>
         <FilesView formState={formState} setFormState={setFormState} />
-        <AddTagsView addedTags={addedTags} setAddedTags={setAddedTags} />
       </div>
       <InputsView
         formState={formState}
         setFormState={setFormState}
         isFormValid={isFormValid}
         loading={projMutation.isLoading}
+        addedTags={addedTags}
+        setAddedTags={setAddedTags}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
@@ -135,7 +126,7 @@ function AddTagsView({
 
   function handleAddTag(tag: string) {
     const val: string = tag.trim();
-    if (addedTags.indexOf(val) != -1) {
+    if (addedTags.indexOf(val) !== -1) {
       setErrors((prev) => [...prev, 'you have already added this tag']);
       return;
     }
@@ -148,28 +139,28 @@ function AddTagsView({
   }
 
   return (
-    <div>
-      <h3 className="text-2xl">Added Tags: </h3>
-      <ul className="border min-h-[1rem]">
-        {addedTags.map((tag) => {
-          return (
-            <li>
-              {tag}
-
-              <button
-                type="button"
-                value="Delete"
-                className=""
-                onClick={() => handleTagDelete(tag)}
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </li>
-          );
-        })}
+    <>
+      <ul className="flex">
+        {addedTags.length > 0 ? (
+          <>
+            {addedTags.map((tag) => {
+              return (
+                <li
+                  key={tag}
+                  className="rounded-full bg-zinc-200 w-fit flex py-1 px-3 items-center gap-2 justify-center"
+                >
+                  <p>{tag}</p>
+                  <SmCloseBtn onClose={() => handleTagDelete(tag)} />
+                </li>
+              );
+            })}
+          </>
+        ) : (
+          <div className='text-zinc-400 text-md lowercase'>No tags selected, search one!</div>
+        )}
       </ul>
-      <GetAutcomplete onSelect={handleAddTag} />
-    </div>
+      <TagsAutocomplete onSelect={handleAddTag} />
+    </>
   );
 }
 
@@ -178,6 +169,8 @@ type InputsViewProps = {
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
   isFormValid: () => boolean;
   loading: boolean;
+  addedTags: string[];
+  setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 //shows the view for inputs to create a new project.
@@ -187,6 +180,8 @@ function InputsView({
   setFormState,
   isFormValid,
   loading,
+  addedTags,
+  setAddedTags,
 }: InputsViewProps) {
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl">
@@ -223,6 +218,11 @@ function InputsView({
           disabled={loading}
           maxLength={1500} //avg length of 300 words
         ></TextArea>
+      </Input>
+
+      <Input className="flex flex-col gap-2">
+        <label>tags</label>
+        <AddTagsView addedTags={addedTags} setAddedTags={setAddedTags} />
       </Input>
 
       <Input>
@@ -338,13 +338,9 @@ function FilesView({
       {formState.image && (
         //loads the image and shows it on screen. Allows you to close it and not show it.
         <Image key={formState.image.name}>
-          <button
-            onClick={() => setFormState((prev) => ({ ...prev, image: null }))}
-            type="button"
-            className="hover:bg-zinc-300 bg-slate-100  "
-          >
-            <span className="material-symbols-outlined">close</span>
-          </button>
+          <SmCloseBtn
+            onClose={() => setFormState((prev) => ({ ...prev, image: null }))}
+          />
           <img
             src={URL.createObjectURL(formState.image)}
             alt={formState.image.name}
@@ -354,6 +350,18 @@ function FilesView({
         </Image>
       )}
     </div>
+  );
+}
+
+export function SmCloseBtn({ onClose }: { onClose: () => void }) {
+  return (
+    <button
+      onClick={onClose}
+      type="button"
+      className="hover:bg-zinc-300 rounded-full flex items-center justify-center h-fit"
+    >
+      <span className="material-symbols-outlined">close</span>
+    </button>
   );
 }
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { authedProcedure, publicProcedure, router } from '../trpc';
+import { authedProcedure, router } from '../trpc';
 
 export const tagsRouter = router({
   addTags: authedProcedure
@@ -53,7 +53,6 @@ export const tagsRouter = router({
           name: true,
         },
       });
-      console.log(startsWith.concat(containsNotStartsWith));
       return startsWith.concat(containsNotStartsWith);
     }),
 });

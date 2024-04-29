@@ -25,7 +25,7 @@ model Project {
   posts        Post[]
   memberships  Memberships[]
   imageUrl     String
-  startDate String
+  startDate    String
 
 }
 
