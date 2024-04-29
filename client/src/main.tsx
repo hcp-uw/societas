@@ -10,6 +10,7 @@ import Project, {
   ProjectPostsLayout,
   CreatePost,
   ProjectPost,
+  MemberList,
 } from './pages/Project.jsx';
 import ProfileLayout from './pages/ProfileLayout.tsx';
 import CreateProj from './pages/CreateProj.tsx';
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
           {
             path: 'posts/new',
             element: <CreatePost />,
+          },
+          {
+            path: 'members',
+            element: <MemberList/>
           },
         ],
       },
