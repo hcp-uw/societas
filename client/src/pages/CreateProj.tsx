@@ -122,12 +122,10 @@ function AddTagsView({
   addedTags: string[];
   setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-  const [errors, setErrors] = useState<string[]>([]);
 
   function handleAddTag(tag: string) {
     const val: string = tag.trim();
     if (addedTags.indexOf(val) !== -1) {
-      setErrors((prev) => [...prev, 'you have already added this tag']);
       return;
     }
     if (val === '') return;
@@ -392,7 +390,7 @@ function SubmitBtnView({
             loading ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Spinner size="1.5rem" />
+          <Spinner size={16}/>
         </div>
       </button>
     </SubmitWrapper>
@@ -413,32 +411,6 @@ const SubmitWrapper = styled.div<SubmitWrapperProps>`
     display: ${({ desktop }) => (desktop ? 'flex' : 'none')};
     justify-content: flex-end;
     align-items: flex-end;
-  }
-`;
-
-const FilesWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: fit-content;
-  min-height: 21rem;
-
-  label {
-    all: unset;
-    font-family: inherit;
-    white-space: nowrap;
-    border: 2px dashed #27a0f2;
-    border-radius: 0.5rem;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-
-    span {
-      font-size: 0.9rem;
-      color: ${({ theme }) => theme.colors.subText};
-    }
   }
 `;
 

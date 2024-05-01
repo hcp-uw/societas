@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { authedProcedure, publicProcedure, router } from '../trpc';
 import { TRPCError } from '@trpc/server';
+import clerkClient from '@clerk/clerk-sdk-node';
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -47,6 +48,32 @@ export const projectsRouter = router({
     
     return data;
   }),
+  getUserList: authedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        userId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const projectMemberships = await ctx.db.memberships.findMany({
+        where: {
+          projectId: input.projectId,
+        },
+      });
+
+      const userList = projectMemberships.map(
+        (membership) => membership.userId,
+      );
+
+      const users = await clerkClient.users.getUserList({ userId: userList });
+      users.map((user) => ({
+        imageUrl: user.imageUrl,
+        email: user.emailAddresses,
+        name: `${user.firstName} ${user.lastName}`,
+      }));
+      return users;
+    }),
 
   getByUserId: authedProcedure
     .input(z.string())
@@ -95,7 +122,7 @@ export const projectsRouter = router({
       await ctx.db.post.create({ data: input });
     }),
 
-  create: authedProcedure 
+  create: authedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -183,4 +210,3 @@ export const projectsRouter = router({
     })
 
 });
-

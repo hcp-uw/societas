@@ -1,7 +1,6 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { trpc } from '../utils/trpc';
 import ProjectsView from '../components/ProjectsView';
-import { util } from 'zod';
 import TagsAutocomplete from '../components/TagsAutocomplete';
 
 type FilterState = {
@@ -18,10 +17,6 @@ export default function Search() {
   });
 
   const { data: projData } = trpc.projects.getByTags.useQuery(filterState.tags);
-  const { data: autcompleteOptions } =
-    trpc.tags.getAutocompleteOptions.useQuery(filterState.input);
-
-  const [errorState, setErrorState] = useState<boolean>(false);
 
   const breakpointColumnsObj = {
     default: 4,

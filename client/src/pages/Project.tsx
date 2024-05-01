@@ -1,5 +1,4 @@
 import {
-  FetcherWithComponents,
   useNavigate,
   useParams,
 } from 'react-router-dom';
@@ -137,7 +136,7 @@ export default function Project() {
           margin: 'auto',
         }}
       >
-        <Spinner size="4rem" />
+        <Spinner size={64}/>
       </div>
     );
 

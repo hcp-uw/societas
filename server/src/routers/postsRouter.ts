@@ -1,7 +1,5 @@
 import { z } from "zod";
 import { authedProcedure, publicProcedure, router } from "../trpc";
-import { TRPCError } from "@trpc/server";
-import { projectsRouter } from "./projectsRouter";
 
 export const postsRouter = router({
     getAll: publicProcedure.query(async ({ ctx }) => {
