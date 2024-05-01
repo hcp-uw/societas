@@ -6,7 +6,6 @@ jobs:
   ts:
     runs-on: ubuntu-latest
     steps:
-      # checkout the code 
       uses: actions/checkout@v3
       - name: Install
       uses: actions/setup-node@v3
