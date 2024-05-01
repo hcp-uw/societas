@@ -75,14 +75,6 @@ export default function Project() {
     }
   }
 
-  const requestData = trpc.memberships.getAllPendingRequests.useQuery(
-    projectId ?? '',
-  );
-
-  if (requestData.data != undefined) {
-    console.log(requestData.data);
-  }
-
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
     onSuccess() {
       console.log('Left Project');
@@ -539,12 +531,10 @@ export function ProjectPostsLayout() {
 
   useEffect(() => {
     if (postId === undefined && data) {
-      console.log('here');
-
       if (data.length === 0) return;
       navigate(`/${projectId}/posts/${data[0].id}`);
     }
-  }, []);
+  }, [data, navigate, postId, projectId]);
 
   if (isLoading) return <div>loading posts</div>;
 

@@ -117,7 +117,7 @@ export function EditProfile() {
   useEffect(() => {
     if (!user) return;
     setImage(user.imageUrl);
-  }, [isLoaded]);
+  }, [isLoaded, user]);
 
   if (!isSignedIn) return <div>must be logged in</div>;
 
