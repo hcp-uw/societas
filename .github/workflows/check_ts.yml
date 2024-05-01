@@ -11,39 +11,48 @@ jobs:
 
       - name: Install
         run: cd ./client
+        run: npm ci
+        run: cd ..
+        run: cd ./client
+        run: npx prisma generate
+        run: npm ci
+        run: cd ..
+        run: cd ./client
+        run: npm run build
 
       # get the lines modified in this PR
-      - name: Get diff lines
-        id: diff
-        uses: Equip-Collaboration/diff-line-numbers@v1.0.0
-        with:
-          include: '["\\.tsx?$"]'
+      # - name: Get diff lines
 
-      # get the files modified in this PR
-      - name: Detecting files changed
-        id: files
-        uses: umani/changed-files@v4.0.0
-        with:
-          repo-token: ${{ github.token }}
-          pattern: '^.*\.tsx?$'
+      #   id: diff
+      #   uses: Equip-Collaboration/diff-line-numbers@v1.0.0
+      #   with:
+      #     include: '["\\.tsx?$"]'
 
-      # echo the changed files 
-      - name: List files changed
-        run: |
-          echo 'Files modified: ${{steps.files.outputs.files_updated}}'
-          echo 'Files added: ${{steps.files.outputs.files_created}}'
-          echo 'Files removed: ${{steps.files.outputs.files_deleted}}'
+      # # get the files modified in this PR
+      # - name: Detecting files changed
+      #   id: files
+      #   uses: umani/changed-files@v4.0.0
+      #   with:
+      #     repo-token: ${{ github.token }}
+      #     pattern: '^.*\.tsx?$'
+
+      # # echo the changed files 
+      # - name: List files changed
+      #   run: |
+      #     echo 'Files modified: ${{steps.files.outputs.files_updated}}'
+      #     echo 'Files added: ${{steps.files.outputs.files_created}}'
+      #     echo 'Files removed: ${{steps.files.outputs.files_deleted}}'
         
-      # run the action 
-      - uses: Arhia/action-check-typescript@v1.0.0
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          use-check: true                                         # if the action fails, the PR wil fail 
-          check-fail-mode: added                                  # only check for added errors 
-          files-changed: ${{steps.files.outputs.files_updated}}
-          files-added: ${{steps.files.outputs.files_created}}
-          files-deleted: ${{steps.files.outputs.files_deleted}}
-          line-numbers: ${{steps.diff.outputs.lineNumbers}}
-          output-behaviour: both                                  # use github annotations and comments on the PR
-          comment-behaviour: new                                  # every run of this action will create a new comment 
-          ts-config-path: './client/tsconfig.json'                # use the tsconfig.json in the client directory 
+      # # run the action 
+      # - uses: Arhia/action-check-typescript@v1.0.0
+      #   with:
+      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #     use-check: true                                         # if the action fails, the PR wil fail 
+      #     check-fail-mode: added                                  # only check for added errors 
+      #     files-changed: ${{steps.files.outputs.files_updated}}
+      #     files-added: ${{steps.files.outputs.files_created}}
+      #     files-deleted: ${{steps.files.outputs.files_deleted}}
+      #     line-numbers: ${{steps.diff.outputs.lineNumbers}}
+      #     output-behaviour: both                                  # use github annotations and comments on the PR
+      #     comment-behaviour: new                                  # every run of this action will create a new comment 
+      #     ts-config-path: './client/tsconfig.json'                # use the tsconfig.json in the client directory 
