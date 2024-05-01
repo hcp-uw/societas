@@ -9,6 +9,9 @@ jobs:
       # checkout the code 
       - uses: actions/checkout@v3
 
+      - name: Install
+        run: cd ./client
+
       # get the lines modified in this PR
       - name: Get diff lines
         id: diff
