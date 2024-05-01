@@ -10,10 +10,6 @@ dayjjs.extend(relativeTime);
 //request page to be shown.
 export default function Requests() {
   const { user } = useUser();
-  // const { data, isLoading, isError } = useQuery(
-  //   requestsQuery(user ? user.id : "")
-  // )
-
   const { data, isLoading, isError } =
     trpc.memberships.getAllIncomingRequests.useQuery(user?.id ?? '');
   const utils = trpc.useUtils();
@@ -73,7 +69,7 @@ export default function Requests() {
           className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
         >
           <div className="flex gap-6">
-            <img src={''} alt="" width={200} height={200} />
+            <img src={request.updatedAt} alt="" width={200} height={200} />
             <div className="">
               <p className="text-sm text-zinc-600">
                 {dayjjs(request.createdAt).toDate().toLocaleDateString()}
