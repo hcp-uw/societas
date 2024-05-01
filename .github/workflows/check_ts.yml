@@ -18,6 +18,7 @@ jobs:
         run: npm ci
       - name: Run build 
         working-directory: client
+        run: npm run build
       # get the lines modified in this PR
       # - name: Get diff lines
 
