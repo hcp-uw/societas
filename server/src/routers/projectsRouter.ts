@@ -27,6 +27,27 @@ export const projectsRouter = router({
     return data;
   }),
 
+  getMembers: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const data = await ctx.db.project.findFirst({
+      where: {
+        id: input,
+      },
+      select: {
+        memberships: {
+          where: {
+            status: "ACCEPTED"
+          },
+          select: {
+            id: true, 
+            userId: true,
+          }
+        }
+      }
+    })
+    
+    return data;
+  }),
+
   getByUserId: authedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -134,16 +155,32 @@ export const projectsRouter = router({
         return undefined;
       }
     }),
+  
+  edit : authedProcedure
+    .input(z.object({
+      projectId: z.string(),
+      name: z.string(),
+      description: z.string(),
+      meetType: z.string(),
+      meetLocation: z.string(),
+      imageUrl: z.string(),
+      tags: z.array(z.string()),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.project.update({
+        where:{
+          id: input.projectId
+        }, 
+        data: {
+          name: input.name, 
+          description: input.description,
+          meetType: input.meetType,
+          meetLocation: input.meetLocation,
+          imageUrl: input.imageUrl,
+          tags: input.tags, 
+        }
+      })
+    })
+
 });
-const generateRelationFilter = (
-  tags: string[],
-  relationName: string,
-  column: string,
-) =>
-  tags.map((tag) => ({
-    [relationName]: {
-      every: {
-        [column]: {},
-      },
-    },
-  }));
+

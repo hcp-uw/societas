@@ -10,13 +10,18 @@ import { useMutation } from '@tanstack/react-query';
 import { uploadProjectImage } from '../firebase';
 import TagsAutocomplete from '../components/TagsAutocomplete';
 
-type FormState = {
+export type FormState = {
   title: string;
   description: string;
   location: string;
   maxMems: string;
   startDate: string;
-  image: Blob | null;
+  image: Blob | null | string;
+};
+
+type TagsState = {
+  input: string;
+  tags: string[];
 };
 
 export default function CreateProj() {
@@ -170,7 +175,7 @@ type InputsViewProps = {
 
 //shows the view for inputs to create a new project.
 //updates fiewlds of formState when inputs are made.
-function InputsView({
+export function InputsView({
   formState,
   setFormState,
   isFormValid,
@@ -292,7 +297,7 @@ function InputsView({
 }
 
 //shows view for selecting a picture for a project.
-function FilesView({
+export function FilesView({
   formState,
   setFormState,
 }: {
@@ -306,13 +311,14 @@ function FilesView({
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
           Select a picture
         </h1>
+        <label htmlFor='image' className='bg-zinc-300 p-3 rounded-lg'>Select file</label>
         <input
           type="file"
           accept="image/*"
           className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
           name="imageUrl"
           id="image"
-          required
+          hidden
           //checks file size and for null returns.
           onChange={(e) => {
             setError(null);
@@ -332,14 +338,12 @@ function FilesView({
       </div>
       {formState.image && (
         //loads the image and shows it on screen. Allows you to close it and not show it.
-        <Image key={formState.image.name}>
+        <Image>
           <SmCloseBtn
             onClose={() => setFormState((prev) => ({ ...prev, image: null }))}
           />
           <img
-            src={URL.createObjectURL(formState.image)}
-            alt={formState.image.name}
-            key={formState.image.name}
+            src={typeof formState.image === "string" ? formState.image : URL.createObjectURL(formState.image)}
             className="w-full max-w-2xl"
           />
         </Image>
