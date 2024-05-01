@@ -7,18 +7,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # checkout the code 
-      - uses: actions/checkout@v3
-
+      uses: actions/checkout@v3
       - name: Install
-        run: cd ./client
-        run: npm ci
-        run: cd ..
-        run: cd ./client
-        run: npx prisma generate
-        run: npm ci
-        run: cd ..
-        run: cd ./client
-        run: npm run build
+      uses: actions/setup-node@v3
+      - run: cd ./client
+      - run: npm ci
+      - run: cd ..
+      - run: cd ./client
+      - run: npx prisma generate
+      - run: npm ci
+      - run: cd ..
+      - run: cd ./client
+      - run: npm run build
 
       # get the lines modified in this PR
       # - name: Get diff lines
