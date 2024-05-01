@@ -14,8 +14,9 @@ jobs:
         run: npm ci 
       - name: Install server depencies
         working-directory: server
-        run: npx prisma generate 
-        run: npm ci
+        run: |
+          npx prisma generate 
+          npm ci
       - name: Run build 
         working-directory: client
         run: npm run build
