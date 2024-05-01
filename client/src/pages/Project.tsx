@@ -310,7 +310,12 @@ function StatusChip({
         >
           New Post
         </NavLink>
-        
+        <NavLink
+          to="edit"
+          className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
+        >
+          Edit Project Info
+        </NavLink>
       </div>
     );
   }
@@ -602,16 +607,19 @@ export function MemberList(){
   const params = useParams();
   const {data, isLoading} = trpc.projects.getMembers.useQuery(params.projectId ?? "");
   const utils = trpc.useUtils();
-  if (isLoading) return <div>loading...</div>
-
-  if(!data) return <div>Error Fetching Members</div>
-
+  // if (isLoading) return <div>loading...</div>
   const kickUserMutation = trpc.projects.kickUser.useMutation({
     onSuccess(){
       console.log("User Removed")
       utils.projects.getMembers.invalidate();
     }
   });
+  
+  if(!data) return <div>Error Fetching Members</div>
+
+  if(!data.memberships || data.memberships.length == 0) return <div> No Members</div>;
+
+
   const handleKickUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const userId = e.currentTarget.getAttribute("value");
@@ -624,7 +632,7 @@ export function MemberList(){
     })
   }
 
-  return<div className="w-full flex flex-col gap-4 ml-8">
+  return <div className="w-full flex flex-col gap-4 ml-8">
     {data.memberships.map((member) => (
       <div
         key={member.userId}
