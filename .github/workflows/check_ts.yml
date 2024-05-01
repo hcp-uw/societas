@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install
-      uses: actions/setup-node@v3
+        uses: actions/setup-node@v3
       - run: cd ./client
       - run: npm ci
       - run: cd ..
