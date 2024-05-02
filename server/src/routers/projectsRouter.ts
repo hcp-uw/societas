@@ -28,26 +28,28 @@ export const projectsRouter = router({
     return data;
   }),
 
-  getMembers: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const data = await ctx.db.project.findFirst({
-      where: {
-        id: input,
-      },
-      select: {
-        memberships: {
-          where: {
-            status: "ACCEPTED"
+  getMembers: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const data = await ctx.db.project.findFirst({
+        where: {
+          id: input,
+        },
+        select: {
+          memberships: {
+            where: {
+              status: 'ACCEPTED',
+            },
+            select: {
+              id: true,
+              userId: true,
+            },
           },
-          select: {
-            id: true, 
-            userId: true,
-          }
-        }
-      }
-    })
-    
-    return data;
-  }),
+        },
+      });
+
+      return data;
+    }),
   getUserList: authedProcedure
     .input(
       z.object({
@@ -182,31 +184,32 @@ export const projectsRouter = router({
         return undefined;
       }
     }),
-  
-  edit : authedProcedure
-    .input(z.object({
-      projectId: z.string(),
-      name: z.string(),
-      description: z.string(),
-      meetType: z.string(),
-      meetLocation: z.string(),
-      imageUrl: z.string(),
-      tags: z.array(z.string()),
-    }))
+
+  edit: authedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        name: z.string(),
+        description: z.string(),
+        meetType: z.string(),
+        meetLocation: z.string(),
+        imageUrl: z.string(),
+        tags: z.array(z.string()),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.project.update({
-        where:{
-          id: input.projectId
-        }, 
+        where: {
+          id: input.projectId,
+        },
         data: {
-          name: input.name, 
+          name: input.name,
           description: input.description,
           meetType: input.meetType,
           meetLocation: input.meetLocation,
           imageUrl: input.imageUrl,
-          tags: input.tags, 
-        }
-      })
-    })
-
+          tags: input.tags,
+        },
+      });
+    }),
 });

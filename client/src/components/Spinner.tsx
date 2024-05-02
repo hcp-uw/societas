@@ -1,5 +1,5 @@
 //Buffering animation - the circle that spins when things are loading
-export default function Spinner({ size }: { size?: number}) {
+export default function Spinner({ size }: { size?: number }) {
   return (
     <div role="status">
       <svg
