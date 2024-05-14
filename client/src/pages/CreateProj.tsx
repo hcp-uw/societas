@@ -311,7 +311,7 @@ export function FilesView({
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
           Select a picture
         </h1>
-        <label htmlFor='image' className='bg-zinc-300 p-3 rounded-lg hover'>Select file</label>
+        <label htmlFor='image' className='bg-zinc-300 p-3 rounded-lg'>Select file</label>
         <input
           type="file"
           accept="image/*"

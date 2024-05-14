@@ -89,7 +89,7 @@ export function EditProject(){
       description: formState.description,
       meetLocation: formState.location,
       meetType: oldData?.meetType ?? "",
-      imageUrl: formState.image.,
+      imageUrl: oldData?.imageUrl ?? "",
       tags: addedTags,
     });
   }
