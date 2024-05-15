@@ -27,7 +27,7 @@ model Project {
   imageUrl     String
   ratings      Ratings[]
   startDate    String
-  maxMems      String
+  maxMems      Int
 }
 
 model Tag {

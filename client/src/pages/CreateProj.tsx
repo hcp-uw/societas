@@ -14,7 +14,7 @@ type FormState = {
   title: string;
   description: string;
   location: string;
-  maxMems: string;
+  maxMems: number;
   startDate: string;
   image: Blob | null;
 };
@@ -25,7 +25,7 @@ export default function CreateProj() {
     title: '',
     description: '',
     location: '',
-    maxMems: '',
+    maxMems: 0,
     image: null,
     startDate: '',
   }); // state form the inputs
@@ -55,14 +55,16 @@ export default function CreateProj() {
     mutationFn: (image: Blob) => uploadProjectImage(image),
     onSuccess(url) {
       if (!user) return;
+      if (Number.isNaN(formState.maxMems)) {
+        return;
+      }
       projMutation.mutate({
         name: formState.title,
         description: formState.description,
         meetLocation: formState.location,
         meetType: '',
         ownerId: user?.id,
-        // maxMems: formState.maxMems,
-        // startDate: formState.startDate,
+        maxMems: formState.maxMems,
         imageUrl: url,
         startDate: formState.startDate,
         tags: addedTags,
@@ -269,7 +271,7 @@ function InputsView({
           max={100}
           placeholder="5"
           onChange={(e) =>
-            setFormState({ ...formState, maxMems: e.target.value })
+            setFormState({ ...formState, maxMems: Number(e.target.value)})
           }
           value={formState.maxMems}
           required
