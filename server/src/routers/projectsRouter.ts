@@ -135,6 +135,7 @@ export const projectsRouter = router({
         imageUrl: z.string(),
         startDate: z.string(),
         tags: z.array(z.string()),
+        maxMems: z.number(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

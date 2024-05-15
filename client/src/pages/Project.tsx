@@ -11,6 +11,8 @@ import { NavLink, Outlet, Form } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { RouterOutputs, trpc } from '../utils/trpc';
 import { z } from 'zod';
+import Husky from "../assets/HuskyRating.png";
+import Husky2 from "../assets/HuskyGreeting.png";
 
 dayjjs.extend(relativeTime);
 
@@ -25,12 +27,23 @@ function useGetProjectData() {
 }
 
 export default function Project() {
+
+  const ratingMutation = trpc.ratings.create.useMutation({
+    onSuccess() {
+      utils.ratings.getAll.invalidate();
+      // toast.success("Project Created!");
+      // navigate("/");
+    },
+  });
+
+  // const { projectId } = useParams()
   const { data, isLoading, projectId } = useGetProjectData();
   const { data: role, isLoading: roleIsLoading } =
     trpc.memberships.getRole.useQuery(projectId ?? '');
   const { user } = useUser();
   const [showModal, setShowModal] = useState(false);
   const utils = trpc.useUtils();
+
 
   const sendJoinReqMutation =
     trpc.memberships.sendProjectJoinRequest.useMutation({
@@ -48,6 +61,7 @@ export default function Project() {
     if (!data) return;
     if (!user) return;
     const formData = new FormData(e.currentTarget);
+    
 
     const description = formData.get('description') as string;
 
@@ -91,6 +105,58 @@ export default function Project() {
     }
   }
 
+    /////////////////////////
+  // rate projects
+  const [firstModalOpen, setFirstModalOpen] = useState(false);
+  const [secondModalOpen, setSecondModalOpen] = useState(false);
+
+  const handleOpenFirstModal = () => {
+    setFirstModalOpen(true);
+  };
+
+  const handleCloseFirstModal = () => {
+    setFirstModalOpen(false);
+  };
+
+  const handleCloseSecondModal = () => {
+    setSecondModalOpen(false);
+  };
+
+  const handleOpenSecondModal = () => {
+    setFirstModalOpen(false);
+    setSecondModalOpen(true);
+  };
+
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    const feedbacks = formData.get("feedbacks") as string;
+    const rating = Object.fromEntries(formData).stars;
+    if (!user) {
+      return;
+    }
+    
+    ratingMutation.mutate({
+      userId: user.id,
+      projectId: projectId ?? "",
+      feedback: feedbacks,
+      rating: parseInt(rating as string),
+    })
+
+    // console.log("Feedbacks:", feedbacks);
+    // console.log(typeof(parseInt(rating as string)));
+    // console.log(user?.firstName, user?.lastName);
+    // console.log(user);
+    // console.log(projectId);
+
+    handleCloseFirstModal();
+    handleOpenSecondModal();
+  };
+
+  
+
   // TO DO: Delete Project
 
   // const deleteProjectMutation = trpc.projects.delete.useMutation({
@@ -130,6 +196,8 @@ export default function Project() {
     );
 
   if (!data) return <div>Project was not found</div>;
+
+  
 
   //shows the user the view of the project and ability/options to join.
   //TO FIX: join button is not working.
@@ -230,11 +298,18 @@ export default function Project() {
             <div className="flex gap-4 flex-row-reverse">
               <StatusChip
                 projectId={projectId ?? ''}
+                startDate={new Date(data.startDate ?? '')}
                 role={role}
                 setShowModal={setShowModal}
                 isLoading={roleIsLoading}
                 ownerId={data.ownerId}
                 handleLeaveReq={handleLeaveReq}
+                firstModalOpen={firstModalOpen}
+                secondModalOpen={secondModalOpen}
+                handleSubmit={handleSubmit}
+                handleOpenFirstModal={handleOpenFirstModal}
+                handleCloseFirstModal={handleCloseFirstModal}
+                handleCloseSecondModal={handleCloseSecondModal}
               />
             </div>
           </nav>
@@ -270,6 +345,13 @@ type StatusChipProps = {
   ownerId: string;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   projectId: string;
+  firstModalOpen: boolean;
+  secondModalOpen: boolean;
+  startDate: Date;
+  handleOpenFirstModal: () => void;
+  handleCloseFirstModal: () => void;
+  handleCloseSecondModal: () => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleLeaveReq: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
@@ -279,6 +361,13 @@ function StatusChip({
   ownerId,
   setShowModal,
   handleLeaveReq,
+  firstModalOpen,
+  secondModalOpen,
+  handleSubmit,
+  handleOpenFirstModal,
+  handleCloseFirstModal,
+  handleCloseSecondModal,
+  startDate,
   projectId,
 }: StatusChipProps) {
   const user = useUser();
@@ -337,8 +426,211 @@ function StatusChip({
       </div>
     );
   } else if (role.status === 'ACCEPTED') {
+    if (startDate > new Date()) {
+      return (
+        <>
+          <Form method="post" onSubmit={handleLeaveReq}>
+            <input type="hidden" value={user ? user.user.id : ''} name="userId" />
+            <input type="hidden" value={projectId} name="projectId" />
+            <button className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors">
+              Leave Project
+            </button>
+          </Form>
+          <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
+            Member
+          </div>
+        </>
+      )
+    } else {
     return (
       <>
+       <div>
+          <button className="text-zinc-100 h-fit py-1 px-6 rounded-lg bg-blue-500 font-medium hover:bg-blue-300 transition-colors" onClick={handleOpenFirstModal}>
+              Rate Project
+          </button>
+
+          {firstModalOpen ? (
+            <form
+              className="fixed top-0 left-0 w-full h-full flex items-center justify-center"
+              onSubmit={(e) => handleSubmit(e)}
+            >
+              <div className="bg-white p-8 rounded shadow-lg w-1/2">
+                <h1 className="text-center RTPO-title" style={{ fontSize: "37px" }}>
+                  Rate Your Experience:
+                  {/* Project Owner: Flying Walrus{" "} */}
+                </h1>
+                <h1
+                  className="text-center RTPO-subTitle"
+                  style={{ fontSize: "20px" }}
+                >
+                  5000 Pieces Puzzle BuildingFlying Walrus
+                </h1>
+
+                <div className="RTPO-wrapper">
+                  <div className="col-7">
+                    {/* stars */}
+                    <div className="starContainer">
+                      <div className="container__items">
+                        <input type="radio" name="stars" id="st5" value={5} />
+                        <label htmlFor="st5">
+                          <div className="star-stroke shadow ">
+                            <div className="star-fill"></div>
+                          </div>
+                          <div
+                            className="label-description"
+                            data-content="Excellent"
+                          ></div>
+                        </label>
+
+
+                        <input type="radio" name="stars" id="st4" value={4} />
+                        <label htmlFor="st4">
+                          <div className="star-stroke shadow ">
+                            <div className="star-fill"></div>
+                          </div>
+                          <div
+                            className="label-description"
+                            data-content="Good"
+                          ></div>
+                        </label>
+
+
+                        <input type="radio" name="stars" id="st3" value={3} />
+                        <label htmlFor="st3">
+                          <div className="star-stroke shadow ">
+                            <div className="star-fill"></div>
+                          </div>
+                          <div
+                            className="label-description"
+                            data-content="OK"
+                          ></div>
+                        </label>
+
+
+                        <input type="radio" name="stars" id="st2" value={2} />
+                        <label htmlFor="st2">
+                          <div className="star-stroke shadow ">
+                            <div className="star-fill"></div>
+                          </div>
+                          <div
+                            className="label-description"
+                            data-content="Bad"
+                          ></div>
+                        </label>
+
+
+                        <input type="radio" name="stars" id="st1" value={1} />
+                        <label htmlFor="st1">
+                          <div className="star-stroke shadow ">
+                            <div className="star-fill"></div>
+                          </div>
+                          <div
+                            className="label-description"
+                            data-content="Terrible"
+                          ></div>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="RTPO-input-div">
+                      <input
+                        type="text"
+                        name="feedbacks"
+                        className="RTPO-form-control"
+                        aria-describedby="tagsHelpInline"
+                        placeholder="Have feedbacks? Share it here!"
+                      />
+                      <div className="RTPO-input-notes">
+                        <p>
+                          Note: Your feedback will be anonymouse and only visible to
+                          the project owner!{" "}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className="RTPO-button-wrapper"
+                      style={{ padding: "6% 15% 10% 15%" }}
+                    >
+                      <button
+                        type="submit"
+                        className="PP-button RTPO-button-orange"
+                      >
+                        Submit
+                      </button>
+                      <button
+                        type="button"
+                        id="closeModal"
+                        className="PP-button RTPO-button-red"
+                        onClick={handleCloseFirstModal}
+                      >
+                        Maybe Later
+                      </button>
+                    </div>
+                  </div>
+                  <div className="Hysky-Img-Wrapper">
+                    <div className="speech-bubble RTPO-speech-bubble-text">
+                      <span>
+                        How many stars would you like to give to
+                        <span className="RTPO-name"> {""}Flying Walrus?</span>
+                      </span>
+                    </div>
+                    <img
+                      src={Husky}
+                      alt="Husky Greeting!"
+                      className="huskyRatingImg"
+                    />
+                  </div>
+                </div>
+              </div>
+            </form>
+          ) : (
+            <div></div>
+          )}
+
+          {secondModalOpen ? (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center">
+              <div className="bg-white p-8 rounded shadow-lg w-1/2">
+                <img src={Husky2} alt="Husky Woof!" className="image-center" />
+                <h1 className="text-center RC-title" style={{ fontSize: "45px" }}>
+                  Woof!
+                </h1>
+
+
+                <div
+                  className="text-center RC-text"
+                  style={{ marginTop: "2rem", fontSize: "22px" }}
+                >
+                  <p style={{ marginBottom: "0" }}>
+                    You have successfully submitted the rating for
+                    <span style={{ fontWeight: "bolder", fontSize: "23px" }}>
+                      {" "}
+                      Flying Walrus
+                    </span>
+                    !! Thank you!!
+                  </p>
+                </div>
+
+
+                <div className="RC-button-wrapper">
+                  {/* <className="RC-button-confirmation"> */}
+                    <button type="button" className="PP-button RC-button-orange" onClick={handleCloseSecondModal}>
+                      Close
+                    </button>
+
+{/* 
+                  <NavLink to="/" className="RC-button-confirmation">
+                    <button type="button" className="PP-button RC-button-orange">
+                      Back To Home Page
+                    </button>
+                  </NavLink> */}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div></div>
+          )}
+        </div>
         <Form method="post" onSubmit={handleLeaveReq}>
           <input type="hidden" value={user ? user.user.id : ''} name="userId" />
           <input type="hidden" value={projectId} name="projectId" />
@@ -349,8 +641,10 @@ function StatusChip({
         <div className="py-1 px-6 bg-blue-500 text-zinc-100 rounded-lg cursor-default">
           Member
         </div>
+       
       </>
     );
+                  }
   }
 }
 
@@ -477,6 +771,7 @@ export function ProjectInfo() {
   if (isLoading) return <div>loading</div>;
 
   if (!data) return <div>something went wrong, Try again!</div>;
+
 
   return (
     <div className="flex justify-between w-full gap-16">
