@@ -1,8 +1,4 @@
-import {
-  FetcherWithComponents,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import dayjjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -88,14 +84,6 @@ export default function Project() {
         },
       });
     }
-  }
-
-  const requestData = trpc.memberships.getAllPendingRequests.useQuery(
-    projectId ?? '',
-  );
-
-  if (requestData.data != undefined) {
-    console.log(requestData.data);
   }
 
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
@@ -203,7 +191,7 @@ export default function Project() {
           margin: 'auto',
         }}
       >
-        <Spinner size={24} />
+        <Spinner size={64} />
       </div>
     );
 
@@ -294,6 +282,16 @@ export default function Project() {
                 }
               >
                 Blog Posts
+              </NavLink>
+              <NavLink
+                to={`/${projectId}/members`}
+                className={({ isActive }) =>
+                  isActive
+                    ? ' font-medium text-zinc-800 p-2 inline-block border-b-2 border-[#FBBC05] hover:bg-zinc-300 transition-colors'
+                    : ' border-b-2 border-transparent p-2 text-zinc-600 inline-block hover:bg-zinc-300 transition-colors'
+                }
+              >
+                Members List
               </NavLink>
             </div>
 
@@ -388,6 +386,12 @@ function StatusChip({
           className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
         >
           New Post
+        </NavLink>
+        <NavLink
+          to="edit"
+          className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
+        >
+          Edit Project Info
         </NavLink>
       </div>
     );
@@ -819,12 +823,10 @@ export function ProjectPostsLayout() {
 
   useEffect(() => {
     if (postId === undefined && data) {
-      console.log('here');
-
       if (data.length === 0) return;
       navigate(`/${projectId}/posts/${data[0].id}`);
     }
-  }, []);
+  }, [data, navigate, postId, projectId]);
 
   if (isLoading) return <div>loading posts</div>;
 
@@ -878,6 +880,59 @@ export function ProjectPost() {
       <article className="prose prose-base prose-slate">
         <Markdown>{data.content}</Markdown>
       </article>
+    </div>
+  );
+}
+
+export function MemberList() {
+  const params = useParams();
+  const { data } = trpc.projects.getMembers.useQuery(params.projectId ?? '');
+  const utils = trpc.useUtils();
+  // if (isLoading) return <div>loading...</div>
+  const kickUserMutation = trpc.projects.kickUser.useMutation({
+    onSuccess() {
+      console.log('User Removed');
+      utils.projects.getMembers.invalidate();
+    },
+  });
+
+  if (!data) return <div>Error Fetching Members</div>;
+
+  if (!data.memberships || data.memberships.length == 0)
+    return <div> No Members</div>;
+
+  const handleKickUser = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const userId = e.currentTarget.getAttribute('value');
+
+    if (userId == null) return;
+
+    kickUserMutation.mutate({
+      userId: userId,
+      projectId: params.projectId ?? '',
+    });
+  };
+
+  return (
+    <div className="w-full flex flex-col gap-4 ml-8">
+      {data.memberships.map((member) => (
+        <div
+          key={member.userId}
+          className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
+        >
+          {member.userId}
+
+          <div className="flex gap-4 items-center">
+            <button
+              onClick={handleKickUser}
+              value={member.userId}
+              className="bg-blue-600 p-2 h-fit text-zinc-100 rounded-xl"
+            >
+              Kick Member
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

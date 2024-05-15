@@ -10,13 +10,13 @@ import { useMutation } from '@tanstack/react-query';
 import { uploadProjectImage } from '../firebase';
 import TagsAutocomplete from '../components/TagsAutocomplete';
 
-type FormState = {
+export type FormState = {
   title: string;
   description: string;
   location: string;
   maxMems: number;
   startDate: string;
-  image: Blob | null;
+  image: Blob | null | string;
 };
 
 export default function CreateProj() {
@@ -86,7 +86,8 @@ export default function CreateProj() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user) return;
-    if (!formState.image) return;
+    if (!formState.image || typeof formState.image === 'string') return;
+
     uploadImageMutation.mutate(formState.image);
   }
   //gets files view and inputs view from formstate.
@@ -121,12 +122,9 @@ function AddTagsView({
   addedTags: string[];
   setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-  const [errors, setErrors] = useState<string[]>([]);
-
   function handleAddTag(tag: string) {
     const val: string = tag.trim();
     if (addedTags.indexOf(val) !== -1) {
-      setErrors((prev) => [...prev, 'you have already added this tag']);
       return;
     }
     if (val === '') return;
@@ -155,7 +153,9 @@ function AddTagsView({
             })}
           </>
         ) : (
-          <div className='text-zinc-400 text-md lowercase'>No tags selected, search one!</div>
+          <div className="text-zinc-400 text-md lowercase">
+            No tags selected, search one!
+          </div>
         )}
       </ul>
       <TagsAutocomplete onSelect={handleAddTag} />
@@ -174,7 +174,7 @@ type InputsViewProps = {
 
 //shows the view for inputs to create a new project.
 //updates fiewlds of formState when inputs are made.
-function InputsView({
+export function InputsView({
   formState,
   setFormState,
   isFormValid,
@@ -296,7 +296,7 @@ function InputsView({
 }
 
 //shows view for selecting a picture for a project.
-function FilesView({
+export function FilesView({
   formState,
   setFormState,
 }: {
@@ -310,13 +310,16 @@ function FilesView({
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
           Select a picture
         </h1>
+        <label htmlFor="image" className="bg-zinc-300 p-3 rounded-lg">
+          Select file
+        </label>
         <input
           type="file"
           accept="image/*"
           className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
           name="imageUrl"
           id="image"
-          required
+          hidden
           //checks file size and for null returns.
           onChange={(e) => {
             setError(null);
@@ -336,14 +339,16 @@ function FilesView({
       </div>
       {formState.image && (
         //loads the image and shows it on screen. Allows you to close it and not show it.
-        <Image key={formState.image.name}>
+        <Image>
           <SmCloseBtn
             onClose={() => setFormState((prev) => ({ ...prev, image: null }))}
           />
           <img
-            src={URL.createObjectURL(formState.image)}
-            alt={formState.image.name}
-            key={formState.image.name}
+            src={
+              typeof formState.image === 'string'
+                ? formState.image
+                : URL.createObjectURL(formState.image)
+            }
             className="w-full max-w-2xl"
           />
         </Image>
@@ -392,7 +397,7 @@ function SubmitBtnView({
             loading ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Spinner size={24} />
+          <Spinner size={16} />
         </div>
       </button>
     </SubmitWrapper>
@@ -413,32 +418,6 @@ const SubmitWrapper = styled.div<SubmitWrapperProps>`
     display: ${({ desktop }) => (desktop ? 'flex' : 'none')};
     justify-content: flex-end;
     align-items: flex-end;
-  }
-`;
-
-const FilesWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: fit-content;
-  min-height: 21rem;
-
-  label {
-    all: unset;
-    font-family: inherit;
-    white-space: nowrap;
-    border: 2px dashed #27a0f2;
-    border-radius: 0.5rem;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-
-    span {
-      font-size: 0.9rem;
-      color: ${({ theme }) => theme.colors.subText};
-    }
   }
 `;
 

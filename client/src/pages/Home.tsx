@@ -50,7 +50,7 @@ function Projects() {
           margin: 'auto',
         }}
       >
-        <Spinner size="4rem" />
+        <Spinner size={64} />
       </div>
     );
 

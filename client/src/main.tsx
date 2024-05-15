@@ -10,6 +10,7 @@ import Project, {
   ProjectPostsLayout,
   CreatePost,
   ProjectPost,
+  MemberList,
 } from './pages/Project.jsx';
 import ProfileLayout from './pages/ProfileLayout.tsx';
 import CreateProj from './pages/CreateProj.tsx';
@@ -20,6 +21,7 @@ import WhoopsPage from './pages/WhoopsPage.tsx';
 import ReportPage from './pages/ReportPage.tsx';
 import Profile, { EditProfile } from './pages/Profile.tsx';
 import Search from './pages/Search.tsx';
+import { EditProject } from './pages/EditProject.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +90,14 @@ const router = createBrowserRouter([
           {
             path: 'posts/new',
             element: <CreatePost />,
+          },
+          {
+            path: 'members',
+            element: <MemberList />,
+          },
+          {
+            path: 'edit',
+            element: <EditProject />,
           },
         ],
       },
