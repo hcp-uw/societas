@@ -93,12 +93,12 @@ const router = createBrowserRouter([
           },
           {
             path: 'members',
-            element: <MemberList/>
+            element: <MemberList />,
           },
           {
             path: 'edit',
-            element: <EditProject/>
-          }
+            element: <EditProject />,
+          },
         ],
       },
       {

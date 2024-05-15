@@ -1,10 +1,9 @@
-import { useUser } from "@clerk/clerk-react";
-import { RouterOutputs, trpc } from "../utils/trpc"
-import { useState } from "react";
-import { Form, useNavigate, useParams } from "react-router-dom";
-import { FilesView, InputsView } from "./CreateProj";
-import toast from "react-hot-toast";
-
+import { useUser } from '@clerk/clerk-react';
+import { trpc } from '../utils/trpc';
+import { useState } from 'react';
+import { Form, useNavigate, useParams } from 'react-router-dom';
+import { FilesView, InputsView } from './CreateProj';
+import toast from 'react-hot-toast';
 
 type FormState = {
   title: string;
@@ -15,19 +14,35 @@ type FormState = {
   image: Blob | null | string;
 };
 
-type ProjectData = RouterOutputs["projects"]["getById"]
-type EditProjectProps = {
-  oldData: ProjectData
-}
-export function EditProject(){
-  const {user} = useUser();
+export function EditProject() {
+  const { user } = useUser();
   const params = useParams();
   const utils = trpc.useUtils();
   const navigate = useNavigate();
 
-  const { data: oldData} = trpc.projects.getById.useQuery(params.projectId ?? "")
-  
-  if(!oldData) return <div>Error</div>
+  const { data: oldData } = trpc.projects.getById.useQuery(
+    params.projectId ?? '',
+  );
+
+  const [formState, setFormState] = useState<FormState>(() =>
+    oldData
+      ? {
+          title: oldData.name,
+          description: oldData.description,
+          location: oldData.meetLocation,
+          maxMems: '0',
+          image: oldData.imageUrl,
+          startDate: oldData.startDate,
+        }
+      : {
+          title: '',
+          description: '',
+          location: '',
+          maxMems: '',
+          image: '',
+          startDate: '',
+        },
+  );
 
   // const getImageAsBlob = async (url : string) : Promise<Blob | null>  => {
   //   // try{
@@ -41,15 +56,6 @@ export function EditProject(){
   //   return null
   // }
 
-  const [formState, setFormState] = useState<FormState>({
-    title: oldData.name,
-    description: oldData.description,
-    location: oldData.meetLocation,
-    maxMems: "0",
-    image: oldData.imageUrl,
-    startDate: oldData.startDate,
-  });
-
   function isFormValid() {
     Object.values(formState).forEach((val) => {
       if (val === '' || val === null) return false;
@@ -57,7 +63,9 @@ export function EditProject(){
     return true;
   }
 
-  const [addedTags, setAddedTags] = useState<string[]>(oldData.tags);
+  const [addedTags, setAddedTags] = useState<string[]>(
+    oldData ? oldData.tags : [],
+  );
 
   const tagMutation = trpc.tags.addTags.useMutation({
     onSuccess() {
@@ -76,20 +84,22 @@ export function EditProject(){
   // getImageAsBlob(oldData.imageUrl).then((img) => {
   //   setFormState((prev) => ({...prev, image: null}))
   // })
-  
+
+  if (!oldData) return <div>Error</div>;
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user) return;
     if (!formState.image) return;
-    if(!params.projectId) return;
+    if (!params.projectId) return;
     // uploadImageMutation.mutate(formState.image);
     projMutation.mutate({
       projectId: params.projectId,
       name: formState.title,
       description: formState.description,
       meetLocation: formState.location,
-      meetType: oldData?.meetType ?? "",
-      imageUrl: oldData?.imageUrl ?? "",
+      meetType: oldData?.meetType ?? '',
+      imageUrl: oldData?.imageUrl ?? '',
       tags: addedTags,
     });
   }
@@ -117,5 +127,4 @@ export function EditProject(){
       <button onClick={() => console.log(formState)}> Check Form State</button>
     </Form>
   );
-
 }

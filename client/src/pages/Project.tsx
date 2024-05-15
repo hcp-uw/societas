@@ -1,8 +1,4 @@
-import {
-  FetcherWithComponents,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import dayjjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -76,14 +72,6 @@ export default function Project() {
     }
   }
 
-  const requestData = trpc.memberships.getAllPendingRequests.useQuery(
-    projectId ?? '',
-  );
-
-  if (requestData.data != undefined) {
-    console.log(requestData.data);
-  }
-
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
     onSuccess() {
       console.log('Left Project');
@@ -137,7 +125,7 @@ export default function Project() {
           margin: 'auto',
         }}
       >
-        <Spinner size="4rem" />
+        <Spinner size={64} />
       </div>
     );
 
@@ -540,12 +528,10 @@ export function ProjectPostsLayout() {
 
   useEffect(() => {
     if (postId === undefined && data) {
-      console.log('here');
-
       if (data.length === 0) return;
       navigate(`/${projectId}/posts/${data[0].id}`);
     }
-  }, []);
+  }, [data, navigate, postId, projectId]);
 
   if (isLoading) return <div>loading posts</div>;
 
@@ -603,50 +589,55 @@ export function ProjectPost() {
   );
 }
 
-export function MemberList(){
+export function MemberList() {
   const params = useParams();
-  const {data, isLoading} = trpc.projects.getMembers.useQuery(params.projectId ?? "");
+  const { data } = trpc.projects.getMembers.useQuery(params.projectId ?? '');
   const utils = trpc.useUtils();
   // if (isLoading) return <div>loading...</div>
   const kickUserMutation = trpc.projects.kickUser.useMutation({
-    onSuccess(){
-      console.log("User Removed")
+    onSuccess() {
+      console.log('User Removed');
       utils.projects.getMembers.invalidate();
-    }
+    },
   });
-  
-  if(!data) return <div>Error Fetching Members</div>
 
-  if(!data.memberships || data.memberships.length == 0) return <div> No Members</div>;
+  if (!data) return <div>Error Fetching Members</div>;
 
+  if (!data.memberships || data.memberships.length == 0)
+    return <div> No Members</div>;
 
   const handleKickUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const userId = e.currentTarget.getAttribute("value");
-    
-    if(userId == null) return;
+    const userId = e.currentTarget.getAttribute('value');
+
+    if (userId == null) return;
 
     kickUserMutation.mutate({
       userId: userId,
-      projectId: params.projectId ?? ""
-    })
-  }
+      projectId: params.projectId ?? '',
+    });
+  };
 
-  return <div className="w-full flex flex-col gap-4 ml-8">
-    {data.memberships.map((member) => (
-      <div
-        key={member.userId}
-        className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
-      >
-        {member.userId} 
-        
-        <div className="flex gap-4 items-center">
-          <button onClick = {handleKickUser} value={member.userId}
-                  className="bg-blue-600 p-2 h-fit text-zinc-100 rounded-xl">
-            Kick Member
-          </button>
+  return (
+    <div className="w-full flex flex-col gap-4 ml-8">
+      {data.memberships.map((member) => (
+        <div
+          key={member.userId}
+          className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
+        >
+          {member.userId}
+
+          <div className="flex gap-4 items-center">
+            <button
+              onClick={handleKickUser}
+              value={member.userId}
+              className="bg-blue-600 p-2 h-fit text-zinc-100 rounded-xl"
+            >
+              Kick Member
+            </button>
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
+      ))}
+    </div>
+  );
 }

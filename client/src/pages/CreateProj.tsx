@@ -19,11 +19,6 @@ export type FormState = {
   image: Blob | null | string;
 };
 
-type TagsState = {
-  input: string;
-  tags: string[];
-};
-
 export default function CreateProj() {
   //elements to fill when creating a project.
   const [formState, setFormState] = useState<FormState>({
@@ -87,7 +82,8 @@ export default function CreateProj() {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user) return;
-    if (!formState.image) return;
+    if (!formState.image || typeof formState.image === 'string') return;
+
     uploadImageMutation.mutate(formState.image);
   }
   //gets files view and inputs view from formstate.
@@ -122,12 +118,9 @@ function AddTagsView({
   addedTags: string[];
   setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-  const [errors, setErrors] = useState<string[]>([]);
-
   function handleAddTag(tag: string) {
     const val: string = tag.trim();
     if (addedTags.indexOf(val) !== -1) {
-      setErrors((prev) => [...prev, 'you have already added this tag']);
       return;
     }
     if (val === '') return;
@@ -156,7 +149,9 @@ function AddTagsView({
             })}
           </>
         ) : (
-          <div className='text-zinc-400 text-md lowercase'>No tags selected, search one!</div>
+          <div className="text-zinc-400 text-md lowercase">
+            No tags selected, search one!
+          </div>
         )}
       </ul>
       <TagsAutocomplete onSelect={handleAddTag} />
@@ -311,7 +306,9 @@ export function FilesView({
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
           Select a picture
         </h1>
-        <label htmlFor='image' className='bg-zinc-300 p-3 rounded-lg'>Select file</label>
+        <label htmlFor="image" className="bg-zinc-300 p-3 rounded-lg">
+          Select file
+        </label>
         <input
           type="file"
           accept="image/*"
@@ -343,7 +340,11 @@ export function FilesView({
             onClose={() => setFormState((prev) => ({ ...prev, image: null }))}
           />
           <img
-            src={typeof formState.image === "string" ? formState.image : URL.createObjectURL(formState.image)}
+            src={
+              typeof formState.image === 'string'
+                ? formState.image
+                : URL.createObjectURL(formState.image)
+            }
             className="w-full max-w-2xl"
           />
         </Image>
@@ -392,7 +393,7 @@ function SubmitBtnView({
             loading ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Spinner size="1.5rem" />
+          <Spinner size={16} />
         </div>
       </button>
     </SubmitWrapper>
@@ -413,32 +414,6 @@ const SubmitWrapper = styled.div<SubmitWrapperProps>`
     display: ${({ desktop }) => (desktop ? 'flex' : 'none')};
     justify-content: flex-end;
     align-items: flex-end;
-  }
-`;
-
-const FilesWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: fit-content;
-  min-height: 21rem;
-
-  label {
-    all: unset;
-    font-family: inherit;
-    white-space: nowrap;
-    border: 2px dashed #27a0f2;
-    border-radius: 0.5rem;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-
-    span {
-      font-size: 0.9rem;
-      color: ${({ theme }) => theme.colors.subText};
-    }
   }
 `;
 

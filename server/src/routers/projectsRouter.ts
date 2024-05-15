@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { authedProcedure, publicProcedure, router } from '../trpc';
 import { TRPCError } from '@trpc/server';
+import clerkClient from '@clerk/clerk-sdk-node';
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
@@ -27,26 +28,54 @@ export const projectsRouter = router({
     return data;
   }),
 
-  getMembers: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const data = await ctx.db.project.findFirst({
-      where: {
-        id: input,
-      },
-      select: {
-        memberships: {
-          where: {
-            status: "ACCEPTED"
+  getMembers: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const data = await ctx.db.project.findFirst({
+        where: {
+          id: input,
+        },
+        select: {
+          memberships: {
+            where: {
+              status: 'ACCEPTED',
+            },
+            select: {
+              id: true,
+              userId: true,
+            },
           },
-          select: {
-            id: true, 
-            userId: true,
-          }
-        }
-      }
-    })
-    
-    return data;
-  }),
+        },
+      });
+
+      return data;
+    }),
+  getUserList: authedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        userId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const projectMemberships = await ctx.db.memberships.findMany({
+        where: {
+          projectId: input.projectId,
+        },
+      });
+
+      const userList = projectMemberships.map(
+        (membership) => membership.userId,
+      );
+
+      const users = await clerkClient.users.getUserList({ userId: userList });
+      users.map((user) => ({
+        imageUrl: user.imageUrl,
+        email: user.emailAddresses,
+        name: `${user.firstName} ${user.lastName}`,
+      }));
+      return users;
+    }),
 
   getByUserId: authedProcedure
     .input(z.string())
@@ -95,7 +124,7 @@ export const projectsRouter = router({
       await ctx.db.post.create({ data: input });
     }),
 
-  create: authedProcedure 
+  create: authedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -155,32 +184,32 @@ export const projectsRouter = router({
         return undefined;
       }
     }),
-  
-  edit : authedProcedure
-    .input(z.object({
-      projectId: z.string(),
-      name: z.string(),
-      description: z.string(),
-      meetType: z.string(),
-      meetLocation: z.string(),
-      imageUrl: z.string(),
-      tags: z.array(z.string()),
-    }))
+
+  edit: authedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        name: z.string(),
+        description: z.string(),
+        meetType: z.string(),
+        meetLocation: z.string(),
+        imageUrl: z.string(),
+        tags: z.array(z.string()),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.project.update({
-        where:{
-          id: input.projectId
-        }, 
+        where: {
+          id: input.projectId,
+        },
         data: {
-          name: input.name, 
+          name: input.name,
           description: input.description,
           meetType: input.meetType,
           meetLocation: input.meetLocation,
           imageUrl: input.imageUrl,
-          tags: input.tags, 
-        }
-      })
-    })
-
+          tags: input.tags,
+        },
+      });
+    }),
 });
-
