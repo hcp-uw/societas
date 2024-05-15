@@ -130,6 +130,10 @@ export default function Project() {
     setFirstModalOpen(false);
   };
 
+  const handleCloseSecondModal = () => {
+    setSecondModalOpen(false);
+  };
+
   const handleOpenSecondModal = () => {
     setFirstModalOpen(false);
     setSecondModalOpen(true);
@@ -307,6 +311,7 @@ export default function Project() {
                 handleSubmit={handleSubmit}
                 handleOpenFirstModal={handleOpenFirstModal}
                 handleCloseFirstModal={handleCloseFirstModal}
+                handleCloseSecondModal={handleCloseSecondModal}
               />
             </div>
           </nav>
@@ -347,6 +352,7 @@ type StatusChipProps = {
   startDate: Date;
   handleOpenFirstModal: () => void;
   handleCloseFirstModal: () => void;
+  handleCloseSecondModal: () => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleLeaveReq: (e: React.FormEvent<HTMLFormElement>) => void;
 };
@@ -362,6 +368,7 @@ function StatusChip({
   handleSubmit,
   handleOpenFirstModal,
   handleCloseFirstModal,
+  handleCloseSecondModal,
   startDate,
   projectId,
 }: StatusChipProps) {
@@ -602,18 +609,17 @@ function StatusChip({
 
 
                 <div className="RC-button-wrapper">
-                  <NavLink to="/account" className="RC-button-confirmation">
-                    <button type="button" className="PP-button RC-button-orange">
+                  {/* <className="RC-button-confirmation"> */}
+                    <button type="button" className="PP-button RC-button-orange" onClick={handleCloseSecondModal}>
                       Close
                     </button>
-                  </NavLink>
 
-
+{/* 
                   <NavLink to="/" className="RC-button-confirmation">
                     <button type="button" className="PP-button RC-button-orange">
                       Back To Home Page
                     </button>
-                  </NavLink>
+                  </NavLink> */}
                 </div>
               </div>
             </div>
