@@ -14,8 +14,11 @@ export const postsRouter = router({
     getByProjectId: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
         const posts = await ctx.db.post.findMany({
             where: {
-            projectId: input,
+                projectId: input,
             },
+            orderBy: {
+                updatedAt: 'desc'
+            }
         });
 
         return posts;
@@ -24,7 +27,7 @@ export const postsRouter = router({
     getById: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
         const posts = await ctx.db.post.findFirst({
             where: {
-            id: input,
+                id: input,
             },
         });
 
@@ -41,5 +44,25 @@ export const postsRouter = router({
         )
         .mutation(async ({ ctx, input }) => {
         await ctx.db.post.create({ data: input });
+    }),
+
+    editPost: authedProcedure
+        .input(
+            z.object({
+                postId: z.string(),
+                title: z.string(),
+                content: z.string(),
+            }),
+        )
+        .mutation(async ({ ctx, input }) => {
+        await ctx.db.post.update({
+            where: {
+                id: input.postId
+            },
+            data: {
+                title: input.title,
+                content: input.content
+            }
+        })
     }),
 })

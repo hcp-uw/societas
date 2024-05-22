@@ -11,6 +11,7 @@ import Project, {
   CreatePost,
   ProjectPost,
   MemberList,
+  PostInfo,
 } from './pages/Project.jsx';
 import ProfileLayout from './pages/ProfileLayout.tsx';
 import CreateProj from './pages/CreateProj.tsx';
@@ -22,6 +23,7 @@ import ReportPage from './pages/ReportPage.tsx';
 import Profile, { EditProfile } from './pages/Profile.tsx';
 import Search from './pages/Search.tsx';
 import { EditProject } from './pages/EditProject.tsx';
+import { EditPost } from './pages/EditPost.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,11 +81,20 @@ const router = createBrowserRouter([
           {
             path: 'posts',
             element: <ProjectPostsLayout />,
-            // loader: projectPostsLoader(queryClient),
             children: [
               {
                 path: ':postId',
                 element: <ProjectPost />,
+                children: [
+                  {
+                    index: true, 
+                    element: <PostInfo/>
+                  },
+                  {
+                    path: 'editpost',
+                    element: <EditPost/>
+                  }
+                ]
               },
             ],
           },

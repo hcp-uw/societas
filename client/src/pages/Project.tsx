@@ -36,6 +36,8 @@ export default function Project() {
   const [showModal, setShowModal] = useState(false);
   const utils = trpc.useUtils();
 
+  const navigate = useNavigate();
+
   const sendJoinReqMutation =
     trpc.memberships.sendProjectJoinRequest.useMutation({
       onSuccess() {
@@ -81,7 +83,7 @@ export default function Project() {
   );
 
   if (requestData.data != undefined) {
-    console.log(requestData.data);
+    // console.log(requestData.data);
   }
 
   const leaveProjectMutation = trpc.memberships.leaveProject.useMutation({
@@ -105,25 +107,30 @@ export default function Project() {
 
   // TO DO: Delete Project
 
-  // const deleteProjectMutation = trpc.projects.delete.useMutation({
-  //   onSuccess(){
-  //     utils.projects.getAll.invalidate();
-  //     toast.success("projectDeleted");
-  //     navigate("/");
-  //   }
-  // })
+  const deleteProjectMutation = trpc.projects.delete.useMutation({
+    onSuccess(){
+      utils.projects.getAll.invalidate();
+      toast.success("projectDeleted");
+      navigate("/");
+    }
+  })
 
-  // function handleDeleteProject(e: React.FormEvent<HTMLFormElement>){
-  //   e.preventDefault();
-  //   if(!user || !data || !projectId) return;
+  function handleDeleteProject(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    if(!user || !data || !projectId) return;
 
-  //   if(user.id === data.ownerId){
-  //     deleteProjectMutation.mutate({
-  //       projectId: projectId,
-  //       ownerId: user.id
-  //     })
-  //   }
-  // }
+    // for now just return since we are not deleting pictures. 
+    window.alert("Delete Disabled. Picture deletion not yet implemented");
+    return;
+
+    // if(user.id === data.ownerId && 
+    //       window.confirm("Are you sure you want to delete this project?")){
+    //   deleteProjectMutation.mutate({
+    //     projectId: projectId,
+    //     ownerId: user.id
+    //   })
+    // }
+  }
 
   if (isLoading)
     return (
@@ -247,6 +254,7 @@ export default function Project() {
                 isLoading={roleIsLoading}
                 ownerId={data.ownerId}
                 handleLeaveReq={handleLeaveReq}
+                handleDeleteProject={handleDeleteProject}
               />
             </div>
           </nav>
@@ -257,7 +265,7 @@ export default function Project() {
   );
 }
 
-function SubmitBtn({
+export function SubmitBtn({
   mutationLoading,
   label,
 }: {
@@ -283,6 +291,7 @@ type StatusChipProps = {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   projectId: string;
   handleLeaveReq: (e: React.FormEvent<HTMLFormElement>) => void;
+  handleDeleteProject: (e: React.FormEvent<HTMLFormElement>) => void;
 };
 
 function StatusChip({
@@ -291,6 +300,7 @@ function StatusChip({
   ownerId,
   setShowModal,
   handleLeaveReq,
+  handleDeleteProject,
   projectId,
 }: StatusChipProps) {
   const user = useUser();
@@ -316,6 +326,13 @@ function StatusChip({
         >
           Edit Project Info
         </NavLink>
+        <Form method="post" onSubmit={handleDeleteProject}>
+          <input type="hidden" value={user ? user.user.id : ''} name="userId" />
+          <input type="hidden" value={projectId} name="projectId" />
+          <button className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium">
+            Delete Project
+          </button>
+        </Form>
       </div>
     );
   }
@@ -576,9 +593,21 @@ export function ProjectPostsLayout() {
             <div>
               <p className="font-medium text-zinc-800">{post.title}</p>
               <p className="text-sm text-zinc-600">
-                {dayjjs(post.createdAt).toDate().toLocaleDateString()}
+                Updated: {dayjjs(post.updatedAt).toDate().toLocaleDateString()}
               </p>
+              
             </div>
+            <NavLink 
+              key = {post.id}
+              to = {`${post.id}/editpost`}
+              className='ml-auto inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-small'>
+                Edit
+            </NavLink>
+            {/* <button 
+              onClick = {() => navigate(`${post.id}/editpost`)}
+              className='ml-auto inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-small'>
+                Edit
+            </button> */}
           </NavLink>
         ))}
       </div>
@@ -588,19 +617,26 @@ export function ProjectPostsLayout() {
 }
 
 export function ProjectPost() {
+  return (
+      <Outlet/>
+  );
+}
+
+
+export function PostInfo(){
   const params = useParams();
   const { data, isLoading } = trpc.posts.getById.useQuery(params.postId ?? '');
   if (isLoading) return <div>loading..</div>;
 
   if (!data) return <div>something went wrong</div>;
 
-  return (
+  return(
     <div className="flex-1 border-1 border-zinc-400 rounded-lg p-4 w-full overflow-auto">
       <article className="prose prose-base prose-slate">
         <Markdown>{data.content}</Markdown>
       </article>
     </div>
-  );
+  )
 }
 
 export function MemberList(){
