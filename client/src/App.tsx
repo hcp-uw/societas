@@ -18,7 +18,7 @@ export default function App({ queryClient }: { queryClient: QueryClient }) {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: import.meta.env?.BACKEND_URL ?? 'http://localhost:3001',
+          url: import.meta.env?.VITE_BACKEND_URL ?? 'http://localhost:3001',
           // You can pass any HTTP headers you wish here
           async headers() {
             const token = await getToken();
