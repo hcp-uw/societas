@@ -593,21 +593,21 @@ export function ProjectPost() {
 export function MemberList() {
   const params = useParams();
   const { user } = useUser();
-  const { data } = trpc.projects.getUserList.useQuery({
+  const { data } = trpc.projects.getMembers.useQuery({
     userId: user?.id ?? '',
     projectId: params.projectId ?? '',
   });
   const utils = trpc.useUtils();
   const kickUserMutation = trpc.projects.kickUser.useMutation({
     onSuccess() {
-      toast.success("Successfully kicked out user")
-      utils.projects.getUserList.invalidate();
+      utils.projects.getMembers.invalidate();
     },
   });
 
   if (!data) return <div>Error Fetching Members</div>;
 
-  if (!data || data.length == 0) return <div> No Members</div>;
+  if (!data || data.length == 0)
+    return <div> No Members</div>;
 
   const handleKickUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

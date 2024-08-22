@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/clerk-react';
+import { SignOutButton, useUser } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input, StyledInput } from '../components/inputs';
@@ -13,6 +13,7 @@ import { trpc } from '../utils/trpc';
  */
 export default function Profile() {
   const { user } = useUser();
+  const navigate = useNavigate();
   // const { data, isError, isLoading } = useQuery(
   //   myProjsQuery(user ? user.id : "")
   // )
@@ -40,9 +41,15 @@ export default function Profile() {
   if (isLoading) return <div>loading</div>;
 
   if (!data) return <div>There was an issue fetching your projects</div>;
+
+  function handleSignout() {
+    navigate('/');
+    toast.success('Successfully Signout');
+  }
+
   return (
-    <div className="flex w-full gap-6 flex-col">
-      <div className="flex gap-6 items-center">
+    <div className="flex w-full gap-6 flex-col mt-8">
+      <div className="flex gap-6 items-center flex-wrap">
         <img
           src={user.imageUrl}
           alt={`Your profile picture`}
@@ -54,13 +61,21 @@ export default function Profile() {
           <h1 className="text-3xl font-medium">{user.fullName}</h1>
           <p>{(user.unsafeMetadata.bio as string) ?? 'No bio'}</p>
         </div>
+        <div className="flex flex-row">
+          <Link
+            to="edit"
+            className="py-2 px-6 bg-blue-400 text-zinc-100 w-fit rounded-lg transition-colors hover:bg-blue-500 whitespace-nowrap mr-6"
+          >
+            Edit Profile
+          </Link>
 
-        <Link
-          to="edit"
-          className="py-2 px-6 bg-blue-400 text-zinc-100 w-fit rounded-lg transition-colors hover:bg-blue-500"
-        >
-          Edit Profile
-        </Link>
+          <SignOutButton signOutCallback={handleSignout}>
+            <div className="flex p-2 rounded gap-2 items-center hover:bg-red-400 hover:text-zinc-100 transition-colors cursor-pointer whitespace-nowrap">
+              <span className="material-symbols-outlined">logout</span>
+              Sign out
+            </div>
+          </SignOutButton>
+        </div>
       </div>
 
       <h1 className="font-medium text-2xl">My Projects</h1>
@@ -125,7 +140,10 @@ export function EditProfile() {
 
   return (
     //form to submit.
-    <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 flex-col">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex gap-4 flex-col mt-8 w-3/4"
+    >
       <div className="relative w-fit">
         <img
           src={typeof image === 'string' ? image : URL.createObjectURL(image)}

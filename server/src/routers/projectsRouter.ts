@@ -28,29 +28,7 @@ export const projectsRouter = router({
     return data;
   }),
 
-  getMembers: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const data = await ctx.db.project.findFirst({
-        where: {
-          id: input,
-        },
-        select: {
-          memberships: {
-            where: {
-              status: 'ACCEPTED',
-            },
-            select: {
-              id: true,
-              userId: true,
-            },
-          },
-        },
-      });
-
-      return data;
-    }),
-  getUserList: authedProcedure
+  getMembers: authedProcedure
     .input(
       z.object({
         projectId: z.string(),

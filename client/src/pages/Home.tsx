@@ -28,8 +28,6 @@ export default function Home() {
  */
 
 function Projects() {
-  //const { data, isLoading } = useQuery(projectsQuery())
-
   const { data, isLoading } = trpc.projects.getAll.useQuery();
 
   if (isLoading)

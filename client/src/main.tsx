@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient } from '@tanstack/react-query';
 import Home from './pages/Home.tsx';
@@ -12,7 +12,6 @@ import Project, {
   ProjectPost,
   MemberList,
 } from './pages/Project.jsx';
-import ProfileLayout from './pages/ProfileLayout.tsx';
 import CreateProj from './pages/CreateProj.tsx';
 import Requests from './pages/Requests.tsx';
 import Intro from './pages/Intro.jsx';
@@ -103,7 +102,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'account',
-        element: <ProfileLayout />,
+        element: <Outlet />,
         children: [
           {
             index: true,
@@ -112,14 +111,6 @@ const router = createBrowserRouter([
           {
             path: 'edit',
             element: <EditProfile />,
-          },
-          {
-            path: 'requests/acceptReq',
-            element: <Requests />,
-          },
-          {
-            path: 'requests/rejectReq',
-            element: <Requests />,
           },
         ],
       },
