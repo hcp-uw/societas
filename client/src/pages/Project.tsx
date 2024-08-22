@@ -11,6 +11,7 @@ import { NavLink, Outlet, Form } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { RouterOutputs, trpc } from '../utils/trpc';
 import { z } from 'zod';
+import ActivityWrapper from '../components/ActivityWrapper';
 
 dayjjs.extend(relativeTime);
 
@@ -188,7 +189,7 @@ export default function Project() {
           </div>
         )}
 
-        <div className="w-full max-w-6xl m-auto flex flex-col gap-4">
+        <ActivityWrapper className="flex flex-col gap-4">
           <h2 className="text-3xl font-bold text-zinc-800 flex items-center">
             {data.name}
           </h2>
@@ -239,7 +240,7 @@ export default function Project() {
             </div>
           </nav>
           <Outlet />
-        </div>
+        </ActivityWrapper>
       </div>
     </>
   );
@@ -302,7 +303,7 @@ function StatusChip({
           to="edit"
           className="inline-block bg-green-600 transition-colors hover:bg-green-700 py-1 px-6 rounded-lg text-zinc-100 font-medium"
         >
-          Edit Project Info
+          Edit Project InfoProje
         </NavLink>
       </div>
     );
@@ -591,20 +592,22 @@ export function ProjectPost() {
 
 export function MemberList() {
   const params = useParams();
-  const { data } = trpc.projects.getMembers.useQuery(params.projectId ?? '');
+  const { user } = useUser();
+  const { data } = trpc.projects.getUserList.useQuery({
+    userId: user?.id ?? '',
+    projectId: params.projectId ?? '',
+  });
   const utils = trpc.useUtils();
-  // if (isLoading) return <div>loading...</div>
   const kickUserMutation = trpc.projects.kickUser.useMutation({
     onSuccess() {
-      console.log('User Removed');
-      utils.projects.getMembers.invalidate();
+      toast.success("Successfully kicked out user")
+      utils.projects.getUserList.invalidate();
     },
   });
 
   if (!data) return <div>Error Fetching Members</div>;
 
-  if (!data.memberships || data.memberships.length == 0)
-    return <div> No Members</div>;
+  if (!data || data.length == 0) return <div> No Members</div>;
 
   const handleKickUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -620,17 +623,24 @@ export function MemberList() {
 
   return (
     <div className="w-full flex flex-col gap-4 ml-8">
-      {data.memberships.map((member) => (
+      {data.map((member) => (
         <div
-          key={member.userId}
+          key={member.id}
           className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
         >
-          {member.userId}
+          {member.name}
 
           <div className="flex gap-4 items-center">
+            <img
+              src={member.imageUrl}
+              alt={`${member.name} profile image`}
+              width={60}
+              height={60}
+              className="rounded-full h-12 w-12 object-cover"
+            />
             <button
               onClick={handleKickUser}
-              value={member.userId}
+              value={member.id}
               className="bg-blue-600 p-2 h-fit text-zinc-100 rounded-xl"
             >
               Kick Member
