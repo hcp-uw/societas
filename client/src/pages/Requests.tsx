@@ -16,9 +16,8 @@ export default function Requests() {
 
   const acceptRequestMutation = trpc.memberships.acceptRequest.useMutation({
     onSuccess() {
-      console.log('Request Accepted');
       utils.memberships.getAllIncomingRequests.invalidate();
-      utils.projects.getUserList.invalidate();
+      utils.projects.getMembers.invalidate();
       toast.success('Request Accepted');
     },
   });
