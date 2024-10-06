@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { authedProcedure, publicProcedure, router } from '../trpc';
+import { notificationsRouter, sendNotificationHandler } from './notificationsRouter';
 
 export const membershipsRouter = router({
   sendProjectJoinRequest: authedProcedure
@@ -18,8 +19,9 @@ export const membershipsRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      let newMembership
       if (!input.role) {
-        await ctx.db.memberships.create({
+        newMembership = await ctx.db.memberships.create({
           data: {
             projectId: input.projectId,
             ownerId: input.ownerId,
@@ -28,7 +30,7 @@ export const membershipsRouter = router({
           },
         });
       } else if (input.role.status === 'REJECTED') {
-        await ctx.db.memberships.update({
+        newMembership = await ctx.db.memberships.update({
           where: {
             id: input.role.id,
           },
@@ -38,6 +40,17 @@ export const membershipsRouter = router({
           },
         });
       }
+      if(!newMembership){
+        throw new Error("Failed to create a new membership")
+      }
+      const notifData = {
+        userId: input.ownerId,
+        content: "nothing",
+        type: "REQUEST",
+        title: "Request Sent!",
+        typeId: newMembership.id,
+      }
+      await sendNotificationHandler(ctx, notifData)
     }),
 
   getAllUserMemberships: publicProcedure

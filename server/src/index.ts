@@ -5,12 +5,14 @@ import { projectsRouter } from './routers/projectsRouter';
 import { membershipsRouter } from './routers/membershipsRouter';
 import { tagsRouter } from './routers/tagsRouter';
 import { postsRouter } from "./routers/postsRouter";
+import { notificationsRouter } from './routers/notificationsRouter';
 
 const appRouter = router({
   projects: projectsRouter,
   memberships: membershipsRouter,
   posts: postsRouter,
   tags: tagsRouter,
+  notifications: notificationsRouter,
 });
 // Export type router type signature,
 // NOT the router itself.

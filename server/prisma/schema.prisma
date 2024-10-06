@@ -10,12 +10,13 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
+
 // add imageurl string field
 model Project {
-  id           String           @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   ownerId      String
   // owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   description  String
@@ -26,12 +27,11 @@ model Project {
   memberships  Memberships[]
   imageUrl     String
   startDate    String
-
 }
 
 model Tag {
-  id       String           @id @default(uuid())
-  name     String
+  id   String @id @default(uuid())
+  name String
 
   @@unique([name])
 }
@@ -81,6 +81,23 @@ model Memberships {
 
   @@unique([projectId, userId])
   @@index([projectId])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  createdAt DateTime         @default(now())
+  seen      Boolean          @default(false)
+  userId    String
+  content   String
+  title     String
+  type      NotificationType
+  typeId    String
+}
+
+enum NotificationType {
+  PROJECT
+  REQUEST
+  POST
 }
 
 enum MembershipStatus {
