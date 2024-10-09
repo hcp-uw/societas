@@ -53,28 +53,33 @@ git checkout -b xxxx (next time when you work, create a new branch)
 git pull origin main (make sure you have the latest version of the main branch before you work)
 ```
 
+## Current Member
+
+Angela Yang: PM/Frontend Github:Ajyang5
+
+Aaron Honjaya: Frontend
+
+Arjun Naik: Backend Github:Aleph-Null-123
+
+Yang Jiao: Fullstack Github:yangy0912
+
+Jingzhou Ma: UX/UI
+
+
 ## Credits
 
 Vincent Liu: PM Github:VincentLiu777
 
-Santiago Gracias: Frontend Github:SantiagoG14
-
-Angela Yang: Frontend Github:Ajyang5
-
-Ben Epstein: Frontend 
-
-Aaron Honjaya: Frontend
+Santiago Gracias: PM/Frontend Github:SantiagoG14
 
 Jasmine Zhang: Frontend
 
-Arjun Naik: Backend Github:Aleph-Null-123
-
 Hansel: Backend
-
-Hrudhai: Backend
 
 Oscar: UX/UI
 
+Kai: UX/UI
+
 ## Contact
 
-If you have any questions or concerns feel free to contact us at [rliu8@uw.edu](mailto:rliu8@uw.edu)
+If you have any questions or concerns feel free to contact us at [ajyang5@uw.edu]
