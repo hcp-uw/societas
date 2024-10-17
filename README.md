@@ -53,11 +53,13 @@ git checkout -b xxxx (next time when you work, create a new branch)
 git pull origin main (make sure you have the latest version of the main branch before you work)
 ```
 
-## Current Member
+## Current Members
 
 Angela Yang: PM/Frontend Github:Ajyang5
 
 Aaron Honjaya: Frontend
+
+Weizhe Sun: Frontend
 
 Arjun Naik: Backend Github:Aleph-Null-123
 
@@ -70,11 +72,11 @@ Jingzhou Ma: UX/UI
 
 Vincent Liu: PM Github:VincentLiu777
 
-Santiago Gracias: PM/Frontend Github:SantiagoG14
-
-Jasmine Zhang: Frontend
+Santiago Garcia: PM/Frontend Github:SantiagoG14
 
 Hansel: Backend
+
+Jasmine Zhang: Frontend
 
 Oscar: UX/UI
 
