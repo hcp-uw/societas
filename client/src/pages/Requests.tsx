@@ -10,18 +10,14 @@ dayjjs.extend(relativeTime);
 //request page to be shown.
 export default function Requests() {
   const { user } = useUser();
-  // const { data, isLoading, isError } = useQuery(
-  //   requestsQuery(user ? user.id : "")
-  // )
-
   const { data, isLoading, isError } =
     trpc.memberships.getAllIncomingRequests.useQuery(user?.id ?? '');
   const utils = trpc.useUtils();
 
   const acceptRequestMutation = trpc.memberships.acceptRequest.useMutation({
     onSuccess() {
-      console.log('Request Accepted');
       utils.memberships.getAllIncomingRequests.invalidate();
+      utils.projects.getMembers.invalidate();
       toast.success('Request Accepted');
     },
   });

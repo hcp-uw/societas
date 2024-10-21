@@ -28,29 +28,7 @@ export const projectsRouter = router({
     return data;
   }),
 
-  getMembers: publicProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const data = await ctx.db.project.findFirst({
-        where: {
-          id: input,
-        },
-        select: {
-          memberships: {
-            where: {
-              status: 'ACCEPTED',
-            },
-            select: {
-              id: true,
-              userId: true,
-            },
-          },
-        },
-      });
-
-      return data;
-    }),
-  getUserList: authedProcedure
+  getMembers: authedProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -61,6 +39,7 @@ export const projectsRouter = router({
       const projectMemberships = await ctx.db.memberships.findMany({
         where: {
           projectId: input.projectId,
+          status: 'ACCEPTED',
         },
       });
 
@@ -68,13 +47,18 @@ export const projectsRouter = router({
         (membership) => membership.userId,
       );
 
+      if (userList.length === 0) {
+        return []
+      }
       const users = await clerkClient.users.getUserList({ userId: userList });
-      users.map((user) => ({
+      const filteredUser = users.map((user) => ({
+        id: user.id,
         imageUrl: user.imageUrl,
         email: user.emailAddresses,
         name: `${user.firstName} ${user.lastName}`,
       }));
-      return users;
+
+      return filteredUser;
     }),
 
   getByUserId: authedProcedure
@@ -96,9 +80,10 @@ export const projectsRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      console.log(input)
       await ctx.db.memberships.delete({
         where: {
-          projectId_userId: input,
+          projectId_userId: input
         },
       });
     }),

@@ -12,7 +12,7 @@ body {
   display: -ms-flexbox; /* Not needed if autoprefixing */
   display: flex; /* gutter size offset */
   width: auto;
-  gap: 4rem;
+  gap: 2.25rem;
 }
 
 .masonryCol {

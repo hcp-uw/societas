@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { trpc } from './utils/trpc';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { httpBatchLink } from '@trpc/client';
+import ActivityWrapper from './components/ActivityWrapper';
 
 export default function App({ queryClient }: { queryClient: QueryClient }) {
   const { getToken, userId } = useAuth();
@@ -40,10 +41,10 @@ export default function App({ queryClient }: { queryClient: QueryClient }) {
             <GlobalStyles />
             <Nav />
             <Toaster position="bottom-center" />
-            <main className="flex-grow-1 overflow-auto overscroll-y-contain">
-              <div className="m-auto max-w-[80%]">
+            <main className="flex-grow-1 overflow-auto overscroll-y-contain sm:px-10">
+              <ActivityWrapper>
                 <Outlet />
-              </div>
+              </ActivityWrapper>
             </main>
           </ThemeProvider>
         </div>

@@ -9,8 +9,8 @@ export default function Nav() {
 
   //returns header of logo and profile button or "sign in/sign up" if user is not registered.
   return (
-    <header className="border-b-2 py-1">
-      <nav className="flex max-w-[80%] justify-between items-center m-auto">
+    <header className="border-b-2 sm:px-10">
+      <nav className="flex w-full justify-between lg:max-w-7xl items-center m-auto">
         <div className="flex items-center gap-4 text-zinc-400">
           <NavLink to="/">
             <img
@@ -75,14 +75,14 @@ export default function Nav() {
             </NavLink>
           </div>
         ) : (
-          <div className="flex gap-4">
+          <div className="flex gap-1">
             <SignInButton mode="modal">
-              <div className="bg-blue-400 hover:bg-blue-500 transition-colors cursor-pointer py-2 px-6 text-zinc-100 rounded-lg">
+              <div className="border border-zinc-900 py-2 cursor-pointer px-6 rounded-lg hover:bg-zinc-200 transition-colors">
                 Login
               </div>
             </SignInButton>
             <SignUpButton mode="modal">
-              <div className="border border-zinc-900 py-2 cursor-pointer px-6 rounded-lg hover:bg-zinc-200 transition-colors">
+              <div className="bg-blue-400 hover:bg-blue-500 transition-colors cursor-pointer py-2 px-6 text-zinc-100 rounded-lg">
                 Sign up
               </div>
             </SignUpButton>

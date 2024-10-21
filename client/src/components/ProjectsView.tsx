@@ -60,8 +60,8 @@ export default function ProjectsView(props: {
               {proj.meetType}
             </Blob>
             {proj.tags.map((tag) => (
-              <Blob>
-                <p>{tag}</p>
+              <Blob key={tag}>
+                {tag}
               </Blob>
             ))}
           </div>
