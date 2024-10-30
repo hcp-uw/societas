@@ -5,9 +5,7 @@ import clerkClient from '@clerk/clerk-sdk-node';
 
 export const projectsRouter = router({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const projects = await ctx.db.project.findMany({
-      take: 5,
-    });
+    const projects = await ctx.db.project.findMany();
     return projects;
   }),
 
@@ -27,6 +25,42 @@ export const projectsRouter = router({
 
     return data;
   }),
+
+  getImage: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+      const data = await ctx.db.project.findFirst({
+        where: {
+          id: input,
+        },
+      });
+
+      if (!data) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'No project has corresponding id',
+        });
+      }
+      
+      return data.imageUrl;
+    }),
+
+    getName: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const data = await ctx.db.project.findFirst({
+        where: {
+          id: input,
+        },
+      });
+
+      if (!data) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'No project has corresponding id',
+        });
+      }
+      
+      return data.name;
+    }),
 
   getMembers: publicProcedure
     .input(z.string())
