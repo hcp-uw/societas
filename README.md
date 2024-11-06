@@ -1,4 +1,4 @@
-# <img src="./client/public/logo.png" width="35" alt="societas logo"> Societas
+# <img src="./client/src/assets/logo.png" width="35" alt="societas logo"> Societas
 
 Societas is a website that creates a judgement-free zone to empower creative UW individuals to find like-minded people to make their dream and goals come true.
 
