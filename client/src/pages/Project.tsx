@@ -12,6 +12,7 @@ import Markdown from 'react-markdown';
 import { RouterOutputs, trpc } from '../utils/trpc';
 import { z } from 'zod';
 
+
 dayjjs.extend(relativeTime);
 
 function useGetProjectData() {
@@ -24,6 +25,7 @@ function useGetProjectData() {
   };
 }
 
+
 export default function Project() {
   const { data, isLoading, projectId } = useGetProjectData();
   const { data: role, isLoading: roleIsLoading } =
@@ -31,6 +33,9 @@ export default function Project() {
   const { user } = useUser();
   const [showModal, setShowModal] = useState(false);
   const utils = trpc.useUtils();
+
+  // const name = user?.getUser(data?.ownerId);
+  
 
   const sendJoinReqMutation =
     trpc.memberships.sendProjectJoinRequest.useMutation({
@@ -57,6 +62,7 @@ export default function Project() {
         ownerId: data.ownerId,
         userId: user?.id,
         description: description,
+        userName: (user?.firstName + ' ' + user?.lastName),
       });
     } else if (role.status === 'REJECTED') {
       sendJoinReqMutation.mutate({
@@ -64,6 +70,7 @@ export default function Project() {
         ownerId: data.ownerId,
         userId: user?.id,
         description: description,
+        userName: (user?.firstName + ' ' + user?.lastName),
         role: {
           status: role.status,
           id: role.id,
@@ -473,6 +480,8 @@ export function CreatePost() {
 
 export function ProjectInfo() {
   const { data, isLoading } = useGetProjectData();
+  // const { owner } = trpc.projects.getOwnerByID.useQuery(data?.ownerId ?? '',);
+
 
   if (isLoading) return <div>loading</div>;
 
@@ -482,6 +491,12 @@ export function ProjectInfo() {
     <div className="flex justify-between w-full gap-16">
       <div className="flex flex-col gap-4">
         <p className="text-zinc-800 leading-7">{data.description} </p>
+        <p>
+          <span className="underline font-semibold mr-3 underline-offset-4">
+            Posted By:
+          </span>
+          {data.creatorName}
+        </p>
         <p>
           <span className="underline font-semibold mr-3 underline-offset-4">
             Meet Location:
@@ -573,6 +588,7 @@ export function ProjectPostsLayout() {
   );
 }
 
+
 export function ProjectPost() {
   const params = useParams();
   const { data, isLoading } = trpc.posts.getById.useQuery(params.postId ?? '');
@@ -625,7 +641,7 @@ export function MemberList() {
           key={member.userId}
           className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
         >
-          {member.userId}
+          {member.userName}
 
           <div className="flex gap-4 items-center">
             <button

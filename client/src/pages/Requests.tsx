@@ -84,6 +84,8 @@ export default function Requests() {
       </h1>
     );
 
+  
+
   return (   
     <div className="w-full flex flex-col gap-4 ml-8">
       {data.map((request) => (
@@ -105,6 +107,9 @@ export default function Requests() {
               <h1 className="text-2xl font-bold text-zinc-800 mb-5">
                 <ProjectName projectId={request.projectId} />
               </h1>
+              <p className="text-2xl font-bold text-zinc-800 mb-5">
+                {request.userName}
+              </p>
               <p className="text-xl text-zinc-800 mb-5">
                 {request.description}
               </p>
