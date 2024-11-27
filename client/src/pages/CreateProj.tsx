@@ -16,8 +16,12 @@ export type FormState = {
   location: string;
   maxMems: string;
   startDate: string;
+  meetType: string,
+  tags: string[];
   image: Blob | null | string;
 };
+
+export type FormChangeHandler = <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 
 export default function CreateProj() {
   //elements to fill when creating a project.
@@ -26,11 +30,11 @@ export default function CreateProj() {
     description: '',
     location: '',
     maxMems: '',
-    image: null,
     startDate: '',
+    meetType: '',
+    tags: [],
+    image: null
   }); // state form the inputs
-
-  const [addedTags, setAddedTags] = useState<string[]>([]);
 
   const utils = trpc.useUtils();
 
@@ -41,7 +45,7 @@ export default function CreateProj() {
       utils.projects.getAll.invalidate();
       toast.success('Project Created!');
       navigate('/');
-      tagMutation.mutate(addedTags);
+      tagMutation.mutate(formState.tags);
     },
   });
 
@@ -52,18 +56,18 @@ export default function CreateProj() {
   });
 
   const uploadImageMutation = useMutation({
-    mutationFn: (image: Blob) => uploadProjectImage(image),
+    mutationFn: uploadProjectImage,
     onSuccess(url) {
       if (!user) return;
       projMutation.mutate({
         name: formState.title,
         description: formState.description,
         meetLocation: formState.location,
-        meetType: '',
+        meetType: formState.meetType,
         ownerId: user?.id,
         imageUrl: url,
         startDate: formState.startDate,
-        tags: addedTags,
+        tags: formState.tags,
       });
     },
   });
@@ -86,6 +90,11 @@ export default function CreateProj() {
 
     uploadImageMutation.mutate(formState.image);
   }
+
+  function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setFormState(prev => ({ ...prev, [key]: value }));
+  }
+
   //gets files view and inputs view from formstate.
   return (
     <Form
@@ -95,15 +104,13 @@ export default function CreateProj() {
       onSubmit={handleSubmit}
     >
       <div>
-        <FilesView formState={formState} setFormState={setFormState} />
+        <FilesView form={formState} onChange={updateForm} />
       </div>
       <InputsView
-        formState={formState}
-        setFormState={setFormState}
+        form={formState}
+        onChange={updateForm}
         isFormValid={isFormValid}
         loading={projMutation.isLoading}
-        addedTags={addedTags}
-        setAddedTags={setAddedTags}
       />
       <input type="hidden" name="ownerId" value={user.id} />
       {/* Submit button for mobile view */}
@@ -112,41 +119,39 @@ export default function CreateProj() {
 }
 
 function AddTagsView({
-  addedTags,
-  setAddedTags,
+  onChange,
+  form
 }: {
-  addedTags: string[];
-  setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
+  onChange: FormChangeHandler;
+  form: FormState;
 }) {
   function handleAddTag(tag: string) {
     const val: string = tag.trim();
-    if (addedTags.indexOf(val) !== -1) {
+    if (form.tags.indexOf(val) !== -1) {
       return;
     }
     if (val === '') return;
-    setAddedTags((prev) => [...prev, val]);
+    onChange('tags', [...form.tags, val]);
   }
 
   function handleTagDelete(tagToDelete: string) {
-    setAddedTags((prev) => prev.filter((tag) => tag !== tagToDelete));
+    onChange('tags', form.tags.filter((tag) => tag !== tagToDelete));
   }
 
   return (
     <>
       <ul className="flex">
-        {addedTags.length > 0 ? (
+        {form.tags.length > 0 ? (
           <>
-            {addedTags.map((tag) => {
-              return (
-                <li
-                  key={tag}
-                  className="rounded-full bg-zinc-200 w-fit flex py-1 px-3 items-center gap-2 justify-center"
-                >
-                  <p>{tag}</p>
-                  <SmCloseBtn onClose={() => handleTagDelete(tag)} />
-                </li>
-              );
-            })}
+            {form.tags.map((tag) => (
+              <li
+                key={tag}
+                className="rounded-full bg-zinc-200 w-fit flex py-1 px-3 items-center gap-2 justify-center"
+              >
+                <p>{tag}</p>
+                <SmCloseBtn onClose={() => handleTagDelete(tag)} />
+              </li>
+            ))}
           </>
         ) : (
           <div className="text-zinc-400 text-md lowercase">
@@ -159,27 +164,27 @@ function AddTagsView({
   );
 }
 
-type InputsViewProps = {
-  formState: FormState;
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
-  isFormValid: () => boolean;
-  loading: boolean;
-  addedTags: string[];
-  setAddedTags: React.Dispatch<React.SetStateAction<string[]>>;
-};
-
 //shows the view for inputs to create a new project.
 //updates fiewlds of formState when inputs are made.
 export function InputsView({
-  formState,
-  setFormState,
+  form,
+  onChange,
   isFormValid,
-  loading,
-  addedTags,
-  setAddedTags,
-}: InputsViewProps) {
+  loading
+}: {
+  form: FormState;
+  onChange: FormChangeHandler;
+  isFormValid: () => boolean;
+  loading: boolean;
+}) {
+  const onRadioChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    if (target.checked) {
+      onChange(target.name as keyof FormState, target.value);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-8 w-full max-w-2xl">
+    <div className="flex flex-col gap-8 w-full max-w-2xl p-6">
       <Input>
         <label htmlFor="title">Title</label>
         <StyledInput
@@ -187,10 +192,8 @@ export function InputsView({
           id="title"
           name="title"
           placeholder="Project Title"
-          onChange={(e) =>
-            setFormState({ ...formState, title: e.target.value })
-          }
-          value={formState.title}
+          onChange={(e) => onChange('title', e.target.value)}
+          value={form.title}
           required
           maxLength={75}
           disabled={loading}
@@ -205,10 +208,8 @@ export function InputsView({
           cols={20}
           rows={5}
           placeholder="Description of your project"
-          onChange={(e) =>
-            setFormState({ ...formState, description: e.target.value })
-          }
-          value={formState.description}
+          onChange={(e) => onChange('description', e.target.value)}
+          value={form.description}
           required
           disabled={loading}
           maxLength={1500} //avg length of 300 words
@@ -217,7 +218,7 @@ export function InputsView({
 
       <Input className="flex flex-col gap-2">
         <label>tags</label>
-        <AddTagsView addedTags={addedTags} setAddedTags={setAddedTags} />
+        <AddTagsView form={form} onChange={onChange} />
       </Input>
 
       <Input>
@@ -227,10 +228,8 @@ export function InputsView({
           id="meetLocation"
           name="meetLocation"
           placeholder="Enter Project Location Here"
-          onChange={(e) =>
-            setFormState({ ...formState, location: e.target.value })
-          }
-          value={formState.location}
+          onChange={(e) => onChange('location', e.target.value)}
+          value={form.location}
           required
           disabled={loading}
         />
@@ -245,15 +244,16 @@ export function InputsView({
             name="meetType"
             id="in-person"
             value="in-person"
+            onChange={onRadioChange}
           />
           <label htmlFor="in-person">In Person</label>
         </div>
         <div className="gap-4 flex">
-          <input type="radio" name="meetType" id="hybrid" value="hybrid" />
+          <input type="radio" name="meetType" id="hybrid" value="hybrid" onChange={onRadioChange}/>
           <label htmlFor="hybrid">Hybrid</label>
         </div>
         <div className="gap-4 flex">
-          <input type="radio" name="meetType" id="remote" value="remote" />
+          <input type="radio" name="meetType" id="remote" value="remote" onChange={onRadioChange}/>
           <label htmlFor="remote">Remote</label>
         </div>
       </div>
@@ -263,13 +263,11 @@ export function InputsView({
           type="number"
           id="maxMems"
           name="maxMembers"
-          min={0}
+          min={1}
           max={100}
           placeholder="5"
-          onChange={(e) =>
-            setFormState({ ...formState, maxMems: e.target.value })
-          }
-          value={formState.maxMems}
+          onChange={(e) => onChange('maxMems', e.target.value)}
+          value={form.maxMems}
           required
           disabled={loading}
         />
@@ -280,9 +278,7 @@ export function InputsView({
           type="date"
           name="startDate"
           id="startDate"
-          onChange={(e) =>
-            setFormState({ ...formState, startDate: e.target.value })
-          }
+          onChange={(e) => onChange('startDate', e.target.value)}
         />
       </Input>
 
@@ -293,11 +289,11 @@ export function InputsView({
 
 //shows view for selecting a picture for a project.
 export function FilesView({
-  formState,
-  setFormState,
+  form,
+  onChange,
 }: {
-  formState: FormState;
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>;
+  form: FormState;
+  onChange: FormChangeHandler;
 }) {
   const [error, setError] = useState<string | null>(null);
   return (
@@ -306,44 +302,43 @@ export function FilesView({
         <h1 className="text-zinc-800 font-medium mb-4 flex items-center justify-between">
           Select a picture
         </h1>
-        <label htmlFor="image" className="bg-zinc-300 p-3 rounded-lg">
+        <label htmlFor="image" className="bg-zinc-300 p-3 rounded-lg overflow-hidden relative">
           Select file
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          className="file:cursor-pointer file:text-zinc-800 file:cursor-pointe file:py-2 file:px-4 file:rounded-3xl hover:file:bg-zinc-300 file:transition-all file:border-dashed file:border-1"
-          name="imageUrl"
-          id="image"
-          hidden
-          //checks file size and for null returns.
-          onChange={(e) => {
-            setError(null);
-            const maxFileSize = 1024 * 1024; // one mb
-            if (!e.target.files) return;
-            const file = e.target.files[0];
+          <input
+            type="file"
+            accept="image/*"
+            className="absolute left-full -z-50 w-px"
+            name="imageUrl"
+            id="image"
+            required={!form.image}
 
-            if (file.size > maxFileSize) {
-              setError('File size is too large');
-              e.target.value = '';
-              return;
-            }
-            setFormState((prev) => ({ ...prev, image: file }));
-          }}
-        />
+            //checks file size and for null returns.
+            onChange={(e) => {
+              setError(null);
+              const maxFileSize = 1024 * 1024; // one mb
+              if (!e.target.files) return;
+              const file = e.target.files[0];
+
+              if (file.size > maxFileSize) {
+                setError('File size is too large');
+                e.target.value = '';
+                return;
+              }
+              onChange('image', file);
+            }}
+          />
+        </label>
         {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
-      {formState.image && (
+      {form.image && (
         //loads the image and shows it on screen. Allows you to close it and not show it.
         <Image>
           <SmCloseBtn
-            onClose={() => setFormState((prev) => ({ ...prev, image: null }))}
+            onClose={() => onChange('image', null)}
           />
           <img
             src={
-              typeof formState.image === 'string'
-                ? formState.image
-                : URL.createObjectURL(formState.image)
+              form.image instanceof Blob ? URL.createObjectURL(form.image) : form.image
             }
             className="w-full max-w-2xl"
           />
@@ -376,9 +371,9 @@ function SubmitBtnView({
   loading: boolean;
 }) {
   return (
-    <SubmitWrapper desktop={desktop}>
+    <SubmitWrapper $desktop={desktop}>
       <button
-        //disabled while form is invalid. Changes to loading spinnner when pressed.
+        //disabled while form is invalid. Changes to loading spinner when pressed.
         type="submit"
         disabled={!isFormValid()}
         aria-busy={loading}
@@ -389,9 +384,7 @@ function SubmitBtnView({
         </p>
 
         <div
-          className={`absolute pointer-events-none ${
-            loading ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`absolute pointer-events-none ${loading ? 'opacity-100' : 'opacity-0'}`}
         >
           <Spinner size={16} />
         </div>
@@ -400,18 +393,15 @@ function SubmitBtnView({
   );
 }
 
-interface SubmitWrapperProps {
-  readonly desktop?: boolean;
-}
-const SubmitWrapper = styled.div<SubmitWrapperProps>`
+const SubmitWrapper = styled.div<{ $desktop?: boolean }>`
   width: 100%;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  display: ${({ desktop }) => (desktop ? 'none' : 'default')};
+  display: ${props => props.$desktop ? 'none' : 'default'};
   @media (min-width: 62rem) {
     display: inline-block;
-    display: ${({ desktop }) => (desktop ? 'flex' : 'none')};
+    display: ${props => props.$desktop ? 'flex' : 'none'};
     justify-content: flex-end;
     align-items: flex-end;
   }
