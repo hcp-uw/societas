@@ -63,6 +63,7 @@ export default function CreateProj() {
         ownerId: user?.id,
         imageUrl: url,
         startDate: formState.startDate,
+        creatorName: (user?.firstName + ' ' + user?.lastName),
         tags: addedTags,
       });
     },

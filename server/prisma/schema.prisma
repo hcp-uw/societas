@@ -26,7 +26,7 @@ model Project {
   memberships  Memberships[]
   imageUrl     String
   startDate    String
-
+  creatorName  String
 }
 
 model Tag {
@@ -78,6 +78,7 @@ model Memberships {
   // User      User             @relation(fields: [userId], references: [id])
   // User      User             @relation(fields: [userId], references: [id])
   description String?
+  userName    String
 
   @@unique([projectId, userId])
   @@index([projectId])

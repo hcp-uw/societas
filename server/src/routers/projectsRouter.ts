@@ -77,6 +77,7 @@ export const projectsRouter = router({
             select: {
               id: true,
               userId: true,
+              userName: true,
             },
           },
         },
@@ -143,7 +144,7 @@ export const projectsRouter = router({
         projectId: input,
       },
     });
-  }),
+  }),  
 
   // must be owner
   createPost: authedProcedure
@@ -168,6 +169,7 @@ export const projectsRouter = router({
         meetLocation: z.string(),
         imageUrl: z.string(),
         startDate: z.string(),
+        creatorName: z.string(),
         tags: z.array(z.string()),
       }),
     )
