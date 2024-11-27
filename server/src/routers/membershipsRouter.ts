@@ -9,6 +9,7 @@ export const membershipsRouter = router({
         ownerId: z.string(),
         userId: z.string(),
         description: z.optional(z.string()),
+        userName: z.string(),
         role: z.optional(
           z.object({
             status: z.string(),
@@ -25,6 +26,7 @@ export const membershipsRouter = router({
             ownerId: input.ownerId,
             userId: input.userId,
             description: input.description,
+            userName: input.userName,
           },
         });
       } else if (input.role.status === 'REJECTED') {
@@ -35,6 +37,7 @@ export const membershipsRouter = router({
           data: {
             status: 'PENDING',
             description: input.description,
+            userName: input.userName,
           },
         });
       }

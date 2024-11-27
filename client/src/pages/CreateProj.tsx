@@ -68,6 +68,7 @@ export default function CreateProj() {
         imageUrl: url,
         startDate: formState.startDate,
         tags: formState.tags,
+        creatorName: (user?.firstName + ' ' + user?.lastName)
       });
     },
   });
