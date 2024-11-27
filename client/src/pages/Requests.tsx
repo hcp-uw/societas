@@ -44,6 +44,25 @@ export default function Requests() {
     },
   });
 
+  const ProjectName = ({ projectId }: { projectId: string }) => {
+    const { data: name, isLoading, isError } = trpc.projects.getName.useQuery(projectId);
+ 
+    if (isLoading) return <div>Loading Title...</div>;
+    if (isError) return <div>Error fetching image</div>;
+ 
+    return name ?? '';
+  };
+
+  const ProjectImage = ({ projectId }: { projectId: string }) => {
+    const { data: imageUrl, isLoading, isError } = trpc.projects.getImage.useQuery(projectId);
+ 
+    if (isLoading) return <div>Loading image...</div>;
+    if (isError) return <div>Error fetching image</div>;
+ 
+    return <img src={imageUrl} alt="Project" width={200} height={200} />;
+  };
+
+
   function handleRejectReq(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -65,7 +84,8 @@ export default function Requests() {
       </h1>
     );
 
-  return (
+
+  return (   
     <div className="w-full flex flex-col gap-4 ml-8">
       {data.map((request) => (
         <div
@@ -73,14 +93,28 @@ export default function Requests() {
           className="flex justify-between w-full border-2 py-5 px-4 rounded-xl"
         >
           <div className="flex gap-6">
-            <img src={''} alt="" width={200} height={200} />
+            {/* <img src={''} alt="" width={200} height={200} /> */}
+            {/* <img src={trpc.projects.getById.useQuery(request.projectId).data?.imageUrl} alt="" width={200} height={200} /> */}
+            {/* <img src={trpc.projects.getImage.useQuery(request.projectId)} alt="" width={200} height={200} /> */}
+            <ProjectImage projectId={request.projectId} />
+
+
             <div className="">
               <p className="text-sm text-zinc-600">
                 {dayjjs(request.createdAt).toDate().toLocaleDateString()}
               </p>
               <h1 className="text-2xl font-bold text-zinc-800 mb-5">
-                {request.description}
+                <ProjectName projectId={request.projectId} />
               </h1>
+
+              <p className="text-2xl font-bold text-zinc-800 mb-5">
+                {request.userName}
+              </p>
+
+              <p className="text-xl text-zinc-800 mb-5">
+                {request.description}
+              </p>
+
 
               <p>{''}</p>
             </div>
@@ -99,6 +133,7 @@ export default function Requests() {
               </button>
             </form>
 
+
             <form onSubmit={handleRejectReq}>
               <input type="hidden" name="requestId" value={request.id} />
               {/* <input type="hidden" name="projectId" value={request.projectId} />
@@ -115,5 +150,6 @@ export default function Requests() {
         </div>
       ))}
     </div>
+
   );
 }

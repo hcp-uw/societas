@@ -2,17 +2,8 @@ import { useUser } from '@clerk/clerk-react';
 import { trpc } from '../utils/trpc';
 import { useState } from 'react';
 import { Form, useNavigate, useParams } from 'react-router-dom';
-import { FilesView, InputsView } from './CreateProj';
+import { FilesView, FormState, InputsView } from './CreateProj';
 import toast from 'react-hot-toast';
-
-type FormState = {
-  title: string;
-  description: string;
-  location: string;
-  maxMems: string;
-  startDate: string;
-  image: Blob | null | string;
-};
 
 export function EditProject() {
   const { user } = useUser();
@@ -21,27 +12,29 @@ export function EditProject() {
   const navigate = useNavigate();
 
   const { data: oldData } = trpc.projects.getById.useQuery(
-    params.projectId ?? '',
+    params.projectId ?? ''
   );
 
   const [formState, setFormState] = useState<FormState>(() =>
-    oldData
-      ? {
-          title: oldData.name,
-          description: oldData.description,
-          location: oldData.meetLocation,
-          maxMems: '0',
-          image: oldData.imageUrl,
-          startDate: oldData.startDate,
-        }
-      : {
-          title: '',
-          description: '',
-          location: '',
-          maxMems: '',
-          image: '',
-          startDate: '',
-        },
+    oldData ? {
+      title: oldData.name,
+      description: oldData.description,
+      location: oldData.meetLocation,
+      maxMems: '0',
+      meetType: oldData.meetType,
+      image: oldData.imageUrl,
+      startDate: oldData.startDate,
+      tags: oldData.tags
+    } : {
+      title: '',
+      description: '',
+      location: '',
+      maxMems: '',
+      image: '',
+      startDate: '',
+      meetType: 'in-person',
+      tags: []
+    }
   );
 
   // const getImageAsBlob = async (url : string) : Promise<Blob | null>  => {
@@ -63,10 +56,6 @@ export function EditProject() {
     return true;
   }
 
-  const [addedTags, setAddedTags] = useState<string[]>(
-    oldData ? oldData.tags : [],
-  );
-
   const tagMutation = trpc.tags.addTags.useMutation({
     onSuccess() {
       // TO DO:
@@ -76,7 +65,7 @@ export function EditProject() {
     onSuccess() {
       utils.projects.getById.invalidate();
       toast.success('Project Edited!');
-      tagMutation.mutate(addedTags);
+      tagMutation.mutate(formState.tags);
       navigate(`/${params.projectId}`);
     },
   });
@@ -100,8 +89,12 @@ export function EditProject() {
       meetLocation: formState.location,
       meetType: oldData?.meetType ?? '',
       imageUrl: oldData?.imageUrl ?? '',
-      tags: addedTags,
+      tags: formState.tags,
     });
+  }
+
+  function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setFormState(prev => ({ ...prev, [key]: value }));
   }
 
   return (
@@ -112,15 +105,13 @@ export function EditProject() {
       onSubmit={handleSubmit}
     >
       <div>
-        <FilesView formState={formState} setFormState={setFormState} />
+        <FilesView form={formState} onChange={updateForm} />
       </div>
       <InputsView
-        formState={formState}
-        setFormState={setFormState}
+        form={formState}
+        onChange={updateForm}
         isFormValid={isFormValid}
         loading={projMutation.isLoading}
-        addedTags={addedTags}
-        setAddedTags={setAddedTags}
       />
       <input type="hidden" name="ownerId" value={user?.id} />
       {/* Submit button for mobile view */}
