@@ -55,11 +55,13 @@ git pull origin main (make sure you have the latest version of the main branch b
 
 ## Current Member
 
-Angela Yang: PM/Frontend Github:Ajyang5
-
-Aaron Honjaya: Frontend
+Angela Yang: PM/Fullstack Github:Ajyang5
 
 Arjun Naik: Backend Github:Aleph-Null-123
+
+H: Frontend
+
+Weizhe Sun: Frontend
 
 Yang Jiao: Fullstack Github:yangy0912
 
@@ -70,7 +72,9 @@ Jingzhou Ma: UX/UI
 
 Vincent Liu: PM Github:VincentLiu777
 
-Santiago Gracias: PM/Frontend Github:SantiagoG14
+Santiago Garcia: PM/Frontend Github:SantiagoG14
+
+Aaron Honjaya: Frontend
 
 Jasmine Zhang: Frontend
 
