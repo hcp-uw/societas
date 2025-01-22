@@ -57,15 +57,18 @@ git pull origin main (make sure you have the latest version of the main branch b
 
 Angela Yang: PM/Fullstack Github:Ajyang5
 
-Arjun Naik: Backend Github:Aleph-Null-123
+Arjun Naik: Backend Github: Aleph-Null-123
 
-H: Frontend
+H: Frontend Github: elkwizard
 
-Weizhe Sun: Frontend
+Weizhe Sun: Frontend Github: APUCIKAA
+
+Lunjia Dai: Frontend Guthub: LD100M
 
 Yang Jiao: Fullstack Github:yangy0912
 
-Jingzhou Ma: UX/UI
+Jingzhou Ma: UX/UI Github: AngryYamcha
+
 
 
 ## Credits
