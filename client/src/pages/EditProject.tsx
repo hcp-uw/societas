@@ -112,10 +112,10 @@ export function EditProject() {
         onChange={updateForm}
         isFormValid={isFormValid}
         loading={projMutation.isLoading}
-      />
+      >
+        <button onClick={() => console.log(formState)}>Check Form State</button>
+      </InputsView>
       <input type="hidden" name="ownerId" value={user?.id} />
-      {/* Submit button for mobile view */}
-      <button onClick={() => console.log(formState)}> Check Form State</button>
     </Form>
   );
 }

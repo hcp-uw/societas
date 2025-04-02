@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Form, useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
@@ -171,13 +171,14 @@ export function InputsView({
   form,
   onChange,
   isFormValid,
-  loading
-}: {
+  loading,
+  children
+}: PropsWithChildren<{
   form: FormState;
   onChange: FormChangeHandler;
   isFormValid: () => boolean;
   loading: boolean;
-}) {
+}>) {
   const onRadioChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (target.checked) {
       onChange(target.name as keyof FormState, target.value);
@@ -283,7 +284,9 @@ export function InputsView({
         />
       </Input>
 
-      <SubmitBtnView isFormValid={isFormValid} desktop loading={loading} />
+      <SubmitBtnView isFormValid={isFormValid} desktop loading={loading}>
+		    {children}
+	    </SubmitBtnView>
     </div>
   );
 }
@@ -366,19 +369,21 @@ function SubmitBtnView({
   isFormValid,
   desktop,
   loading,
-}: {
+  children
+}: PropsWithChildren<{
   isFormValid: () => boolean;
   desktop: boolean;
   loading: boolean;
-}) {
+}>) {
   return (
     <SubmitWrapper $desktop={desktop}>
+      {children}
       <button
         //disabled while form is invalid. Changes to loading spinner when pressed.
         type="submit"
         disabled={!isFormValid()}
         aria-busy={loading}
-        className="group relative flex items-center justify-center bg-blue-500 text-zinc-100 cursor-pointer py-2 px-4 rounded-3xl transition-all hover:bg-blue-600 hover:shadow-md disabled:bg-blue-300 disabled:pointer-events-none min-w-[8rem] aria-busy:bg-blue-300 aria-busy:pointer-events-none"
+        className="group relative flex items-center justify-center bg-blue-500 text-zinc-100 cursor-pointer py-2 px-4 rounded-3xl transition-all hover:bg-blue-600 hover:shadow-md disabled:bg-blue-300 disabled:pointer-events-none min-w-[8rem] aria-busy:bg-blue-300 aria-busy:pointer-events-none self-end"
       >
         <p className="text-lg font-medium group-aria-busy:opacity-0">
           Create Project
@@ -395,17 +400,10 @@ function SubmitBtnView({
 }
 
 const SubmitWrapper = styled.div<{ $desktop?: boolean }>`
-  width: 100%;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  display: ${props => props.$desktop ? 'none' : 'default'};
-  @media (min-width: 62rem) {
-    display: inline-block;
-    display: ${props => props.$desktop ? 'flex' : 'none'};
-    justify-content: flex-end;
-    align-items: flex-end;
-  }
+	display: inline-block;
+	display: ${props => props.$desktop ? 'flex' : 'none'};
+	justify-content: space-between;
+	align-items: center;
 `;
 
 const Image = styled.div`
